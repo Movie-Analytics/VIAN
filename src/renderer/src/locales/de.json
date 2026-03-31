@@ -44,6 +44,14 @@
       "updateAvailable": "Update verfügbar",
       "openVideo": "Video öffnen",
       "importProject": "Projekt importieren",
+
+      "tooltips": {
+        "logout": "Abmelden",
+        "openProject": "Projekt öffnen",
+        "renameProject": "Projekt umbenennen",
+        "deleteProject": "Projekt löschen"
+      },
+
       "renameProject": {
         "title": "Projekt umbenennen",
         "newNameLabel": "Neuer Projektname"
@@ -141,6 +149,16 @@
       }
     },
 
+    "vocabularyDialogListItem": {
+      "tooltips": {
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "editItem": "Eintrag bearbeiten",
+        "exportItem": "Eintrag exportieren",
+        "deleteItem": "Eintrag löschen"
+      }
+    },
+
     "shotDetail": {
       "noSelection": "Keine Elemente in der Timeline ausgewählt",
       "multipleSelected": "Mehrere Elemente ausgewählt",
@@ -171,7 +189,32 @@
     },
 
     "videoPlayer": {
-      "playbackRateHelp": "Wiedergabegeschwindigkeit (KL-System)\n\nK: Stopp\nL: Vorwärts abspielen (2x, 4x, 8x, 16x)\n\nMehrfach drücken, um die Geschwindigkeit zu erhöhen"
+      "playbackRateHelp": "Wiedergabegeschwindigkeit anpassen",
+      "tooltips": {
+        "jumpBackward": "5 Sekunden zurückspringen",
+        "previousFrame": "Vorheriges Bild",
+        "playVideo": "Video abspielen",
+        "pausePlayback": "Wiedergabe pausieren",
+        "nextFrame": "Nächstes Bild",
+        "jumpForward": "5 Sekunden vorspringen",
+        "pictureInPicture": "Bild-in-Bild",
+        "takeScreenshot": "Screenshot aufnehmen",
+        "adjustVolume": "Lautstärke anpassen",
+        "unmuteOrAdjustVolume": "Stummschaltung aufheben oder Lautstärke anpassen",
+        "showSubtitles": "Untertitel anzeigen",
+        "hideSubtitles": "Untertitel ausblenden"
+      }
+    },
+
+    "timelines": {
+      "tooltips": {
+        "deleteSelectedSegment": "Ausgewähltes Segment löschen",
+        "splitSelectedSegment": "Ausgewähltes Segment teilen",
+        "mergeSelectedSegments": "Ausgewählte Segmente zusammenführen",
+        "showCategories": "Kategorien anzeigen",
+        "hideCategories": "Kategorien ausblenden",
+        "timelineOptions": "Timeline-Optionen"
+      }
     },
 
     "timelineCanvas": {

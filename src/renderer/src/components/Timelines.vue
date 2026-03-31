@@ -1,35 +1,62 @@
 <template>
   <v-sheet class="d-flex flex-1-1 flex-column height-min-0">
     <div>
-      <v-btn
-        density="compact"
-        variant="text"
-        :disabled="!segmentDeletable"
-        icon
-        @click="segmentDelete"
+      <v-tooltip
+        :text="$t('components.timelines.tooltips.deleteSelectedSegment')"
+        location="bottom"
       >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
+        <template #activator="{ props }">
+          <span v-bind="props">
+            <v-btn
+              density="compact"
+              variant="text"
+              :disabled="!segmentDeletable"
+              icon
+              :aria-label="$t('components.timelines.tooltips.deleteSelectedSegment')"
+              @click="segmentDelete"
+            >
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </span>
+        </template>
+      </v-tooltip>
 
-      <v-btn
-        density="compact"
-        variant="text"
-        :disabled="!segmentSplitable"
-        icon
-        @click="segmentSplit"
-      >
-        <v-icon>mdi-table-split-cell</v-icon>
-      </v-btn>
+      <v-tooltip :text="$t('components.timelines.tooltips.splitSelectedSegment')" location="bottom">
+        <template #activator="{ props }">
+          <span v-bind="props">
+            <v-btn
+              density="compact"
+              variant="text"
+              :disabled="!segmentSplitable"
+              icon
+              :aria-label="$t('components.timelines.tooltips.splitSelectedSegment')"
+              @click="segmentSplit"
+            >
+              <v-icon>mdi-table-split-cell</v-icon>
+            </v-btn>
+          </span>
+        </template>
+      </v-tooltip>
 
-      <v-btn
-        density="compact"
-        variant="text"
-        :disabled="!segmentMergable"
-        icon
-        @click="segmentMerge"
+      <v-tooltip
+        :text="$t('components.timelines.tooltips.mergeSelectedSegments')"
+        location="bottom"
       >
-        <v-icon>mdi-table-merge-cells</v-icon>
-      </v-btn>
+        <template #activator="{ props }">
+          <span v-bind="props">
+            <v-btn
+              density="compact"
+              variant="text"
+              :disabled="!segmentMergable"
+              icon
+              :aria-label="$t('components.timelines.tooltips.mergeSelectedSegments')"
+              @click="segmentMerge"
+            >
+              <v-icon>mdi-table-merge-cells</v-icon>
+            </v-btn>
+          </span>
+        </template>
+      </v-tooltip>
     </div>
 
     <div id="timelineAxesContainer"></div>
@@ -61,15 +88,32 @@
                 >
                   <template #append>
                     <v-list-item-action start>
-                      <v-btn
+                      <v-tooltip
                         v-if="timeline.categories"
-                        icon
-                        variant="text"
-                        density="compact"
-                        @click="timeline.visible = !timeline.visible"
+                        :text="
+                          timeline.visible
+                            ? $t('components.timelines.tooltips.hideCategories')
+                            : $t('components.timelines.tooltips.showCategories')
+                        "
+                        location="bottom"
                       >
-                        <v-icon>mdi-expand-all</v-icon>
-                      </v-btn>
+                        <template #activator="{ props }">
+                          <v-btn
+                            icon
+                            variant="text"
+                            density="compact"
+                            v-bind="props"
+                            :aria-label="
+                              timeline.visible
+                                ? $t('components.timelines.tooltips.hideCategories')
+                                : $t('components.timelines.tooltips.showCategories')
+                            "
+                            @click="timeline.visible = !timeline.visible"
+                          >
+                            <v-icon>mdi-expand-all</v-icon>
+                          </v-btn>
+                        </template>
+                      </v-tooltip>
 
                       <v-menu>
                         <template #activator="{ props }">

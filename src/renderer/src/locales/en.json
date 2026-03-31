@@ -53,7 +53,13 @@
         "video": "Video",
         "projectFile": "Project file"
       },
-      "uploading": "Video uploading"
+      "uploading": "Video uploading",
+      "tooltips": {
+        "logout": "Logout",
+        "openProject": "Open project",
+        "renameProject": "Rename project",
+        "deleteProject": "Delete project"
+      }
     },
 
     "video": {
@@ -141,6 +147,16 @@
       }
     },
 
+    "vocabularyDialogListItem": {
+      "tooltips": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "editItem": "Edit item",
+        "exportItem": "Export item",
+        "deleteItem": "Delete item"
+      }
+    },
+
     "shotDetail": {
       "noSelection": "No elements in timeline selected",
       "multipleSelected": "Multiple elements selected",
@@ -171,7 +187,32 @@
     },
 
     "videoPlayer": {
-      "playbackRateHelp": "Playback Rate (KL System)\n\nK: Stop\nL: Play forward (2x, 4x, 8x, 16x)\n\nPress multiple times to increase speed"
+      "playbackRateHelp": "Playback Rate (KL System)\n\nK: Stop\nL: Play forward (2x, 4x, 8x, 16x)\n\nPress multiple times to increase speed",
+      "tooltips": {
+        "jumpBackward": "Jump backward 5 seconds",
+        "previousFrame": "Previous frame",
+        "playVideo": "Play video",
+        "pausePlayback": "Pause playback",
+        "nextFrame": "Next frame",
+        "jumpForward": "Jump forward 5 seconds",
+        "pictureInPicture": "Picture in picture",
+        "takeScreenshot": "Take screenshot",
+        "adjustVolume": "Adjust volume",
+        "unmuteOrAdjustVolume": "Unmute or adjust volume",
+        "showSubtitles": "Show subtitles",
+        "hideSubtitles": "Hide subtitles"
+      }
+    },
+
+    "timelines": {
+      "tooltips": {
+        "deleteSelectedSegment": "Delete selected segment",
+        "splitSelectedSegment": "Split selected segment",
+        "mergeSelectedSegments": "Merge selected segments",
+        "showCategories": "Show categories",
+        "hideCategories": "Hide categories",
+        "timelineOptions": "Timeline options"
+      }
     },
 
     "timelineCanvas": {
