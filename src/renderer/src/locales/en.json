@@ -123,11 +123,11 @@
         "duplicate": "Duplicate",
         "delete": "Delete",
         "rename": "Rename",
-        "linkVocabulary": "Link to vocabulary",
+        "linkVocabulary": "Link to Vocabulary",
         "renameTimelineTitle": "Rename Timeline",
         "newTimelineName": "New Timeline Name",
-        "linkVocabularyTitle": "Link vocabulary to timeline",
-        "selectVocabulary": "Select vocabulary"
+        "linkVocabularyTitle": "Link Vocabulary to Timeline",
+        "selectVocabulary": "Select Vocabulary"
       }
     }
   },
@@ -141,9 +141,9 @@
       "add": "Add {itemType}",
       "new": "New {itemType}",
       "types": {
-        "vocabulary": "vocabulary",
-        "category": "category",
-        "tag": "tag"
+        "vocabulary": "Vocabulary",
+        "category": "Category",
+        "tag": "Tag"
       }
     },
 
@@ -151,9 +151,9 @@
       "tooltips": {
         "save": "Save",
         "cancel": "Cancel",
-        "editItem": "Edit item",
-        "exportItem": "Export item",
-        "deleteItem": "Delete item"
+        "editItem": "Rename",
+        "exportItem": "Export",
+        "deleteItem": "Delete"
       }
     },
 

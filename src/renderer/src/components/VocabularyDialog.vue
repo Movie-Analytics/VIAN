@@ -1,22 +1,20 @@
 <template>
-  <v-dialog v-model="dialogShown" persistent max-width="500">
+  <v-dialog v-model="dialogShown" persistent max-width="1000">
     <v-card>
       <v-card-title>{{ $t('components.vocabularyDialog.title') }}</v-card-title>
 
       <v-card-text>
-        <VocabularyDialogList
-          :id="null"
-          :items="undoableStore.vocabularies"
-          :level="1"
-        ></VocabularyDialogList>
+        <VocabularyDialogList :id="null" :items="undoableStore.vocabularies"></VocabularyDialogList>
       </v-card-text>
 
       <v-card-actions>
-        <v-btn color="info" @click="importVocab">
+        <v-btn color="primary" @click="importVocab">
           {{ $t('common.import') }}
         </v-btn>
 
-        <v-btn color="warning" @click="dialogShown = false">
+        <v-spacer></v-spacer>
+
+        <v-btn color="primary" @click="dialogShown = false">
           {{ $t('common.close') }}
         </v-btn>
       </v-card-actions>
