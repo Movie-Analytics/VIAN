@@ -530,7 +530,7 @@ export default {
 
     selectTimeline(id) {
       this.tempStore.selectedSegments = new Map()
-      this.tempStore.selectedTimelineId = id
+      this.tempStore.activeTimelineId = id
     },
 
     toggleTimelineLock(id) {
