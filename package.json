@@ -18,7 +18,8 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
-    "build:web": "vite build --config vite_web.config.mjs"
+    "build:web": "vite build --config vite_web.config.mjs",
+    "bench": "node bench/run.mjs"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -45,7 +46,9 @@
     "eslint": "^9.21.0",
     "eslint-plugin-vue": "^9.32.0",
     "pinia": "^2.2.6",
+    "playwright": "^1.59.1",
     "prettier": "^3.3.2",
+    "tinybench": "^6.0.1",
     "vite": "^6.0.0",
     "vite-plugin-vuetify": "^2.0.4",
     "vue": "^3.4.30",

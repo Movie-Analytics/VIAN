@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>VIAN Bench</title>
+    <style>
+      body {
+        margin: 0;
+        width: 1920px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- TimelineCanvas teleports the time axis here -->
+    <div id="timelineAxesContainer"></div>
+
+    <!-- TimelineCanvas.resize() reads this element's scroll dimensions -->
+    <div id="timelineSplitter" style="width: 1920px; overflow: hidden"></div>
+
+    <div id="app" style="width: 1920px; position: relative"></div>
+
+    <script type="module" src="./main.bench.js"></script>
+  </body>
+</html>
