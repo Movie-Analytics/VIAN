@@ -52,8 +52,8 @@ export default {
     return {
       associatedAnnotations: [],
       isOpen: false,
-      posX: 0,
-      posY: 0,
+      originX: 50,
+      originY: 50,
       screenshot: null,
       zoom: 1
     }
@@ -64,8 +64,8 @@ export default {
 
     imageStyle() {
       return {
-        transform: `translate(${this.posX}px, ${this.posY}px) scale(${this.zoom})`,
-        transformOrigin: '0 0'
+        transform: `scale(${this.zoom})`,
+        transformOrigin: `${this.originX}% ${this.originY}%`
       }
     },
 
@@ -122,12 +122,12 @@ export default {
 
         const newZoom = 3
         // Adjust position to zoom toward the mouse cursor
-        this.posX = mouseX - (mouseX - this.posX) * newZoom
-        this.posY = mouseY - (mouseY - this.posY) * newZoom
+        this.originX = (mouseX / rect.width) * 100
+        this.originY = (mouseY / rect.height) * 100
         this.zoom = newZoom
       } else {
-        this.posX = 0
-        this.posY = 0
+        this.originX = 50
+        this.originY = 50
         this.zoom = 1
       }
     },
@@ -143,14 +143,10 @@ export default {
       const mouseY = e.clientY - rect.top
 
       // Adjust position to zoom toward the mouse cursor
-      this.posX = mouseX - (mouseX - this.posX) * (newZoom / this.zoom)
-      this.posY = mouseY - (mouseY - this.posY) * (newZoom / this.zoom)
+      this.originX = (mouseX / rect.width) * 100
+      this.originY = (mouseY / rect.height) * 100
 
       this.zoom = newZoom
-      if (newZoom === 1) {
-        this.posX = 0
-        this.posY = 0
-      }
     },
 
     show(screenshot) {
@@ -177,8 +173,9 @@ export default {
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
 }
 .image {
+  object-fit: contain;
+  max-height: 100%;
   max-width: 100%;
-  max-height: 60vh;
   transition: transform 0.1s ease;
   cursor: zoom-in;
 }
@@ -186,8 +183,10 @@ export default {
   cursor: zoom-out;
 }
 .image-container {
+  height: 60vh;
   max-height: 60vh;
-  max-width: 100%;
+  max-width: 90%;
+  margin: auto;
   overflow: hidden;
   display: flex;
   justify-content: center;
