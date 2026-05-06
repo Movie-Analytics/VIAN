@@ -2,13 +2,15 @@
   <v-dialog v-model="isOpen" max-height="90vh" max-width="90vw">
     <v-card :title="title">
       <v-card-text class="container">
-        <div
-          class="image-container"
-          :class="{ zoomed: zoom != 1 }"
-          @click="handleZoomClick"
-          @wheel.prevent="handleZoomWheel"
-        >
-          <v-img :src="screenshot.image" class="image" :style="imageStyle" />
+        <div class="image-container">
+          <img
+            :src="screenshot.image"
+            class="image"
+            :class="{ zoomed: zoom != 1 }"
+            :style="imageStyle"
+            @click="handleZoomClick"
+            @wheel.prevent="handleZoomWheel"
+          />
         </div>
 
         <v-list>
@@ -178,16 +180,18 @@ export default {
   max-width: 100%;
   max-height: 60vh;
   transition: transform 0.1s ease;
+  cursor: zoom-in;
+}
+.image.zoomed {
+  cursor: zoom-out;
 }
 .image-container {
   max-height: 60vh;
-  max-width: 90%;
-  margin: auto;
-  cursor: zoom-in;
+  max-width: 100%;
   overflow: hidden;
-}
-.image-container.zoomed {
-  cursor: zoom-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .timeline {
   width: 100%;
