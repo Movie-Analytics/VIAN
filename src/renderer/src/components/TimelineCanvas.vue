@@ -695,11 +695,12 @@ export default {
       const EDGE_ZONE = 8
       const JOINT_ZONE = 2
       const rescale = this.transform.rescaleX(this.scale)
+      const data = this.data
       let best = null
       let bestScore = -1
 
-      for (let i = 0; i < this.data.length; i += 1) {
-        const d = this.data[i]
+      for (let i = 0; i < data.length; i += 1) {
+        const d = data[i]
         if (d.type === 'shot' && coordY >= d.y && coordY <= d.y + d.height) {
           const rightEdgeX = rescale(d.x + d.width)
           const distRight = Math.abs(coordX - rightEdgeX)
@@ -707,7 +708,7 @@ export default {
             const score = (EDGE_ZONE - distRight) * (coordX <= rightEdgeX ? 2 : 1)
             if (score > bestScore) {
               bestScore = score
-              const next = this.data[i + 1]
+              const next = data[i + 1]
               const touching =
                 next &&
                 next.type === 'shot' &&
@@ -723,7 +724,7 @@ export default {
             const score = (EDGE_ZONE - distLeft) * (coordX >= leftEdgeX ? 2 : 1)
             if (score > bestScore) {
               bestScore = score
-              const prev = this.data[i - 1]
+              const prev = data[i - 1]
               const touching =
                 prev &&
                 prev.type === 'shot' &&
