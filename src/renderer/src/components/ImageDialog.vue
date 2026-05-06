@@ -2,7 +2,14 @@
   <v-dialog v-model="isOpen" max-height="90vh" max-width="90vw">
     <v-card :title="title">
       <v-card-text class="container">
-        <v-img :src="screenshot.image" contain max-height="60vh" />
+        <div
+          class="image-container"
+          :class="{ zoomed: zoom != 1 }"
+          @click="handleZoomClick"
+          @wheel.prevent="handleZoomWheel"
+        >
+          <v-img :src="screenshot.image" class="image" :style="imageStyle" />
+        </div>
 
         <v-list>
           <v-list-item v-for="item in associatedAnnotations" :key="item.timeline" class="item">
@@ -43,12 +50,22 @@ export default {
     return {
       associatedAnnotations: [],
       isOpen: false,
-      screenshot: null
+      posX: 0,
+      posY: 0,
+      screenshot: null,
+      zoom: 1
     }
   },
 
   computed: {
     ...mapStores(useMainStore, useUndoableStore),
+
+    imageStyle() {
+      return {
+        transform: `translate(${this.posX}px, ${this.posY}px) scale(${this.zoom})`,
+        transformOrigin: '0 0'
+      }
+    },
 
     title() {
       return (
@@ -95,6 +112,45 @@ export default {
       this.associatedAnnotations = annotations
     },
 
+    handleZoomClick(e) {
+      if (this.zoom === 1) {
+        const rect = e.target.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+
+        const newZoom = 3
+        // Adjust position to zoom toward the mouse cursor
+        this.posX = mouseX - (mouseX - this.posX) * newZoom
+        this.posY = mouseY - (mouseY - this.posY) * newZoom
+        this.zoom = newZoom
+      } else {
+        this.posX = 0
+        this.posY = 0
+        this.zoom = 1
+      }
+    },
+
+    handleZoomWheel(e) {
+      const delta = e.deltaY > 0 ? -0.2 : 0.2
+      // Limit zoom between 1x and 6x
+      const newZoom = Math.min(Math.max(1, this.zoom + delta), 6)
+
+      const imgContainer = document.querySelector('.image-container')
+      const rect = imgContainer.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
+
+      // Adjust position to zoom toward the mouse cursor
+      this.posX = mouseX - (mouseX - this.posX) * (newZoom / this.zoom)
+      this.posY = mouseY - (mouseY - this.posY) * (newZoom / this.zoom)
+
+      this.zoom = newZoom
+      if (newZoom === 1) {
+        this.posX = 0
+        this.posY = 0
+      }
+    },
+
     show(screenshot) {
       this.screenshot = screenshot
       this.getAssociatedAnnotations()
@@ -117,6 +173,21 @@ export default {
   margin-top: 8px;
   border-radius: 4px !important;
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+.image {
+  max-width: 100%;
+  max-height: 60vh;
+  transition: transform 0.1s ease;
+}
+.image-container {
+  max-height: 60vh;
+  max-width: 90%;
+  margin: auto;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+.image-container.zoomed {
+  cursor: zoom-out;
 }
 .timeline {
   width: 100%;
