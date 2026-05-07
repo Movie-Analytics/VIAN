@@ -9,10 +9,72 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const outputIdx = process.argv.indexOf('--output')
 const outputPath = outputIdx !== -1 ? process.argv[outputIdx + 1] : null
 
-// Zoom so ~100 shots are visible across the 1920px canvas:
-// 100 shots × 120 frames = 12,000 frames → zoom ≈ 259200/12000 ≈ 22
-const ZOOM = 22
 const DRAW_N = 100
+
+// Each scenario describes a distinct draw-path to benchmark.
+// setup() is called before warmup+measure; state persists into the draw loop.
+const SCENARIOS = [
+  {
+    key: 'zoom22',
+    label: 'zoom=22  (~100 shots visible, baseline)',
+    setup: () => {
+      window.__bench.lockTimelines(0)
+      window.__bench.clearSelection()
+      window.__bench.setTmpShot(false)
+      window.__bench.setZoom(22)
+    },
+  },
+  {
+    key: 'zoom1',
+    label: 'zoom=1   (fully zoomed out, all ~43k segments in view)',
+    setup: () => {
+      window.__bench.lockTimelines(0)
+      window.__bench.clearSelection()
+      window.__bench.setTmpShot(false)
+      window.__bench.setZoom(1)
+    },
+  },
+  {
+    key: 'zoom100',
+    label: 'zoom=100 (~10 shots visible, heavy culling)',
+    setup: () => {
+      window.__bench.lockTimelines(0)
+      window.__bench.clearSelection()
+      window.__bench.setTmpShot(false)
+      window.__bench.setZoom(100)
+    },
+  },
+  {
+    key: 'selection50',
+    label: 'zoom=22, 50 segments selected',
+    setup: () => {
+      window.__bench.lockTimelines(0)
+      window.__bench.setTmpShot(false)
+      window.__bench.setZoom(22)
+      window.__bench.selectSegments(50)
+    },
+  },
+  {
+    key: 'tmpshot',
+    label: 'zoom=22, one segment being dragged',
+    setup: () => {
+      window.__bench.lockTimelines(0)
+      window.__bench.clearSelection()
+      window.__bench.setZoom(22)
+      window.__bench.setTmpShot(true)
+    },
+  },
+  {
+    key: 'locked20',
+    label: 'zoom=22, all 20 timelines locked (stripe rendering)',
+    setup: () => {
+      window.__bench.clearSelection()
+      window.__bench.setTmpShot(false)
+      window.__bench.setZoom(22)
+      window.__bench.lockTimelines(20)
+    },
+  },
+]
 
 const server = await createServer({
   configFile: resolve(__dirname, 'vite.config.bench.mjs')
@@ -39,16 +101,6 @@ while (!ready) {
   if (!ready) await page.waitForTimeout(500)
 }
 
-// Set a meaningful zoom and let it settle
-await page.evaluate((k) => window.__bench.setZoom(k), ZOOM)
-await page.waitForTimeout(200)
-
-// Warmup
-await page.evaluate((n) => window.__bench.runDraw(n), 10)
-
-// Measure
-const drawTimes = await page.evaluate((n) => window.__bench.runDraw(n), DRAW_N)
-
 function stats(times) {
   const sorted = [...times].sort((a, b) => a - b)
   const mean = times.reduce((a, b) => a + b, 0) / times.length
@@ -57,24 +109,38 @@ function stats(times) {
     p50: sorted[Math.floor(sorted.length * 0.5)],
     p95: sorted[Math.floor(sorted.length * 0.95)],
     p99: sorted[Math.floor(sorted.length * 0.99)],
-    samples: times.length
+    samples: times.length,
   }
 }
-
-const results = { draw: stats(drawTimes) }
 
 function fmt(ms) {
   return ms.toFixed(3) + 'ms'
 }
 
+const results = {}
+
 console.log('\n=== VIAN Timeline Benchmark ===')
-console.log('Dataset: 3h · 20 timelines · ~5s shots · ~43k segments · zoom=' + ZOOM)
+console.log('Dataset: 3h · 20 timelines · ~5s shots · ~43k segments')
 console.log()
-console.log('draw() × ' + DRAW_N)
-console.log(
-  `  mean ${fmt(results.draw.mean)}  p50 ${fmt(results.draw.p50)}  p95 ${fmt(results.draw.p95)}  p99 ${fmt(results.draw.p99)}`
-)
-console.log()
+
+for (const scenario of SCENARIOS) {
+  await page.evaluate(scenario.setup)
+  await page.waitForTimeout(200)
+
+  // Warmup
+  await page.evaluate((n) => window.__bench.runDraw(n), 10)
+
+  // Measure
+  const times = await page.evaluate((n) => window.__bench.runDraw(n), DRAW_N)
+  results[scenario.key] = stats(times)
+
+  const s = results[scenario.key]
+  console.log(scenario.label)
+  console.log(
+    `  mean ${fmt(s.mean)}  p50 ${fmt(s.p50)}  p95 ${fmt(s.p95)}  p99 ${fmt(s.p99)}`
+  )
+  console.log()
+}
 
 if (outputPath) {
   writeFileSync(outputPath, JSON.stringify(results, null, 2))
