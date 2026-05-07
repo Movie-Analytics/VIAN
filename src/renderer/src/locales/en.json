@@ -92,7 +92,18 @@
         "switchToDarkMode": "Switch to Dark Mode",
         "layout": "Layout",
         "tabbedLayout": "Tabbed Layout",
-        "draggableLayout": "Draggable Layout"
+        "draggableLayout": "Draggable Layout",
+        "tooltips": {
+          "shotBoundaryDetection": "Automatically detect shot boundaries in the video",
+          "loadSubtitles": "Import a subtitle file and add it as a track",
+          "generateScreenshots": "Capture screenshots from the video at a set interval",
+          "manageVocabulary": "Create and edit vocabularies for structured annotation",
+          "importData": "Import annotations from external files",
+          "exportData": "Export annotations to external formats",
+          "switchToLightMode": "Switch the interface to light mode",
+          "switchToDarkMode": "Switch the interface to dark mode",
+          "layout": "Change the panel layout of the workspace"
+        }
       },
 
       "dialogs": {
@@ -212,7 +223,11 @@
         "showCategories": "Show categories",
         "hideCategories": "Hide categories",
         "lockTrack": "Lock/unlock track",
-        "timelineOptions": "Timeline options"
+        "timelineOptions": "Timeline options",
+        "duplicateTrack": "Create a copy of this track",
+        "deleteTrack": "Permanently remove this track and all its segments",
+        "renameTrack": "Change the name of this track",
+        "linkVocabularyToTrack": "Associate this track with a vocabulary for annotation"
       }
     },
 

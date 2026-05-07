@@ -4,7 +4,14 @@ import api from '@renderer/api'
 import { useUndoableStore } from './undoable'
 
 export const useTempStore = defineStore('temp', {
+  getters: {
+    selectedTimelineId: (state) =>
+      state.selectedSegments.size > 0
+        ? state.selectedSegments.values().next().value
+        : state.activeTimelineId
+  },
   state: () => ({
+    activeTimelineId: null,
     adjacentShot: null,
     imageCache: new Map(),
     jobs: [],

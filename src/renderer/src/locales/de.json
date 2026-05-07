@@ -94,7 +94,18 @@
         "switchToDarkMode": "Zum Dunkelmodus wechseln",
         "layout": "Layout",
         "tabbedLayout": "Tab-Layout",
-        "draggableLayout": "Verschiebbares Layout"
+        "draggableLayout": "Verschiebbares Layout",
+        "tooltips": {
+          "shotBoundaryDetection": "Shotgrenzen im Video automatisch erkennen",
+          "loadSubtitles": "Untertiteldatei importieren und als Spur hinzufügen",
+          "generateScreenshots": "Screenshots aus dem Video in festgelegtem Intervall aufnehmen",
+          "manageVocabulary": "Vokabulare für strukturierte Annotationen erstellen und bearbeiten",
+          "importData": "Annotationen aus externen Dateien importieren",
+          "exportData": "Annotationen in externe Formate exportieren",
+          "switchToLightMode": "Zur hellen Benutzeroberfläche wechseln",
+          "switchToDarkMode": "Zur dunklen Benutzeroberfläche wechseln",
+          "layout": "Panel-Layout des Arbeitsbereichs ändern"
+        }
       },
 
       "dialogs": {
@@ -214,7 +225,11 @@
         "showCategories": "Kategorien anzeigen",
         "hideCategories": "Kategorien ausblenden",
         "lockTrack": "Track sperren/entsperren",
-        "timelineOptions": "Timeline-Optionen"
+        "timelineOptions": "Timeline-Optionen",
+        "duplicateTrack": "Eine Kopie dieser Spur erstellen",
+        "deleteTrack": "Diese Spur und alle Segmente dauerhaft entfernen",
+        "renameTrack": "Den Namen dieser Spur ändern",
+        "linkVocabularyToTrack": "Diese Spur mit einem Vokabular für Annotationen verknüpfen"
       }
     },
 
