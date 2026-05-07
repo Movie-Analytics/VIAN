@@ -1,21 +1,23 @@
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import BenchApp from './App.bench.vue'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createVuetify } from 'vuetify'
 import { i18n } from '@renderer/i18n'
-import BenchApp from './App.bench.vue'
 import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
 // 3-hour video at 24fps, shots averaging ~5 seconds with ±50% random variation
 const FPS = 24
-const TOTAL_FRAMES = 3 * 3600 * FPS // 259,200
+// 259,200
+const TOTAL_FRAMES = 3 * 3600 * FPS
 const NUM_TIMELINES = 20
-const AVG_SHOT_FRAMES = 5 * FPS // 120 frames
+// 120 frames
+const AVG_SHOT_FRAMES = 5 * FPS
 
-function generateTimelines() {
+const generateTimelines = function generateTimelines() {
   return Array.from({ length: NUM_TIMELINES }, (_, i) => {
     const data = []
     let frame = 0
