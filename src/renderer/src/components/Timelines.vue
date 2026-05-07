@@ -105,24 +105,6 @@
                   <template #append>
                     <v-list-item-action start>
                       <v-btn
-                        v-tooltip="{
-                          text: $t('components.timelines.tooltips.lockTrack'),
-                          location: 'bottom'
-                        }"
-                        icon
-                        variant="text"
-                        density="compact"
-                        :aria-label="$t('components.timelines.tooltips.lockTrack')"
-                        @click.stop="toggleTimelineLock(id)"
-                      >
-                        <v-icon>{{
-                          undoableStore.getTimelineById(id).locked
-                            ? 'mdi-lock'
-                            : 'mdi-lock-open-outline'
-                        }}</v-icon>
-                      </v-btn>
-
-                      <v-btn
                         v-if="timeline.categories"
                         v-tooltip="{
                           text: timeline.visible
@@ -143,6 +125,24 @@
                         <v-icon>mdi-expand-all</v-icon>
                       </v-btn>
 
+                      <v-btn
+                        v-tooltip="{
+                          text: $t('components.timelines.tooltips.lockTrack'),
+                          location: 'bottom'
+                        }"
+                        icon
+                        variant="text"
+                        density="compact"
+                        :aria-label="$t('components.timelines.tooltips.lockTrack')"
+                        @click.stop="toggleTimelineLock(id)"
+                      >
+                        <v-icon size="x-small">{{
+                          undoableStore.getTimelineById(id).locked
+                            ? 'mdi-lock'
+                            : 'mdi-lock-open-outline'
+                        }}</v-icon>
+                      </v-btn>
+
                       <v-menu>
                         <template #activator="{ props }">
                           <v-btn variant="text" density="compact" icon v-bind="props">
@@ -152,21 +152,37 @@
 
                         <v-list class="pb-0 pt-0">
                           <v-list-item
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.duplicateTrack'),
+                              location: 'right'
+                            }"
                             :title="$t('pages.video.timelines.duplicate')"
                             @click="duplicateTimeline(id)"
                           ></v-list-item>
 
                           <v-list-item
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.deleteTrack'),
+                              location: 'right'
+                            }"
                             :title="$t('pages.video.timelines.delete')"
                             @click="deleteTimeline(id)"
                           ></v-list-item>
 
                           <v-list-item
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.renameTrack'),
+                              location: 'right'
+                            }"
                             :title="$t('pages.video.timelines.rename')"
                             @click="renameDialogOpen(id)"
                           ></v-list-item>
 
                           <v-list-item
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.linkVocabularyToTrack'),
+                              location: 'right'
+                            }"
                             :title="$t('pages.video.timelines.linkVocabulary')"
                             :disabled="!canLinkVocabulary(id)"
                             @click="linkVocabDialogOpen(id)"
@@ -514,7 +530,7 @@ export default {
 
     selectTimeline(id) {
       this.tempStore.selectedSegments = new Map()
-      this.tempStore.selectedTimelineId = id
+      this.tempStore.activeTimelineId = id
     },
 
     toggleTimelineLock(id) {
@@ -528,6 +544,20 @@ export default {
 <style scoped>
 #timeline-list {
   padding-top: 30px;
+}
+
+#timelineSplitter::-webkit-scrollbar {
+  width: 8px;
+}
+
+#timelineSplitter::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+#timelineSplitter::-webkit-scrollbar-thumb {
+  background: #aaaaaa;
+  border-radius: 4px;
 }
 
 :deep(.active-track) {

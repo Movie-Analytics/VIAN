@@ -2,6 +2,9 @@
   <v-app-bar density="compact">
     <v-app-bar-title>
       {{ $t('app.title') }}
+      <span v-if="mainStore.video" class="text-body-2 text-medium-emphasis">{{
+        mainStore.video.split(/[\\/]/).pop()
+      }}</span>
     </v-app-bar-title>
 
     <v-btn v-tooltip="$t('pages.video.tooltips.undo')" :disabled="!isUndoable" icon @click="undo">
@@ -65,18 +68,27 @@
   >
     <v-list v-model:opened="drawerGroupsOpen" density="compact" nav>
       <v-list-item
+        v-tooltip="{
+          text: $t('pages.video.drawer.tooltips.shotBoundaryDetection'),
+          location: 'left'
+        }"
         prepend-icon="mdi-movie-open"
         :title="$t('pages.video.drawer.shotBoundaryDetection')"
         @click="shotBoundaryDetectionClicked"
       ></v-list-item>
 
       <v-list-item
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.loadSubtitles'), location: 'left' }"
         :title="$t('pages.video.drawer.loadSubtitles')"
         prepend-icon="mdi-microphone-message"
         @click="loadSubtitles"
       ></v-list-item>
 
       <v-list-item
+        v-tooltip="{
+          text: $t('pages.video.drawer.tooltips.generateScreenshots'),
+          location: 'left'
+        }"
         prepend-icon="mdi-image-plus"
         :title="$t('pages.video.drawer.generateScreenshots')"
         @click="genScreenshotDialog = true"
@@ -85,6 +97,7 @@
       <v-divider class="my-5"></v-divider>
 
       <v-list-item
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.manageVocabulary'), location: 'left' }"
         prepend-icon="mdi-playlist-edit"
         :title="$t('pages.video.drawer.manageVocabulary')"
         @click="manageVocabulary"
@@ -93,6 +106,7 @@
       <v-list-group>
         <template #activator="{ props }">
           <v-list-item
+            v-tooltip="{ text: $t('pages.video.drawer.tooltips.importData'), location: 'left' }"
             v-bind="props"
             prepend-icon="mdi-import"
             :title="$t('pages.video.drawer.importData')"
@@ -115,6 +129,7 @@
       <v-list-group>
         <template #activator="{ props }">
           <v-list-item
+            v-tooltip="{ text: $t('pages.video.drawer.tooltips.exportData'), location: 'left' }"
             v-bind="props"
             prepend-icon="mdi-export"
             :title="$t('pages.video.drawer.exportData')"
@@ -150,6 +165,7 @@
 
       <v-list-item
         v-if="darkMode"
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.switchToLightMode'), location: 'left' }"
         prepend-icon="mdi-weather-sunny"
         :title="$t('pages.video.drawer.switchToLightMode')"
         @click="switchLightMode"
@@ -157,6 +173,7 @@
 
       <v-list-item
         v-else
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.switchToDarkMode'), location: 'left' }"
         prepend-icon="mdi-weather-night"
         :title="$t('pages.video.drawer.switchToDarkMode')"
         @click="switchLightMode"
@@ -165,6 +182,7 @@
       <v-list-group>
         <template #activator="{ props }">
           <v-list-item
+            v-tooltip="{ text: $t('pages.video.drawer.tooltips.layout'), location: 'left' }"
             v-bind="props"
             prepend-icon="mdi-arrow-expand-all"
             :title="$t('pages.video.drawer.layout')"

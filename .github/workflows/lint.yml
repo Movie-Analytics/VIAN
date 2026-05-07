@@ -62,7 +62,7 @@ jobs:
       - name: Build venv
         run: |
           cd server
-          uv venv
+          uv venv --python 3.12
 
       - name: Install linters
         run: |

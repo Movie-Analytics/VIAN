@@ -4,7 +4,14 @@ import api from '@renderer/api'
 import { useUndoableStore } from './undoable'
 
 export const useTempStore = defineStore('temp', {
+  getters: {
+    selectedTimelineId: (state) =>
+      state.selectedSegments.size > 0
+        ? state.selectedSegments.values().next().value
+        : state.activeTimelineId
+  },
   state: () => ({
+    activeTimelineId: null,
     adjacentShot: null,
     imageCache: new Map(),
     jobs: [],
@@ -13,7 +20,6 @@ export const useTempStore = defineStore('temp', {
     playPosition: 0,
     // Maps shot id -> timeline id
     selectedSegments: new Map(),
-    selectedTimelineId: null,
     timelinesFold: {},
     tmpShot: null
   }),
@@ -22,12 +28,6 @@ export const useTempStore = defineStore('temp', {
     initialize() {
       api.onJobsUpdate((data) => {
         this.jobs = data
-      })
-
-      this.$subscribe((_, state) => {
-        if (state.selectedSegments.size > 0) {
-          state.selectedTimelineId = state.selectedSegments.values().next().value
-        }
       })
     },
     async login(email, password) {
