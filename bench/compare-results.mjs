@@ -5,28 +5,32 @@ const [, , beforeFile, afterFile, beforeRef, afterRef] = process.argv
 const before = JSON.parse(readFileSync(beforeFile, 'utf8'))
 const after = JSON.parse(readFileSync(afterFile, 'utf8'))
 
-function pct(a, b) {
+const pct = function pct(a, b) {
   const diff = ((b - a) / a) * 100
   return (diff > 0 ? '+' : '') + diff.toFixed(1) + '%'
 }
 
-function row(metric, bScenario, aScenario) {
+const row = function row(metric, bScenario, aScenario) {
   const b = bScenario[metric]
   const a = aScenario[metric]
   const change = pct(b, a)
-  const flag = b - a > b * 0.05 ? ' ✓' : b - a < -b * 0.05 ? ' ✗' : ''
-  console.log(`  ${metric.padEnd(4)}  ${b.toFixed(3).padStart(8)}ms → ${a.toFixed(3).padStart(8)}ms  (${change})${flag}`)
+  let flag = ''
+  if (b - a > b * 0.05) flag = ' ✓'
+  else if (b - a < -b * 0.05) flag = ' ✗'
+  console.log(
+    `  ${metric.padEnd(4)}  ${b.toFixed(3).padStart(8)}ms → ${a.toFixed(3).padStart(8)}ms  (${change})${flag}`
+  )
 }
 
 // Labels for known scenario keys; falls back to the key itself.
 const LABELS = {
-  zoom22:      'zoom=22  (baseline)',
-  zoom1:       'zoom=1   (all segments visible)',
-  zoom100:     'zoom=100 (heavy culling)',
+  draw: 'draw (legacy)',
+  locked20: 'zoom=22, all locked',
   selection50: 'zoom=22, 50 selected',
-  tmpshot:     'zoom=22, dragging segment',
-  locked20:    'zoom=22, all locked',
-  draw:        'draw (legacy)',
+  tmpshot: 'zoom=22, dragging segment',
+  zoom1: 'zoom=1   (all segments visible)',
+  zoom100: 'zoom=100 (heavy culling)',
+  zoom22: 'zoom=22  (baseline)'
 }
 
 const keys = [...new Set([...Object.keys(before), ...Object.keys(after)])]
@@ -41,11 +45,11 @@ for (const key of keys) {
   if (!b || !a) {
     console.log(`${LABELS[key] ?? key}: missing in one result, skipping`)
     console.log()
-    continue
+  } else {
+    console.log(`${LABELS[key] ?? key}:`)
+    for (const m of ['mean', 'p50', 'p95', 'p99']) row(m, b, a)
+    console.log()
   }
-  console.log(`${LABELS[key] ?? key}:`)
-  for (const m of ['mean', 'p50', 'p95', 'p99']) row(m, b, a)
-  console.log()
 }
 
 console.log('✓ = >5% faster   ✗ = >5% slower')

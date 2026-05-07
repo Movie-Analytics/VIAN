@@ -1,13 +1,13 @@
-import { createServer } from 'vite'
+import { dirname, resolve } from 'path'
 import { chromium } from 'playwright'
-import { writeFileSync } from 'fs'
-import { resolve, dirname } from 'path'
+import { createServer } from 'vite'
 import { fileURLToPath } from 'url'
+import { writeFileSync } from 'fs'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const dir = dirname(fileURLToPath(import.meta.url))
 
 const outputIdx = process.argv.indexOf('--output')
-const outputPath = outputIdx !== -1 ? process.argv[outputIdx + 1] : null
+const outputPath = outputIdx === -1 ? null : process.argv[outputIdx + 1]
 
 const DRAW_N = 100
 
@@ -18,73 +18,73 @@ const SCENARIOS = [
     key: 'zoom22',
     label: 'zoom=22  (~100 shots visible, baseline)',
     setup: () => {
-      window.__bench.lockTimelines(0)
-      window.__bench.clearSelection()
-      window.__bench.setTmpShot(false)
-      window.__bench.setZoom(22)
-    },
+      window.bench.lockTimelines(0)
+      window.bench.clearSelection()
+      window.bench.setTmpShot(false)
+      window.bench.setZoom(22)
+    }
   },
   {
     key: 'zoom1',
     label: 'zoom=1   (fully zoomed out, all ~43k segments in view)',
     setup: () => {
-      window.__bench.lockTimelines(0)
-      window.__bench.clearSelection()
-      window.__bench.setTmpShot(false)
-      window.__bench.setZoom(1)
-    },
+      window.bench.lockTimelines(0)
+      window.bench.clearSelection()
+      window.bench.setTmpShot(false)
+      window.bench.setZoom(1)
+    }
   },
   {
     key: 'zoom100',
     label: 'zoom=100 (~10 shots visible, heavy culling)',
     setup: () => {
-      window.__bench.lockTimelines(0)
-      window.__bench.clearSelection()
-      window.__bench.setTmpShot(false)
-      window.__bench.setZoom(100)
-    },
+      window.bench.lockTimelines(0)
+      window.bench.clearSelection()
+      window.bench.setTmpShot(false)
+      window.bench.setZoom(100)
+    }
   },
   {
     key: 'selection50',
     label: 'zoom=22, 50 segments selected',
     setup: () => {
-      window.__bench.lockTimelines(0)
-      window.__bench.setTmpShot(false)
-      window.__bench.setZoom(22)
-      window.__bench.selectSegments(50)
-    },
+      window.bench.lockTimelines(0)
+      window.bench.setTmpShot(false)
+      window.bench.setZoom(22)
+      window.bench.selectSegments(50)
+    }
   },
   {
     key: 'tmpshot',
     label: 'zoom=22, one segment being dragged',
     setup: () => {
-      window.__bench.lockTimelines(0)
-      window.__bench.clearSelection()
-      window.__bench.setZoom(22)
-      window.__bench.setTmpShot(true)
-    },
+      window.bench.lockTimelines(0)
+      window.bench.clearSelection()
+      window.bench.setZoom(22)
+      window.bench.setTmpShot(true)
+    }
   },
   {
     key: 'locked20',
     label: 'zoom=22, all 20 timelines locked (stripe rendering)',
     setup: () => {
-      window.__bench.clearSelection()
-      window.__bench.setTmpShot(false)
-      window.__bench.setZoom(22)
-      window.__bench.lockTimelines(20)
-    },
-  },
+      window.bench.clearSelection()
+      window.bench.setTmpShot(false)
+      window.bench.setZoom(22)
+      window.bench.lockTimelines(20)
+    }
+  }
 ]
 
 const server = await createServer({
-  configFile: resolve(__dirname, 'vite.config.bench.mjs')
+  configFile: resolve(dir, 'vite.config.bench.mjs')
 })
 await server.listen()
 const { port } = server.config.server
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
-await page.setViewportSize({ width: 1920, height: 1080 })
+await page.setViewportSize({ height: 1080, width: 1920 })
 await page.goto(`http://localhost:${port}`)
 
 // Vite triggers a dep-optimization reload on the first run, which destroys the JS
@@ -94,14 +94,16 @@ let ready = false
 while (!ready) {
   if (Date.now() > deadline) throw new Error('Bench app failed to initialize within 90s')
   try {
-    ready = await page.evaluate(() => !!window.__benchReady)
+    // eslint-disable-next-line no-await-in-loop
+    ready = await page.evaluate(() => Boolean(window.benchReady))
   } catch {
-    // context destroyed during Vite HMR reload — keep polling
+    // Context destroyed during Vite HMR reload — keep polling
   }
+  // eslint-disable-next-line no-await-in-loop
   if (!ready) await page.waitForTimeout(500)
 }
 
-function stats(times) {
+const stats = function stats(times) {
   const sorted = [...times].sort((a, b) => a - b)
   const mean = times.reduce((a, b) => a + b, 0) / times.length
   return {
@@ -109,11 +111,11 @@ function stats(times) {
     p50: sorted[Math.floor(sorted.length * 0.5)],
     p95: sorted[Math.floor(sorted.length * 0.95)],
     p99: sorted[Math.floor(sorted.length * 0.99)],
-    samples: times.length,
+    samples: times.length
   }
 }
 
-function fmt(ms) {
+const fmt = function fmt(ms) {
   return ms.toFixed(3) + 'ms'
 }
 
@@ -124,21 +126,23 @@ console.log('Dataset: 3h · 20 timelines · ~5s shots · ~43k segments')
 console.log()
 
 for (const scenario of SCENARIOS) {
+  // eslint-disable-next-line no-await-in-loop
   await page.evaluate(scenario.setup)
+  // eslint-disable-next-line no-await-in-loop
   await page.waitForTimeout(200)
 
   // Warmup
-  await page.evaluate((n) => window.__bench.runDraw(n), 10)
+  // eslint-disable-next-line no-await-in-loop
+  await page.evaluate((n) => window.bench.runDraw(n), 10)
 
   // Measure
-  const times = await page.evaluate((n) => window.__bench.runDraw(n), DRAW_N)
+  // eslint-disable-next-line no-await-in-loop
+  const times = await page.evaluate((n) => window.bench.runDraw(n), DRAW_N)
   results[scenario.key] = stats(times)
 
   const s = results[scenario.key]
   console.log(scenario.label)
-  console.log(
-    `  mean ${fmt(s.mean)}  p50 ${fmt(s.p50)}  p95 ${fmt(s.p95)}  p99 ${fmt(s.p99)}`
-  )
+  console.log(`  mean ${fmt(s.mean)}  p50 ${fmt(s.p50)}  p95 ${fmt(s.p95)}  p99 ${fmt(s.p99)}`)
   console.log()
 }
 
