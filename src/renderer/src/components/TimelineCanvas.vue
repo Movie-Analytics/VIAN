@@ -94,20 +94,31 @@ import { useUndoableStore } from '@renderer/stores/undoable'
 const TIMELINE_HEIGHT = 49
 const PLAYHEAD_COLOR = '#ff0000'
 
-function truncateText(ctx, text, maxWidth) {
+const truncateText = (ctx, text, maxWidth) => {
   if (ctx.measureText(text).width <= maxWidth) return text
   let t = text
   while (t.length > 0 && ctx.measureText(t + '…').width > maxWidth) t = t.slice(0, -1)
   return t + '…'
 }
 
-function segmentFill(d, selectedSegments, selectedTimelineId) {
+const segmentFill = (d, selectedSegments, selectedTimelineId) => {
   if (selectedSegments.has(d.id)) return 'yellow'
   if (d.timeline === selectedTimelineId && d.fill !== '#aa5555') return '#e0e0e0'
   return d.fill
 }
 
-function drawSegment(d, x, xwidth, ctx, hCtx, selectedSegments, imageCache, rescale, fps, selectedTimelineId) {
+const drawSegment = (
+  d,
+  x,
+  xwidth,
+  ctx,
+  hCtx,
+  selectedSegments,
+  imageCache,
+  rescale,
+  fps,
+  selectedTimelineId
+) => {
   hCtx.fillStyle = d.hiddenColor
   if (d.type === 'shot') {
     ctx.fillStyle = segmentFill(d, selectedSegments, selectedTimelineId)
@@ -561,7 +572,7 @@ export default {
           }
         }
         if (timeline.locked) {
-          for (let row = startRow; row <= this.numTimelines; row++) {
+          for (let row = startRow; row <= this.numTimelines; row += 1) {
             lockedRows.push(row * TIMELINE_HEIGHT)
           }
         }
@@ -647,7 +658,18 @@ export default {
           // eslint-disable-next-line no-continue
           continue
 
-        drawSegment(d, x, xwidth, ctx, hCtx, selectedSegments, imageCache, rescale, fps, selectedTimelineId)
+        drawSegment(
+          d,
+          x,
+          xwidth,
+          ctx,
+          hCtx,
+          selectedSegments,
+          imageCache,
+          rescale,
+          fps,
+          selectedTimelineId
+        )
       }
 
       ctx.strokeStyle = 'rgba(0,0,0,0.22)'
