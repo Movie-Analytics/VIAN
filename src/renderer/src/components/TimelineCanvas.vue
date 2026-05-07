@@ -252,7 +252,7 @@ export default {
 
       if (entry) {
         // Select shots
-        if (entry.type === 'select') {
+        if (entry.type === 'select' && !entry.locked) {
           this.undoableStore.addVocabAnnotation(entry.id, entry.tag)
         } else if (Date.now() - this.lastClick < 500 && !entry.locked) {
           this.doubleClickPopup(entry)
@@ -518,6 +518,7 @@ export default {
             type: 'scalar'
           })
         }
+        const startRow = this.numTimelines
         if (timeline.vocabulary && this.tempStore.timelinesFold[timeline.id].visible) {
           for (const category of this.tempStore.timelinesFold[timeline.id].categories) {
             this.numTimelines += 1
@@ -534,6 +535,7 @@ export default {
                     fill: color,
                     height: 44,
                     id: shot.id,
+                    locked: timeline.locked,
                     tag: tag.id,
                     timeline: timeline.id,
                     type: 'select',
@@ -547,7 +549,11 @@ export default {
             }
           }
         }
-        if (timeline.locked) lockedRows.push(this.numTimelines * TIMELINE_HEIGHT)
+        if (timeline.locked) {
+          for (let row = startRow; row <= this.numTimelines; row++) {
+            lockedRows.push(row * TIMELINE_HEIGHT)
+          }
+        }
         this.numTimelines += 1
       }
 
