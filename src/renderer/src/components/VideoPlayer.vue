@@ -21,18 +21,21 @@
 
       <v-dialog v-model="missingVideoDialog" persistent max-width="500">
         <v-card>
-          <v-card-title>Video file not found</v-card-title>
+          <v-card-title>
+            {{ $t('components.videoPlayer.videoFileNotFound') }}
+          </v-card-title>
 
           <v-card-text>
-            The video could not be loaded. It may have been moved or deleted. You can ignore this or
-            choose a new video location.
+            {{ $t('components.videoPlayer.videoCouldNotBeLoaded') }}
           </v-card-text>
 
           <v-card-actions>
-            <v-btn color="warning" @click="missingVideoDialog = false"> Ignore </v-btn>
+            <v-btn color="warning" @click="missingVideoDialog = false">
+              {{ $t('common.ignore') }}
+            </v-btn>
 
             <v-btn color="primary" @click="chooseNewVideoLocation">
-              Choose new video location
+              {{ $t('components.videoPlayer.chooseNewVideoLocation') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -283,17 +286,17 @@ export default {
   },
 
   watch: {
-    'mainStore.video'() {
-      return this.$nextTick().then(() => {
-        const video = this.$refs.video
-        video?.load()
+    async 'mainStore.video'() {
+      await this.$nextTick()
 
-        setTimeout(() => {
-          if (!video || !video.duration || isNaN(video.duration)) {
-            this.videoError()
-          }
-        }, 1000)
-      })
+      const video = this.$refs.video
+      video?.load()
+
+      if (!this.mainStore.video) return
+
+      const videoExists = await this.checkVideoExists(this.mainStore.video)
+
+      this.missingVideoDialog = !videoExists
     },
 
     'tempStore.playJumpPosition'(newValue) {
@@ -336,20 +339,26 @@ export default {
       this.$refs.video.currentTime -= 1 / this.mainStore.fps
     },
 
+    async checkVideoExists(url) {
+      try {
+        const res = await fetch(url, { method: 'HEAD' })
+        return res.ok
+      } catch {
+        return false
+      }
+    },
+
     async chooseNewVideoLocation() {
       const newVideoLocation = await this.metaStore.chooseNewVideo()
 
-      if (!newVideoLocation) {
-        this.missingVideoDialog = false
-        return
-      }
-
       this.missingVideoDialog = false
+
+      if (!newVideoLocation) return
+
       this.mainStore.openVideo(this.mainStore.id, newVideoLocation)
 
-      this.$nextTick().then(() => {
-        this.$refs.video?.load()
-      })
+      await this.$nextTick()
+      this.$refs.video?.load()
     },
 
     durationChange(event) {
@@ -475,10 +484,7 @@ export default {
 
     videoError() {
       this.stopPlayback()
-
-      if (!this.missingVideoDialog) {
-        this.missingVideoDialog = true
-      }
+      this.missingVideoDialog = true
     },
 
     videoTimeUpdate(event) {
