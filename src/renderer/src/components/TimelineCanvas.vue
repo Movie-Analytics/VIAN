@@ -65,6 +65,29 @@
 
     <canvas ref="hiddenCanvas" height="0" class="d-none"></canvas>
 
+    <div class="position-fixed" :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }">
+      <v-menu v-model="contextMenuVisible" activator="parent">
+        <v-list density="compact" class="pb-0 pt-0">
+          <v-list-item :title="contextMenuAnnotateLabel" @click="contextMenuAnnotate" />
+
+          <template v-if="contextMenuEntry && contextMenuEntry.type === 'shot'">
+            <v-list-item
+              :disabled="!contextMenuMergable"
+              :title="$t('components.timelineCanvas.contextMenu.merge')"
+              @click="contextMenuMerge"
+            />
+
+            <v-divider />
+
+            <v-list-item
+              :title="$t('components.timelineCanvas.contextMenu.removeSegment')"
+              @click="contextMenuDelete"
+            />
+          </template>
+        </v-list>
+      </v-menu>
+    </div>
+
     <v-snackbar v-model="moveWarning" color="warning" timeout="6000" location="top">
       {{ $t('components.timelineCanvas.moveWarning') }}
     </v-snackbar>
@@ -175,6 +198,10 @@ export default {
       axisColor: 'black',
       canvasHeight: 0,
       canvasWidth: 500,
+      contextMenuEntry: null,
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
       ctx: null,
       data: [],
       dpr: window.devicePixelRatio || 1,
@@ -204,6 +231,25 @@ export default {
 
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
+
+    contextMenuAnnotateLabel() {
+      if (this.contextMenuEntry?.type === 'select') {
+        return this.$t('components.timelineCanvas.contextMenu.toggleAnnotation')
+      }
+      return this.$t('components.timelineCanvas.contextMenu.addTextAnnotation')
+    },
+
+    contextMenuMergable() {
+      if (this.tempStore.selectedSegments.size <= 1) return false
+      const timelineId = this.tempStore.selectedSegments.values().next().value
+      const timeline = this.undoableStore.timelines.find((t) => t.id === timelineId)
+      if (!timeline || timeline.type !== 'shots') return false
+      const timelineDataIds = timeline.data.map((d) => d.id)
+      const indices = Array.from(this.tempStore.selectedSegments.keys())
+        .map((s) => timelineDataIds.indexOf(s))
+        .sort((a, b) => a - b)
+      return indices[indices.length - 1] - indices[0] === indices.length - 1
+    },
 
     scrollMax() {
       return Math.max(0, Math.round(this.canvasWidth * (this.transform.k - 1)))
@@ -281,6 +327,7 @@ export default {
     this.resizeoberserver.observe(this.$refs.canvas)
 
     d3.select(this.$refs.canvas).on('click', (e) => this.clickHandler(e))
+    d3.select(this.$refs.canvas).on('contextmenu', (e) => this.contextMenuHandler(e))
     d3.select(this.$refs.canvas).on('mousedown', (e) => this.mousedown(e))
     d3.select(this.$refs.canvas).on('mouseleave', (e) => this.mouseleave(e))
     d3.select(this.$refs.canvas).on('mousemove', (e) => this.mousemove(e))
@@ -367,6 +414,49 @@ export default {
         this.requestDraw()
       }
       this.lastClick = Date.now()
+    },
+
+    contextMenuAnnotate() {
+      if (!this.contextMenuEntry) return
+      if (this.contextMenuEntry.type === 'select') {
+        this.undoableStore.addVocabAnnotation(this.contextMenuEntry.id, this.contextMenuEntry.tag)
+      } else {
+        this.doubleClickPopup(this.contextMenuEntry)
+      }
+    },
+
+    contextMenuDelete() {
+      if (!this.contextMenuEntry) return
+      const timelineId = this.contextMenuEntry.timeline
+      const segmentIds = Array.from(this.tempStore.selectedSegments.keys())
+      this.undoableStore.deleteSegments(timelineId, segmentIds)
+      this.tempStore.selectedSegments = new Map()
+    },
+
+    contextMenuHandler(event) {
+      event.preventDefault()
+      const rect = this.$refs.canvas.getBoundingClientRect()
+      const x = (event.clientX - rect.left) * this.dpr
+      const y = (event.clientY - rect.top) * this.dpr
+      const entry = this.getEntryAtPosition(x, y)
+      if (!entry) return
+
+      if (!this.tempStore.selectedSegments.has(entry.id)) {
+        this.tempStore.selectedSegments = new Map([[entry.id, entry.timeline]])
+        this.requestDraw()
+      }
+
+      this.contextMenuEntry = entry
+      this.contextMenuX = event.clientX
+      this.contextMenuY = event.clientY
+      this.contextMenuVisible = true
+    },
+
+    contextMenuMerge() {
+      if (!this.contextMenuMergable) return
+      const segments = this.tempStore.selectedSegments
+      this.undoableStore.mergeSegments(segments.values().next().value, Array.from(segments.keys()))
+      this.tempStore.selectedSegments = new Map()
     },
 
     doubleClickPopup(entry) {

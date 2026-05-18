@@ -235,7 +235,13 @@
 
     "timelineCanvas": {
       "annotations": "Annotation",
-      "moveWarning": "Segment kann hier nicht verschoben werden, da es sich mit einem anderen Segment überschneiden würde."
+      "moveWarning": "Segment kann hier nicht verschoben werden, da es sich mit einem anderen Segment überschneiden würde.",
+      "contextMenu": {
+        "addTextAnnotation": "Textannotation hinzufügen",
+        "toggleAnnotation": "Annotation umschalten",
+        "merge": "Ausgewählte Segmente zusammenführen",
+        "removeSegment": "Segment entfernen"
+      }
     }
   }
 }

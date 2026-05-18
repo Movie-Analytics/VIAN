@@ -233,7 +233,13 @@
 
     "timelineCanvas": {
       "annotations": "Annotation",
-      "moveWarning": "Segment cannot be moved here as it would overlap with another segment."
+      "moveWarning": "Segment cannot be moved here as it would overlap with another segment.",
+      "contextMenu": {
+        "addTextAnnotation": "Add text annotation",
+        "toggleAnnotation": "Toggle annotation",
+        "merge": "Merge selected segments",
+        "removeSegment": "Remove segment"
+      }
     }
   }
 }
