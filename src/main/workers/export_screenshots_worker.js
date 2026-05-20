@@ -58,7 +58,10 @@ const exportScreenshots = async (storePath, location, frames) => {
 
 console.log('Started screenshot export worker')
 
-exportScreenshots(workerData.storePath, workerData.location, workerData.frames).then((err) => {
-  if (err) throw err
-  else parentPort.postMessage(true)
-})
+exportScreenshots(workerData.storePath, workerData.location, workerData.frames)
+  .then(() => {
+    parentPort.postMessage(true)
+  })
+  .catch((error) => {
+    throw error
+  })

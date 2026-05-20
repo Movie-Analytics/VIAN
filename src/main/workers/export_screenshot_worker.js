@@ -50,7 +50,10 @@ exportScreenshot(
   workerData.location,
   workerData.screenshot,
   workerData.associatedAnnotations
-).then((err) => {
-  if (err) throw err
-  else parentPort.postMessage(true)
-})
+)
+  .then(() => {
+    parentPort.postMessage(true)
+  })
+  .catch((error) => {
+    throw error
+  })
