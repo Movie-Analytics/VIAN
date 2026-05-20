@@ -204,9 +204,26 @@
                     <template #activator>
                       <v-list-item
                         class="border-t-sm mt-1px"
-                        :title="category.name"
                         @click="category.visible = !category.visible"
-                      ></v-list-item>
+                      >
+                        <template #title>
+                          <div class="track-name-wrap">
+                            <span
+                              :ref="
+                                (el) => {
+                                  if (el) trackNameRefs[category.id] = el
+                                }
+                              "
+                              class="track-name-text"
+                              >{{ category.name }}</span
+                            >
+
+                            <div v-if="overflowingTracks[category.id]" class="track-name-popover">
+                              {{ category.name }}
+                            </div>
+                          </div>
+                        </template>
+                      </v-list-item>
                     </template>
 
                     <v-list-item
