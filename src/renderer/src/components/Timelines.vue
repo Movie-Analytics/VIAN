@@ -298,8 +298,8 @@ export default {
       selectedTimeline: null,
       selectedVocab: null,
       timelineName: '',
-      trackNameRefs: {},
-      trackListResizeObserver: null
+      trackListResizeObserver: null,
+      trackNameRefs: {}
     }
   },
 
