@@ -298,7 +298,8 @@ export default {
       selectedTimeline: null,
       selectedVocab: null,
       timelineName: '',
-      trackNameRefs: {}
+      trackNameRefs: {},
+      trackListResizeObserver: null
     }
   },
 
@@ -387,6 +388,8 @@ export default {
 
   mounted() {
     this.checkTrackNameOverflow()
+    this.trackListResizeObserver = new ResizeObserver(() => this.checkTrackNameOverflow())
+    this.trackListResizeObserver.observe(document.getElementById('timeline-list'))
     // Register shorcuts and menu actions
     shortcuts.register('Delete', this.segmentDelete)
     shortcuts.register('Backspace', this.segmentDelete)
@@ -399,6 +402,7 @@ export default {
   },
 
   beforeUnmount() {
+    this.trackListResizeObserver?.disconnect()
     for (const key of ['m', 's', 'Delete', 'Backspace']) {
       shortcuts.clear(key)
     }
