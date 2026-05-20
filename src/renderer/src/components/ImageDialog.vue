@@ -29,11 +29,9 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn :text="$t('common.export')" @click="exportScreenshot"></v-btn>
+        <v-btn color="primary" :text="$t('common.export')" @click="exportScreenshot"></v-btn>
 
-        <v-spacer></v-spacer>
-
-        <v-btn :text="$t('common.close')" @click="closeDialog"></v-btn>
+        <v-btn color="warning" :text="$t('common.close')" @click="closeDialog"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
