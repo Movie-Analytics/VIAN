@@ -189,9 +189,9 @@
 
     "videoPlayer": {
       "playbackRateHelp": "Playback Rate (KL System)\n\nK: Stop\nL: Play forward (2x, 4x, 8x, 16x)\n\nPress multiple times to increase speed",
-        "videoFileNotFound": "Video file not found",
-"videoCouldNotBeLoaded": "The video could not be loaded. It may have been moved or deleted. You can ignore this or choose a new video location.",
-"chooseNewVideoLocation": "Choose new video location",
+      "videoFileNotFound": "Video file not found",
+      "videoCouldNotBeLoaded": "The video could not be loaded. It may have been moved or deleted. You can ignore this or choose a new video location.",
+      "chooseNewVideoLocation": "Choose new video location",
       "tooltips": {
         "jumpBackward": "Jump backward 5 seconds",
         "previousFrame": "Previous frame",
