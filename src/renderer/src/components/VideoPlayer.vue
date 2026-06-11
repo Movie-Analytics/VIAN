@@ -122,16 +122,31 @@
               <v-icon>mdi-skip-forward</v-icon>
             </v-btn>
 
-            <v-chip
-              v-tooltip="{
-                text: $t('components.videoPlayer.playbackRateHelp'),
-                location: 'top'
-              }"
-              class="playback-rate"
-              variant="text"
-            >
-              {{ playbackRate }}x
-            </v-chip>
+            <v-menu>
+              <template #activator="{ props }">
+                <v-chip
+                  v-tooltip="{
+                    text: $t('components.videoPlayer.playbackRateHelp'),
+                    location: 'top'
+                  }"
+                  class="playback-rate"
+                  variant="text"
+                  v-bind="props"
+                >
+                  {{ playbackRate }}x
+                </v-chip>
+              </template>
+
+              <v-list class="pb-0 pt-0" density="compact">
+                <v-list-item
+                  v-for="rate in playbackRates"
+                  :key="rate"
+                  :active="rate === playbackRate"
+                  :title="rate + 'x'"
+                  @click="setPlaybackRate(rate)"
+                ></v-list-item>
+              </v-list>
+            </v-menu>
 
             <p>{{ readableTime }}</p>
           </div>
@@ -266,6 +281,7 @@ export default {
     return {
       missingVideoDialog: false,
       playbackRate: 1,
+      playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8, 16],
       playingState: false,
       showVolumeSlider: false,
       sliderPosition: 0,
@@ -316,14 +332,14 @@ export default {
     api.onFrameForward(this.forwardClicked)
     api.onFrameBackward(this.backwardClicked)
     api.onPlaybackForward(this.playForward)
-    api.onStopPlayback(this.stopPlayback)
+    api.onStopPlayback(this.stopClicked)
     api.onSegmentPrevious(this.navigateToPreviousSegment)
     api.onSegmentNext(this.navigateToNextSegment)
 
     shortcuts.register(' ', this.playPauseClicked)
     shortcuts.register('ArrowRight', this.forwardClicked)
     shortcuts.register('ArrowLeft', this.backwardClicked)
-    shortcuts.register('k', this.stopPlayback)
+    shortcuts.register('k', this.stopClicked)
     shortcuts.register('l', this.playForward)
     shortcuts.register('ArrowUp', this.navigateToPreviousSegment)
     shortcuts.register('ArrowDown', this.navigateToNextSegment)
@@ -425,10 +441,9 @@ export default {
     },
 
     playForward() {
-      if (this.playbackRate === 16 && this.playingState) {
-        this.playbackRate = 1
-      } else if (this.playingState) {
-        this.playbackRate = Math.min(16, this.playbackRate * 2)
+      if (this.playingState) {
+        const index = this.playbackRates.indexOf(this.playbackRate)
+        this.playbackRate = this.playbackRates[(index + 1) % this.playbackRates.length]
       }
       this.$refs.video.playbackRate = this.playbackRate
       this.$refs.video.play()
@@ -455,8 +470,18 @@ export default {
       )
     },
 
+    setPlaybackRate(rate) {
+      this.playbackRate = rate
+      this.$refs.video.playbackRate = rate
+    },
+
     sliderMoved(value) {
       this.$refs.video.currentTime = value
+    },
+
+    stopClicked() {
+      this.setPlaybackRate(1)
+      this.stopPlayback()
     },
 
     stopPlayback() {
