@@ -3,6 +3,24 @@
     <div>
       <span
         v-tooltip="{
+          text: $t('components.timelines.tooltips.addSegment'),
+          location: 'bottom'
+        }"
+      >
+        <v-btn
+          density="compact"
+          variant="text"
+          :disabled="!segmentAddable"
+          icon
+          :aria-label="$t('components.timelines.tooltips.addSegment')"
+          @click="segmentAdd"
+        >
+          <v-icon>mdi-shape-square-plus</v-icon>
+        </v-btn>
+      </span>
+
+      <span
+        v-tooltip="{
           text: $t('components.timelines.tooltips.deleteSelectedSegment'),
           location: 'bottom'
         }"
@@ -346,6 +364,10 @@ export default {
       return openedTimelines.concat(openedCategories)
     },
 
+    segmentAddable() {
+      return this.newSegmentBounds() !== null
+    },
+
     segmentDeletable() {
       return this.tempStore.selectedSegments.size > 0 && !this.segmentsLocked
     },
@@ -523,6 +545,20 @@ export default {
       this.selectedVocab = null
     },
 
+    newSegmentBounds() {
+      const timeline = this.undoableStore.getTimelineById(this.tempStore.selectedTimelineId)
+      if (!timeline || timeline.type !== 'shots' || timeline.locked) return null
+      const start = Math.round(this.tempStore.playPosition * this.mainStore.fps)
+      if (timeline.data.some((s) => s.start <= start && s.end >= start)) return null
+      const nextStarts = timeline.data.filter((s) => s.start > start).map((s) => s.start - 1)
+      const end = Math.min(
+        start + Math.round(this.mainStore.fps),
+        this.mainStore.numFrames - 1,
+        ...nextStarts
+      )
+      return end > start ? { end, start, timelineId: timeline.id } : null
+    },
+
     renameDialogOpen(id) {
       this.timelineName = ''
       this.renameDialog = true
@@ -534,6 +570,13 @@ export default {
       this.renameDialog = false
       this.createTimelineFolds()
       this.checkTrackNameOverflow()
+    },
+
+    segmentAdd() {
+      const bounds = this.newSegmentBounds()
+      if (bounds === null) return
+      const index = this.undoableStore.timelines.findIndex((t) => t.id === bounds.timelineId)
+      this.undoableStore.addShotToNth(index, bounds.start, bounds.end)
     },
 
     segmentDelete() {

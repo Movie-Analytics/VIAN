@@ -223,6 +223,7 @@
 
     "timelines": {
       "tooltips": {
+        "addSegment": "Neues Segment an der Abspielposition hinzufügen",
         "deleteSelectedSegment": "Ausgewähltes Segment löschen",
         "splitSelectedSegment": "Ausgewähltes Segment teilen",
         "mergeSelectedSegments": "Ausgewählte Segmente zusammenführen",

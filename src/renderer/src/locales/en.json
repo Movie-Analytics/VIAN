@@ -221,6 +221,7 @@
 
     "timelines": {
       "tooltips": {
+        "addSegment": "Add new segment at playhead",
         "deleteSelectedSegment": "Delete selected segment",
         "splitSelectedSegment": "Split selected segment",
         "mergeSelectedSegments": "Merge selected segments",
