@@ -145,7 +145,17 @@
 
                       <v-menu>
                         <template #activator="{ props }">
-                          <v-btn variant="text" density="compact" icon v-bind="props">
+                          <v-btn
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.timelineOptions'),
+                              location: 'bottom'
+                            }"
+                            variant="text"
+                            density="compact"
+                            icon
+                            :aria-label="$t('components.timelines.tooltips.timelineOptions')"
+                            v-bind="props"
+                          >
                             <v-icon>mdi-dots-vertical</v-icon>
                           </v-btn>
                         </template>
