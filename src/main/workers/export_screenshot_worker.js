@@ -28,7 +28,7 @@ const exportScreenshot = async (storePath, location, screenshot, associatedAnnot
     fs.copyFileSync(imagePath, path.join(tmpPath, imageName + '.jpg'))
   } catch (err) {
     console.error('Failed to copy screenshot:', imagePath, err)
-    throw new Error('Failed to copy screenshot')
+    throw new Error('Failed to copy screenshot', { cause: err })
   }
 
   const annotationsPath = path.join(tmpPath, imageName + '.json')
