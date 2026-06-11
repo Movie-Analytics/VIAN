@@ -92,16 +92,18 @@
       {{ $t('components.timelineCanvas.moveWarning') }}
     </v-snackbar>
 
-    <input
-      v-if="transform.k > 1"
-      type="range"
-      class="timeline-scrollbar"
-      min="0"
-      :max="scrollMax"
-      :value="scrollBarValue"
-      :style="{ '--thumb-width': scrollThumbWidth + 'px' }"
-      @input="onScroll(Number($event.target.value))"
-    />
+    <teleport defer to="#timelineScrollbarContainer">
+      <input
+        ref="hScrollbar"
+        type="range"
+        class="timeline-scrollbar"
+        min="0"
+        :max="scrollMax"
+        :value="scrollBarValue"
+        :style="{ '--thumb-width': scrollThumbWidth + 'px' }"
+        @input="onScroll(Number($event.target.value))"
+      />
+    </teleport>
   </div>
 </template>
 
@@ -1151,11 +1153,18 @@ export default {
       this.$refs.canvas.style.height = `${displayHeight}px`
 
       const parent = document.getElementById('timelineSplitter')
-      this.$refs.timeCanvas.style.marginRight = parent.offsetWidth - parent.clientWidth + 'px'
+      const rightInset =
+        parent.offsetWidth - parent.clientWidth + parseFloat(getComputedStyle(parent).paddingRight)
+      this.$refs.timeCanvas.style.marginRight = rightInset + 'px'
 
       this.$refs.timeCanvas.width = Math.floor(displayWidth * this.dpr)
       this.$refs.timeCanvas.height = 32 * this.dpr
       this.$refs.timeCanvas.style.width = getComputedStyle(this.$refs.canvas).width
+
+      if (this.$refs.hScrollbar) {
+        this.$refs.hScrollbar.style.marginRight = rightInset + 'px'
+        this.$refs.hScrollbar.style.width = getComputedStyle(this.$refs.canvas).width
+      }
 
       // Same for hidden canvas
       this.$refs.hiddenCanvas.width = Math.floor(displayWidth * this.dpr)
@@ -1230,12 +1239,12 @@ canvas {
   background: transparent;
   cursor: pointer;
   height: 8px;
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   width: 100%;
 }
 
 .timeline-scrollbar::-webkit-slider-runnable-track {
-  background: #e0e0e0;
+  background: rgba(33, 150, 243, 0.08);
   border-radius: 4px;
   height: 8px;
 }
@@ -1243,7 +1252,7 @@ canvas {
 .timeline-scrollbar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  background: #aaaaaa;
+  background: #90caf9;
   border-radius: 4px;
   cursor: pointer;
   height: 8px;

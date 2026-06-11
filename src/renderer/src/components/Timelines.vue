@@ -58,7 +58,7 @@
 
     <div id="timelineAxesContainer"></div>
 
-    <div id="timelineSplitter" class="overflow-y-auto">
+    <div id="timelineSplitter" class="flex-1-1 overflow-y-auto">
       <SplitterContainer :inital-panel1-percent="30" class="overflow-y-auto">
         <template #panel1>
           <v-list
@@ -259,6 +259,8 @@
         </template>
       </SplitterContainer>
     </div>
+
+    <div id="timelineScrollbarContainer"></div>
 
     <v-dialog v-model="renameDialog" persistent max-width="400">
       <v-card>
@@ -577,18 +579,28 @@ export default {
   padding-top: 30px;
 }
 
+#timelineSplitter {
+  /* gap between the timeline and the vertical scrollbar */
+  padding-right: 8px;
+}
+
 #timelineSplitter::-webkit-scrollbar {
   width: 8px;
 }
 
 #timelineSplitter::-webkit-scrollbar-track {
-  background: #e0e0e0;
+  background: rgba(33, 150, 243, 0.08);
   border-radius: 4px;
 }
 
 #timelineSplitter::-webkit-scrollbar-thumb {
-  background: #aaaaaa;
+  background: #90caf9;
   border-radius: 4px;
+}
+
+#timelineScrollbarContainer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 :deep(.active-track) {
