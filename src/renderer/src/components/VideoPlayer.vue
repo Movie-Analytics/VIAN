@@ -358,9 +358,6 @@ export default {
       if (!newVideoLocation) return
 
       this.mainStore.openVideo(this.mainStore.id, newVideoLocation)
-
-      await this.$nextTick()
-      this.$refs.video?.load()
     },
 
     durationChange(event) {
