@@ -12,7 +12,8 @@
     "rename": "Rename",
     "import": "Import",
     "generate": "Generate",
-    "close": "Close"
+    "close": "Close",
+    "ignore": "Ignore"
   },
 
   "pages": {
@@ -20,14 +21,14 @@
       "appTitle": "VIAN",
       "description": "VIAN is an open video annotation application. Some of its features are:",
       "features": {
-        "shotboundary": "automatic shotboundary detection",
-        "elan": "import and export to ELAN",
-        "screenshots": "screenshot generation",
-        "electronBrowser": "works in the browser or via Electron as a desktop application"
+        "shotboundary": "automatic shot boundary detection",
+        "elan": "Import and export to ELAN",
+        "screenshots": "Screenshot generation",
+        "electronBrowser": "Works in the browser or via Electron as a desktop application"
       },
       "tabs": {
         "login": "Login",
-        "signup": "Signup"
+        "signup": "Sign up"
       },
       "form": {
         "email": "E-Mail",
@@ -108,17 +109,17 @@
 
       "dialogs": {
         "generateScreenshots": {
-          "title": "Screenshots erzeugen",
-          "description": "Alle N Sekunden einen Screenshot erstellen",
+          "title": "Generate Screenshots",
+          "description": "Create a screenshot every N seconds",
           "intervalLabel": "N",
-          "perShotLabel": "Mindestens einen Screenshot pro Shot sicherstellen",
-          "shotTimelineLabel": "Shot-Timeline"
+          "perShotLabel": "Ensure at least one screenshot per shot",
+          "shotTimelineLabel": "Shot Timeline"
         },
         "exportScreenshots": {
-          "title": "Screenshots exportieren",
-          "description": "Du kannst entweder alle Screenshots auf einmal exportieren oder sie in einer Timeline einzeln auswählen und nur diese exportieren.",
-          "exportAll": "Alle exportieren",
-          "exportIndividually": "Einzeln exportieren"
+          "title": "Export Screenshots",
+          "description": "You can either export all screenshots at once or select individual screenshots from the timeline and export only those.",
+          "exportAll": "Export all",
+          "exportIndividually": "Export individually"
         }
       },
 
@@ -199,6 +200,9 @@
 
     "videoPlayer": {
       "playbackRateHelp": "Playback Rate (KL System)\n\nK: Stop\nL: Play forward (2x, 4x, 8x, 16x)\n\nPress multiple times to increase speed",
+      "videoFileNotFound": "Video file not found",
+      "videoCouldNotBeLoaded": "The video could not be loaded. It may have been moved or deleted. You can ignore this or choose a new video location.",
+      "chooseNewVideoLocation": "Choose new video location",
       "tooltips": {
         "jumpBackward": "Jump backward 5 seconds",
         "previousFrame": "Previous frame",

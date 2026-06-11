@@ -12,7 +12,8 @@
     "import": "Importieren",
     "close": "Schließen",
     "rename": "Umbenennen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "ignore": "Ignorieren"
   },
 
   "pages": {
@@ -201,6 +202,9 @@
 
     "videoPlayer": {
       "playbackRateHelp": "Wiedergabegeschwindigkeit anpassen",
+      "videoFileNotFound": "Videodatei nicht gefunden",
+      "videoCouldNotBeLoaded": "Das Video konnte nicht geladen werden. Es wurde möglicherweise verschoben oder gelöscht. Sie können dies ignorieren oder einen neuen Videospeicherort auswählen.",
+      "chooseNewVideoLocation": "Neuen Videospeicherort auswählen",
       "tooltips": {
         "jumpBackward": "5 Sekunden zurückspringen",
         "previousFrame": "Vorheriges Bild",
