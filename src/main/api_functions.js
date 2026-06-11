@@ -6,7 +6,8 @@ import path from 'path'
 
 import cleanUpWorker from './workers/cleanup_worker?nodeWorker'
 import exportProjectWorker from './workers/export_project_worker?nodeWorker'
-import exportScreenshotWorker from './workers/export_screenshots_worker?nodeWorker'
+import exportScreenshotWorker from './workers/export_screenshot_worker?nodeWorker'
+import exportScreenshotsWorker from './workers/export_screenshots_worker?nodeWorker'
 import importProjectWorker from './workers/import_project_worker?nodeWorker'
 import screenshotGenerationWorker from './workers/screenshot_generation_worker?nodeWorker'
 import screenshotsGenerationWorker from './workers/screenshots_generation_worker?nodeWorker'
@@ -208,6 +209,23 @@ export const getVideoInfo = (channel, videoPath) => {
   })
 }
 
+export const exportScreenshot = (channel, projectId, screenshot, associatedAnnotations) => {
+  const location = dialog.showSaveDialogSync(null, {
+    defaultPath: 'screenshot.zip',
+    title: 'Select Export Location'
+  })
+  if (location === '') return
+
+  const worker = exportScreenshotWorker({
+    workerData: { associatedAnnotations, location, screenshot, storePath: getDataPath(projectId) }
+  })
+  const job = jobManager.createWorkerJob(channel, 'export-screenshot', worker)
+
+  worker.on('message', () => {
+    jobManager.updateJobStatus(channel, job.id, 'DONE')
+  })
+}
+
 export const exportScreenshots = (channel, projectId, frames) => {
   const location = dialog.showSaveDialogSync(null, {
     defaultPath: 'screenshots.zip',
@@ -215,7 +233,7 @@ export const exportScreenshots = (channel, projectId, frames) => {
   })
   if (location === '') return
 
-  const worker = exportScreenshotWorker({
+  const worker = exportScreenshotsWorker({
     workerData: { frames, location, storePath: getDataPath(projectId) }
   })
   const job = jobManager.createWorkerJob(channel, 'export-screenshots', worker)

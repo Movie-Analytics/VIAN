@@ -10,6 +10,7 @@
     "generate": "Erstellen",
     "save": "Speichern",
     "import": "Importieren",
+    "export": "Exportieren",
     "close": "Schließen",
     "rename": "Umbenennen",
     "delete": "Löschen",

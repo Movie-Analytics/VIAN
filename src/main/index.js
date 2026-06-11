@@ -6,6 +6,7 @@ import { join } from 'path'
 import {
   cleanUp,
   exportProject,
+  exportScreenshot,
   exportScreenshots,
   getVideoInfo,
   importProject,
@@ -154,6 +155,9 @@ ipcMain.on('run-screenshot-generation', (channel, path, frame, videoId) =>
   runScreenshotGeneration(channel, path, frame, videoId)
 )
 ipcMain.on('get-video-info', (channel, path) => getVideoInfo(channel, path))
+ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnotations) =>
+  exportScreenshot(channel, projectId, screenshot, associatedAnnotations)
+)
 ipcMain.on('export-screenshots', (channel, projectId, frames) =>
   exportScreenshots(channel, projectId, frames)
 )

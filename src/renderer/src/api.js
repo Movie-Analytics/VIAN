@@ -9,7 +9,8 @@ class RemoteApi {
   constructor() {
     this.callbacks = {
       'export-project': this.onExportProject,
-      'export-screenshots': this.onExportScreenhots
+      'export-screenshot': this.onExportScreenshot,
+      'export-screenshots': this.onExportScreenshots
     }
     this.jobUpdate = null
     this.tokenUpdate = null
@@ -391,6 +392,24 @@ class RemoteApi {
     return response.ok
   }
 
+  async exportScreenshot(projectId, screenshot, associatedAnnotations) {
+    const response = await fetch(this.baseApi + 'export-screenshot', {
+      body: JSON.stringify({
+        associatedAnnotations,
+        id: projectId,
+        screenshot
+      }),
+      headers: {
+        Authorization: `Bearer ${this.bearerToken}`,
+        'Content-type': 'application/json; charset=UTF-8'
+      },
+      method: 'POST'
+    })
+    this.startJobUpdateFetch()
+
+    return response.ok
+  }
+
   async exportScreenshots(projectId, frames) {
     const response = await fetch(this.baseApi + 'export-screenshots', {
       body: JSON.stringify({
@@ -408,7 +427,16 @@ class RemoteApi {
     return response.ok
   }
 
-  onExportScreenhots(url) {
+  onExportScreenshot(url) {
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'screenshot.zip'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  onExportScreenshots(url) {
     const a = document.createElement('a')
     a.href = url
     a.download = 'screenshots.zip'

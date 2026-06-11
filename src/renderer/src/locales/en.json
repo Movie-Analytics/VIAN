@@ -11,6 +11,7 @@
     "delete": "Delete",
     "rename": "Rename",
     "import": "Import",
+    "export": "Export",
     "generate": "Generate",
     "close": "Close",
     "ignore": "Ignore"
