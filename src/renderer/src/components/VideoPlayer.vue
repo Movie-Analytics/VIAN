@@ -296,7 +296,9 @@ export default {
 
       const videoExists = await this.checkVideoExists(this.mainStore.video)
 
-      this.missingVideoDialog = !videoExists
+      if (!videoExists) {
+        this.missingVideoDialog = true
+      }
     },
 
     'tempStore.playJumpPosition'(newValue) {
