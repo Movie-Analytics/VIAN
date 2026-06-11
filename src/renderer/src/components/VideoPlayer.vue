@@ -186,47 +186,38 @@
                 v-tooltip="{
                   text:
                     volume === 0
-                      ? $t('components.videoPlayer.tooltips.unmuteOrAdjustVolume')
-                      : $t('components.videoPlayer.tooltips.adjustVolume'),
-                  location: 'top'
+                      ? $t('components.videoPlayer.tooltips.unmute')
+                      : $t('components.videoPlayer.tooltips.mute'),
+                  location: 'bottom'
                 }"
                 density="comfortable"
                 size="small"
                 icon
                 :aria-label="
                   volume === 0
-                    ? $t('components.videoPlayer.tooltips.unmuteOrAdjustVolume')
-                    : $t('components.videoPlayer.tooltips.adjustVolume')
+                    ? $t('components.videoPlayer.tooltips.unmute')
+                    : $t('components.videoPlayer.tooltips.mute')
                 "
-                @click.stop="toggleVolumeSlider"
+                @click.stop="toggleMute"
               >
                 <v-icon>{{ volume === 0 ? 'mdi-volume-mute' : 'mdi-volume-high' }}</v-icon>
               </v-btn>
 
-              <v-menu
-                v-model="showVolumeSlider"
-                :close-on-content-click="false"
-                location="top"
-                offset="10"
-              >
-                <template #activator="{ props }">
-                  <div v-bind="props"></div>
-                </template>
-
-                <v-card min-width="50" class="overflow-hidden pa-2">
-                  <v-slider
-                    v-model="volume"
-                    class="volume-slider"
-                    direction="vertical"
-                    :step="1"
-                    :min="0"
-                    :max="100"
-                    hide-details
-                    @update:model-value="updateVolume"
-                  >
-                  </v-slider>
-                </v-card>
-              </v-menu>
+              <div class="volume-slider-popup">
+                <v-slider
+                  v-model="volume"
+                  class="volume-slider"
+                  direction="vertical"
+                  :step="1"
+                  :min="0"
+                  :max="100"
+                  thumb-size="12"
+                  track-size="3"
+                  hide-details
+                  @update:model-value="updateVolume"
+                >
+                </v-slider>
+              </div>
             </div>
 
             <v-btn
@@ -279,11 +270,11 @@ export default {
 
   data() {
     return {
+      lastVolume: 100,
       missingVideoDialog: false,
       playbackRate: 1,
       playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8, 16],
       playingState: false,
-      showVolumeSlider: false,
       sliderPosition: 0,
       volume: 100
     }
@@ -489,15 +480,18 @@ export default {
       this.playingState = false
     },
 
-    toggleSubtitles() {
-      this.undoableStore.subtitlesVisible = !this.undoableStore.subtitlesVisible
+    toggleMute() {
+      if (this.volume === 0) {
+        this.volume = this.lastVolume
+      } else {
+        this.lastVolume = this.volume
+        this.volume = 0
+      }
+      this.updateVolume(this.volume)
     },
 
-    toggleVolumeSlider(event) {
-      // Don't show slider if it's a double click
-
-      if (event?.detail === 2) return
-      this.showVolumeSlider = !this.showVolumeSlider
+    toggleSubtitles() {
+      this.undoableStore.subtitlesVisible = !this.undoableStore.subtitlesVisible
     },
 
     updateVolume(value) {
@@ -538,6 +532,22 @@ video {
   position: relative;
   display: flex;
   align-items: center;
+}
+.volume-slider-popup {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  justify-content: center;
+  padding: 8px 0 4px;
+  background-color: rgb(var(--v-theme-surface));
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.volume-control:hover .volume-slider-popup {
+  display: flex;
 }
 .volume-slider :deep(> .v-input__control) {
   /* min height sets the height of the slider here */

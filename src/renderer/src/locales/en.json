@@ -213,8 +213,8 @@
         "jumpForward": "Jump forward 5 seconds",
         "pictureInPicture": "Picture in picture",
         "takeScreenshot": "Take screenshot",
-        "adjustVolume": "Adjust volume",
-        "unmuteOrAdjustVolume": "Unmute or adjust volume",
+        "mute": "Mute",
+        "unmute": "Unmute",
         "showSubtitles": "Show subtitles",
         "hideSubtitles": "Hide subtitles"
       }

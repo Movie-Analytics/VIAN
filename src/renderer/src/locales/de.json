@@ -215,8 +215,8 @@
         "jumpForward": "5 Sekunden vorspringen",
         "pictureInPicture": "Bild-in-Bild",
         "takeScreenshot": "Screenshot aufnehmen",
-        "adjustVolume": "Lautstärke anpassen",
-        "unmuteOrAdjustVolume": "Stummschaltung aufheben oder Lautstärke anpassen",
+        "mute": "Stummschalten",
+        "unmute": "Stummschaltung aufheben",
         "showSubtitles": "Untertitel anzeigen",
         "hideSubtitles": "Untertitel ausblenden"
       }
