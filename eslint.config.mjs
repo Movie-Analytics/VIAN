@@ -106,6 +106,7 @@ export default [
             '$router',
             '$route',
             '$t',
+            '$i18n',
             '$vuetify'
           ]
         }

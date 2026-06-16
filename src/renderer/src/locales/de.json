@@ -94,6 +94,8 @@
         "exportProjectZip": "Projekt als .zip exportieren",
         "switchToLightMode": "Zum Hellmodus wechseln",
         "switchToDarkMode": "Zum Dunkelmodus wechseln",
+        "switchToGerman": "Zu Deutsch wechseln",
+        "switchToEnglish": "Zu Englisch wechseln",
         "layout": "Layout",
         "tabbedLayout": "Tab-Layout",
         "draggableLayout": "Verschiebbares Layout",
@@ -106,6 +108,8 @@
           "exportData": "Annotationen in externe Formate exportieren",
           "switchToLightMode": "Zur hellen Benutzeroberfläche wechseln",
           "switchToDarkMode": "Zur dunklen Benutzeroberfläche wechseln",
+          "switchToGerman": "Benutzeroberfläche auf Deutsch umstellen",
+          "switchToEnglish": "Benutzeroberfläche auf Englisch umstellen",
           "layout": "Panel-Layout des Arbeitsbereichs ändern"
         }
       },

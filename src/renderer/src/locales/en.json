@@ -92,6 +92,8 @@
         "exportProjectZip": "Export Project as .zip",
         "switchToLightMode": "Switch to Light Mode",
         "switchToDarkMode": "Switch to Dark Mode",
+        "switchToGerman": "Switch to German",
+        "switchToEnglish": "Switch to English",
         "layout": "Layout",
         "tabbedLayout": "Tabbed Layout",
         "draggableLayout": "Draggable Layout",
@@ -104,6 +106,8 @@
           "exportData": "Export annotations to external formats",
           "switchToLightMode": "Switch the interface to light mode",
           "switchToDarkMode": "Switch the interface to dark mode",
+          "switchToGerman": "Switch the interface to German",
+          "switchToEnglish": "Switch the interface to English",
           "layout": "Change the panel layout of the workspace"
         }
       },

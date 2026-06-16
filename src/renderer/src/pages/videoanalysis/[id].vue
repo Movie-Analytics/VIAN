@@ -179,6 +179,22 @@
         @click="switchLightMode"
       ></v-list-item>
 
+      <v-list-item
+        v-if="isGerman"
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.switchToEnglish'), location: 'left' }"
+        prepend-icon="mdi-translate"
+        :title="$t('pages.video.drawer.switchToEnglish')"
+        @click="switchLanguage"
+      ></v-list-item>
+
+      <v-list-item
+        v-else
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.switchToGerman'), location: 'left' }"
+        prepend-icon="mdi-translate"
+        :title="$t('pages.video.drawer.switchToGerman')"
+        @click="switchLanguage"
+      ></v-list-item>
+
       <v-list-group>
         <template #activator="{ props }">
           <v-list-item
@@ -339,6 +355,10 @@ export default {
 
     hasJobs() {
       return this.tempStore.jobs.length > 0
+    },
+
+    isGerman() {
+      return this.$i18n.locale === 'de'
     },
 
     isRedoable() {
@@ -523,6 +543,12 @@ export default {
       else if (status === 'DONE') return 'success'
       else if (status === 'CANCELED') return 'black'
       return 'white'
+    },
+
+    switchLanguage() {
+      const locale = this.$i18n.locale === 'de' ? 'en' : 'de'
+      this.$i18n.locale = locale
+      localStorage.setItem('locale', locale)
     },
 
     switchLightMode() {
