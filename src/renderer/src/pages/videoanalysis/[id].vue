@@ -257,7 +257,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="exportScreenshotsDialog" persistent max-width="500">
+    <v-dialog v-model="exportScreenshotsDialog" persistent max-width="500" scrollable>
       <v-card>
         <v-card-title>{{ $t('pages.video.dialogs.exportScreenshots.title') }}</v-card-title>
 
@@ -265,7 +265,7 @@
           {{ $t('pages.video.dialogs.exportScreenshots.description') }}
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions class="flex-wrap">
           <v-btn color="warning" @click="exportScreenshotsDialog = false">
             {{ $t('common.cancel') }}
           </v-btn>
