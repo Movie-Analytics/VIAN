@@ -112,6 +112,7 @@ import * as d3 from 'd3'
 import { mapStores } from 'pinia'
 import { markRaw } from 'vue'
 
+import shortcuts from '@renderer/shortcuts'
 import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
 import { useUndoableStore } from '@renderer/stores/undoable'
@@ -298,10 +299,16 @@ export default {
     },
 
     'tempStore.playPosition'() {
+      const tmpShot = this.tempStore.tmpShot
+      if (tmpShot?.ioPending) {
+        tmpShot.end = Math.max(this.playHeadFrame(), tmpShot.start)
+        tmpShot.invalid = this.shotOverlaps(tmpShot)
+      }
       this.requestDraw()
     },
 
     'tempStore.selectedTimelineId'() {
+      if (this.tempStore.tmpShot?.ioPending) this.tempStore.tmpShot = null
       this.requestDraw()
     },
 
@@ -357,12 +364,17 @@ export default {
       .on('drag', this.timeAxisDrag)
     d3.select(this.$refs.timeCanvas).call(drag)
 
+    shortcuts.register('i', this.setInPoint)
+    shortcuts.register('o', this.setOutPoint)
+
     this.drawSetup()
     this.requestDraw()
   },
 
   beforeUnmount() {
     this.resizeoberserver.unobserve(this.$refs.canvas)
+    shortcuts.clear('i')
+    shortcuts.clear('o')
   },
 
   methods: {
@@ -902,6 +914,22 @@ export default {
       return index
     },
 
+    getTimelineRowY(timelineId) {
+      let rows = 0
+      for (const timeline of this.undoableStore.timelines) {
+        if (timeline.id === timelineId) return rows * TIMELINE_HEIGHT
+        const fold = this.tempStore.timelinesFold[timeline.id]
+        if (fold?.visible && fold.categories) {
+          for (const category of fold.categories) {
+            rows += 1
+            if (category.visible) rows += category.tags.length
+          }
+        }
+        rows += 1
+      }
+      return null
+    },
+
     mousedown(e) {
       this.tempStore.tmpShot = null
       if (e.altKey || e.shiftKey) e.stopImmediatePropagation()
@@ -1003,6 +1031,7 @@ export default {
     mouseleave(e) {
       if (e.buttons === 1) return
       this.$refs.canvas.style.cursor = 'default'
+      if (this.tempStore.tmpShot?.ioPending) return
       if (this.tempStore.tmpShot !== null) {
         this.tempStore.tmpShot = null
         this.tempStore.adjacentShot = null
@@ -1126,6 +1155,10 @@ export default {
       this.overlayInput = false
     },
 
+    playHeadFrame() {
+      return Math.round(this.tempStore.playPosition * this.mainStore.fps)
+    },
+
     requestDraw() {
       if (!this.isDrawingScheduled) {
         this.isDrawingScheduled = true
@@ -1186,6 +1219,38 @@ export default {
     rgbToHex(r, g, b) {
       // eslint-disable-next-line
       return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toLowerCase()
+    },
+
+    setInPoint() {
+      const timelineId = this.tempStore.selectedTimelineId
+      const timeline = this.undoableStore.getTimelineById(timelineId)
+      if (!timeline || timeline.type !== 'shots' || timeline.locked) return
+      const y = this.getTimelineRowY(timelineId)
+      if (y === null) return
+      const start = this.playHeadFrame()
+      const tmpShot = {
+        end: start,
+        height: 44,
+        ioPending: true,
+        originalShot: null,
+        start,
+        timelineIndex: this.undoableStore.timelines.findIndex((t) => t.id === timelineId),
+        y
+      }
+      tmpShot.invalid = this.shotOverlaps(tmpShot)
+      this.tempStore.tmpShot = tmpShot
+      this.requestDraw()
+    },
+
+    setOutPoint() {
+      const tmpShot = this.tempStore.tmpShot
+      if (!tmpShot?.ioPending) return
+      tmpShot.end = Math.max(this.playHeadFrame(), tmpShot.start)
+      if (!this.shotOverlaps(tmpShot)) {
+        this.undoableStore.addShotToNth(tmpShot.timelineIndex, tmpShot.start, tmpShot.end)
+      }
+      this.tempStore.tmpShot = null
+      this.requestDraw()
     },
 
     shotOverlaps(shot) {
