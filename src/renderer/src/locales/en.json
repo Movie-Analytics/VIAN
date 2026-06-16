@@ -229,7 +229,7 @@
         "showCategories": "Show categories",
         "hideCategories": "Hide categories",
         "lockTrack": "Lock/unlock track",
-        "timelineOptions": "Timeline options",
+        "timelineOptions": "Options",
         "duplicateTrack": "Create a copy of this track",
         "deleteTrack": "Permanently remove this track and all its segments",
         "renameTrack": "Change the name of this track",
