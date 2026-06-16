@@ -552,7 +552,7 @@ export default {
       if (timeline.data.some((s) => s.start <= start && s.end >= start)) return null
       const nextStarts = timeline.data.filter((s) => s.start > start).map((s) => s.start - 1)
       const end = Math.min(
-        start + Math.round(this.mainStore.fps),
+        start + Math.round(this.mainStore.fps * 10),
         this.mainStore.numFrames - 1,
         ...nextStarts
       )
