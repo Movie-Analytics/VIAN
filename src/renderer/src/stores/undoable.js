@@ -257,7 +257,7 @@ export const useUndoableStore = defineStore('undoable', {
           vocabAnnotation: []
         })),
         id: crypto.randomUUID(),
-        name: 'Automated Shotdetection',
+        name: 'Shots Detected Automatically',
         type: 'shots',
         vocabulary: null
       })
