@@ -127,10 +127,14 @@ const truncateText = (ctx, text, maxWidth) => {
   return t + '…'
 }
 
-const segmentFill = (d, selectedSegments, selectedTimelineId) => {
-  if (selectedSegments.has(d.id)) return 'yellow'
+const baseFill = (d, selectedTimelineId) => {
   if (d.timeline === selectedTimelineId && d.fill !== '#aa5555') return '#e0e0e0'
   return d.fill
+}
+
+const segmentFill = (d, selectedSegments, selectedTimelineId) => {
+  if (selectedSegments.has(d.id)) return 'yellow'
+  return baseFill(d, selectedTimelineId)
 }
 
 const drawSegment = (
@@ -164,11 +168,16 @@ const drawSegment = (
     ctx.strokeRect(x, d.y, xwidth - x, d.height)
     hCtx.fillRect(x, d.y, xwidth - x, d.height)
   } else if (d.type === 'select') {
-    ctx.fillStyle = segmentFill(d, selectedSegments, selectedTimelineId)
+    ctx.fillStyle = baseFill(d, selectedTimelineId)
     ctx.fillRect(x, d.y, xwidth - x, d.height)
     ctx.strokeStyle = '#666666'
     ctx.lineWidth = 1
     ctx.strokeRect(x, d.y, xwidth - x, d.height)
+    if (selectedSegments.has(d.id)) {
+      ctx.strokeStyle = 'yellow'
+      ctx.lineWidth = 3
+      ctx.strokeRect(x + 2, d.y + 2, xwidth - x - 4, d.height - 4)
+    }
     hCtx.fillRect(x, d.y, xwidth - x, d.height)
   } else if (d.type === 'screenshot') {
     const image = imageCache.get(d.uri)
