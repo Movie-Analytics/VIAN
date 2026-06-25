@@ -119,6 +119,7 @@ import { useUndoableStore } from '@renderer/stores/undoable'
 
 const TIMELINE_HEIGHT = 49
 const PLAYHEAD_COLOR = '#ff0000'
+const SELECTION_COLOR = '#fff59d'
 
 const truncateText = (ctx, text, maxWidth) => {
   if (ctx.measureText(text).width <= maxWidth) return text
@@ -133,7 +134,7 @@ const baseFill = (d, selectedTimelineId) => {
 }
 
 const segmentFill = (d, selectedSegments, selectedTimelineId) => {
-  if (selectedSegments.has(d.id)) return 'yellow'
+  if (selectedSegments.has(d.id)) return SELECTION_COLOR
   return baseFill(d, selectedTimelineId)
 }
 
@@ -174,7 +175,7 @@ const drawSegment = (
     ctx.lineWidth = 1
     ctx.strokeRect(x, d.y, xwidth - x, d.height)
     if (selectedSegments.has(d.id)) {
-      ctx.strokeStyle = 'yellow'
+      ctx.strokeStyle = SELECTION_COLOR
       ctx.lineWidth = 3
       ctx.strokeRect(x + 2, d.y + 2, xwidth - x - 4, d.height - 4)
     }
@@ -183,7 +184,7 @@ const drawSegment = (
     const image = imageCache.get(d.uri)
     if (!image) return
     if (selectedSegments.has(d.id)) {
-      ctx.fillStyle = 'yellow'
+      ctx.fillStyle = SELECTION_COLOR
       ctx.fillRect(x, d.y, d.width, d.height)
       ctx.globalAlpha = 0.5
     }
@@ -826,7 +827,7 @@ export default {
     drawTmpShot(rescale) {
       if (this.tempStore.tmpShot === null) return
       this.ctx.globalAlpha = this.tempStore.tmpShot.invalid ? 0.4 : 1
-      this.ctx.fillStyle = this.tempStore.tmpShot.invalid ? '#ffcccc' : 'yellow'
+      this.ctx.fillStyle = this.tempStore.tmpShot.invalid ? '#ffcccc' : SELECTION_COLOR
       this.ctx.fillRect(
         rescale(this.tempStore.tmpShot.start),
         this.tempStore.tmpShot.y,
