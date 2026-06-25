@@ -113,6 +113,11 @@
       },
 
       "dialogs": {
+        "shotBoundaryDetection": {
+          "title": "Shot Boundary Detection",
+          "description": "This detects the shot boundaries in the video automatically and adds them as a new timeline. It runs as a background job that can take a while; you can cancel it from the job list.",
+          "start": "Start"
+        },
         "generateScreenshots": {
           "title": "Generate Screenshots",
           "description": "Create a screenshot every N seconds",

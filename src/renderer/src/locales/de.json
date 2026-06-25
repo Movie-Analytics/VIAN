@@ -115,6 +115,11 @@
       },
 
       "dialogs": {
+        "shotBoundaryDetection": {
+          "title": "Shot Boundary Detection",
+          "description": "Dies erkennt die Shot-Grenzen im Video automatisch und fügt sie als neue Timeline hinzu. Es läuft als Hintergrundjob, der eine Weile dauern kann; du kannst ihn in der Jobliste abbrechen.",
+          "start": "Starten"
+        },
         "generateScreenshots": {
           "title": "Screenshots erzeugen",
           "description": "Alle N Sekunden einen Screenshot erstellen",

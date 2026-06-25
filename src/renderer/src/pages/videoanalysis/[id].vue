@@ -74,7 +74,7 @@
         }"
         prepend-icon="mdi-movie-open"
         :title="$t('pages.video.drawer.shotBoundaryDetection')"
-        @click="shotBoundaryDetectionClicked"
+        @click="shotBoundaryDialog = true"
       ></v-list-item>
 
       <v-list-item
@@ -227,6 +227,26 @@
 
     <LayoutDraggable v-else-if="layout === 'draggable'"></LayoutDraggable>
 
+    <v-dialog v-model="shotBoundaryDialog" persistent max-width="400">
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.shotBoundaryDetection.title') }}</v-card-title>
+
+        <v-card-text>
+          {{ $t('pages.video.dialogs.shotBoundaryDetection.description') }}
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="shotBoundaryDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn color="primary" @click="shotBoundaryDetectionClicked">
+            {{ $t('pages.video.dialogs.shotBoundaryDetection.start') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="genScreenshotDialog" persistent max-width="400">
       <v-card>
         <v-card-title>{{ $t('pages.video.dialogs.generateScreenshots.title') }}</v-card-title>
@@ -332,7 +352,8 @@ export default {
     layout: 'tibava',
     screenshotInterval: 10,
     screenshotPerShot: false,
-    screenshotShotTimeline: null
+    screenshotShotTimeline: null,
+    shotBoundaryDialog: false
   }),
 
   computed: {
@@ -534,6 +555,7 @@ export default {
     },
 
     shotBoundaryDetectionClicked() {
+      this.shotBoundaryDialog = false
       this.undoableStore.runShotBoundaryDetection()
     },
 
