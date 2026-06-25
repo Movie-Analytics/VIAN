@@ -35,7 +35,7 @@
       <v-virtual-scroll v-if="shotTimeline" :items="shots">
         <template #default="{ item, index }">
           <div class="pa-3" :class="getEntryBgColor(item)">
-            <div class="cursor-pointer" @click="jumpPlayer(item.start)">
+            <div class="cursor-pointer" @click="shotClicked(item)">
               <span class="font-weight-bold">
                 {{ $t('components.shotList.id') }} {{ index + 1 }}
               </span>
@@ -136,6 +136,11 @@ export default {
     jumpPlayer(pos) {
       // Add extra time to ensure we are within the shot bounds
       this.tempStore.playJumpPosition = pos / this.mainStore.fps + 0.001
+    },
+
+    shotClicked(shot) {
+      this.tempStore.selectedSegments = new Map([[shot.id, this.shotTimeline]])
+      this.jumpPlayer(shot.start)
     }
   }
 }
