@@ -299,9 +299,11 @@ export const useUndoableStore = defineStore('undoable', {
       const index = timeline.data.findIndex((s) => s.id === segmentId)
       const segment = timeline.data[index]
       timeline.data.splice(index + 1, 0, {
+        annotation: '',
         end: segment.end,
         id: crypto.randomUUID(),
-        start: position
+        start: position,
+        vocabAnnotation: []
       })
       segment.end = position - 1
     },
