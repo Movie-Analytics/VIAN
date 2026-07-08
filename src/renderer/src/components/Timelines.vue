@@ -1,6 +1,6 @@
 <template>
   <v-sheet class="d-flex flex-1-1 flex-column height-min-0">
-    <div>
+    <div class="align-center d-flex">
       <span
         v-tooltip="{
           text: $t('components.timelines.tooltips.addSegment'),
@@ -108,6 +108,30 @@
           <v-icon>mdi-table-merge-cells</v-icon>
         </v-btn>
       </span>
+
+      <v-spacer></v-spacer>
+
+      <span
+        v-tooltip="{
+          text: $t('components.timelines.tooltips.trackHeight'),
+          location: 'bottom'
+        }"
+        class="align-center d-flex mr-2 track-height-slider"
+      >
+        <v-icon size="small">mdi-arrow-expand-vertical</v-icon>
+
+        <v-slider
+          :model-value="tempStore.trackScale"
+          :aria-label="$t('components.timelines.tooltips.trackHeight')"
+          density="compact"
+          hide-details
+          :max="1"
+          :min="0.5"
+          :step="0.05"
+          class="ml-1"
+          @end="tempStore.trackScale = $event"
+        ></v-slider>
+      </span>
     </div>
 
     <div id="timelineAxesContainer"></div>
@@ -131,6 +155,11 @@
                 <v-list-item
                   class="pr-2"
                   :class="[{ 'active-track': id === selectedTimelineId }]"
+                  :style="{
+                    height: trackHeight + 'px',
+                    minHeight: trackHeight + 'px',
+                    '--row-font-size': trackNameFontSize + 'px'
+                  }"
                   draggable="true"
                   @click.stop="selectTimeline(id)"
                   @dragstart="dragStart($event, id)"
@@ -267,7 +296,12 @@
                   >
                     <template #activator>
                       <v-list-item
-                        class="border-t-sm mt-1px"
+                        class="bg-surface-light border-t-sm category-header-row mt-1px"
+                        :style="{
+                          height: categoryHeaderHeight + 'px',
+                          minHeight: categoryHeaderHeight + 'px',
+                          '--row-font-size': categoryNameFontSize + 'px'
+                        }"
                         @click="category.visible = !category.visible"
                       >
                         <template #title>
@@ -295,6 +329,11 @@
                       :key="tag.id"
                       :title="tag.name"
                       class="border-t-sm mt-1px"
+                      :style="{
+                        height: trackHeight + 'px',
+                        minHeight: trackHeight + 'px',
+                        '--row-font-size': trackNameFontSize + 'px'
+                      }"
                     >
                     </v-list-item>
                   </v-list-group>
@@ -369,6 +408,9 @@ import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
+const BASE_TRACK_HEIGHT = 49
+const CATEGORY_HEADER_HEIGHT = 27
+
 export default {
   name: 'Timelines',
   components: { SplitterContainer, TimelineCanvas },
@@ -388,6 +430,14 @@ export default {
 
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
+
+    categoryHeaderHeight() {
+      return CATEGORY_HEADER_HEIGHT
+    },
+
+    categoryNameFontSize() {
+      return Math.max(10, Math.round(16 * (CATEGORY_HEADER_HEIGHT / BASE_TRACK_HEIGHT)))
+    },
 
     inPointSettable() {
       const timeline = this.undoableStore.getTimelineById(this.tempStore.selectedTimelineId)
@@ -454,6 +504,14 @@ export default {
 
     shotTimelinesExists() {
       return this.undoableStore.timelines.filter((t) => t.type === 'shots').length > 0
+    },
+
+    trackHeight() {
+      return Math.round(BASE_TRACK_HEIGHT * this.tempStore.trackScale)
+    },
+
+    trackNameFontSize() {
+      return Math.max(10, Math.round(16 * (this.trackHeight / BASE_TRACK_HEIGHT)))
     },
 
     vocabularies() {
@@ -663,6 +721,15 @@ export default {
 </script>
 
 <style scoped>
+.track-height-slider {
+  width: 130px;
+}
+
+.category-header-row {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 #timeline-list {
   padding-top: 30px;
 }
@@ -702,6 +769,10 @@ export default {
 #timeline-list :deep(.v-list-item-title),
 #timeline-list :deep(.v-list-item__content) {
   overflow: visible;
+}
+
+#timeline-list :deep(.v-list-item-title) {
+  font-size: var(--row-font-size, 1rem);
 }
 
 .track-name-wrap {

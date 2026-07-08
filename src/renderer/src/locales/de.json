@@ -251,7 +251,8 @@
         "duplicateTrack": "Eine Kopie dieser Spur erstellen",
         "deleteTrack": "Diese Spur und alle Segmente dauerhaft entfernen",
         "renameTrack": "Den Namen dieser Spur ändern",
-        "linkVocabularyToTrack": "Diese Spur mit einem Vokabular für Annotationen verknüpfen"
+        "linkVocabularyToTrack": "Diese Spur mit einem Vokabular für Annotationen verknüpfen",
+        "trackHeight": "Die Höhe der Spuren anpassen"
       }
     },
 

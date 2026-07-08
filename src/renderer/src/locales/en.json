@@ -249,7 +249,8 @@
         "duplicateTrack": "Create a copy of this track",
         "deleteTrack": "Permanently remove this track and all its segments",
         "renameTrack": "Change the name of this track",
-        "linkVocabularyToTrack": "Associate this track with a vocabulary for annotation"
+        "linkVocabularyToTrack": "Associate this track with a vocabulary for annotation",
+        "trackHeight": "Adjust the height of the tracks"
       }
     },
 

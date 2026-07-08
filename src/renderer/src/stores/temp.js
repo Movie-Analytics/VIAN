@@ -21,7 +21,8 @@ export const useTempStore = defineStore('temp', {
     // Maps shot id -> timeline id
     selectedSegments: new Map(),
     timelinesFold: {},
-    tmpShot: null
+    tmpShot: null,
+    trackScale: 1
   }),
   /* eslint-disable-next-line vue/sort-keys */
   actions: {

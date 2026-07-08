@@ -123,7 +123,8 @@ import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
-const TIMELINE_HEIGHT = 49
+const BASE_TRACK_HEIGHT = 49
+const CATEGORY_HEADER_HEIGHT = 27
 const PLAYHEAD_COLOR = '#ff0000'
 const SELECTION_COLOR = '#fff59d'
 
@@ -166,8 +167,10 @@ const drawSegment = (
       ctx.rect(x, d.y, xwidth - x, d.height)
       ctx.clip()
       ctx.fillStyle = d.locked ? '#666' : 'black'
+      const fontSize = Math.max(9, Math.round(d.height * (15 / 44)))
+      ctx.font = `${fontSize}px Arial`
       const label = truncateText(ctx, d.annotation, xwidth - x - 20)
-      ctx.fillText(label, x + 10, d.y + 15)
+      ctx.fillText(label, x + 10, d.y + fontSize)
       ctx.restore()
     }
     ctx.strokeStyle = '#666666'
@@ -217,6 +220,7 @@ export default {
       axisColor: 'black',
       canvasHeight: 0,
       canvasWidth: 500,
+      contentHeight: 0,
       contextMenuEntry: null,
       contextMenuVisible: false,
       contextMenuX: 0,
@@ -232,7 +236,6 @@ export default {
       lastClick: Date.now(),
       lockedRows: [],
       moveWarning: false,
-      numTimelines: 0,
       overlayInput: false,
       overlayInputEntry: null,
       overlayInputModel: '',
@@ -290,8 +293,16 @@ export default {
       return Math.round(-this.transform.x)
     },
 
+    segmentHeight() {
+      return this.trackHeight - 5
+    },
+
     selectedTimelineId() {
       return this.tempStore.selectedTimelineId
+    },
+
+    trackHeight() {
+      return Math.round(BASE_TRACK_HEIGHT * this.tempStore.trackScale)
     }
   },
 
@@ -343,6 +354,11 @@ export default {
         this.drawSetup()
         this.requestDraw()
       }
+    },
+
+    'tempStore.trackScale'() {
+      this.drawSetup()
+      this.requestDraw()
     },
 
     'undoableStore.timelines': {
@@ -617,9 +633,14 @@ export default {
     drawSetup() {
       const data = []
       const lockedRows = []
+      const trackHeight = this.trackHeight
+      const segmentHeight = this.segmentHeight
 
-      this.numTimelines = 0
+      let offset = 0
       for (const timeline of this.undoableStore.timelines) {
+        const mainRowY = offset
+        const timelineRowRects = [{ height: trackHeight, y: mainRowY }]
+
         for (const [shotIndex, shot] of timeline.data.entries()) {
           if (timeline.type === 'shots') {
             const effectiveLocked = [timeline.locked, shot.locked].some(Boolean)
@@ -628,7 +649,7 @@ export default {
             data.push({
               annotation,
               fill: color,
-              height: 44,
+              height: segmentHeight,
               id: shot.id,
               locked: effectiveLocked,
               selected: this.tempStore.selectedSegments.has(shot.id),
@@ -636,19 +657,19 @@ export default {
               type: 'shot',
               width: shot.end - shot.start + 1,
               x: shot.start,
-              y: this.numTimelines * TIMELINE_HEIGHT
+              y: mainRowY
             })
           } else if (timeline.type.startsWith('screenshots')) {
             data.push({
-              height: 44,
+              height: segmentHeight,
               id: shot.id,
               selected: this.tempStore.selectedSegments.has(shot.id),
               timeline: timeline.id,
               type: 'screenshot',
               uri: shot.thumbnail,
-              width: 44 * (16 / 9),
+              width: segmentHeight * (16 / 9),
               x: shot.frame,
-              y: this.numTimelines * TIMELINE_HEIGHT
+              y: mainRowY
             })
             // Only re-draw after 200 new images were loaded
             if (!this.tempStore.imageCache.has(shot.thumbnail)) {
@@ -669,23 +690,24 @@ export default {
         }
         if (timeline.type === 'scalar') {
           data.push({
-            data: timeline.data.map(
-              (t) => (this.numTimelines + 1) * TIMELINE_HEIGHT - t * (TIMELINE_HEIGHT - 5) - 5
-            ),
+            data: timeline.data.map((t) => mainRowY + trackHeight - t * segmentHeight - 5),
             fps: timeline.fps,
-            height: 44,
+            height: segmentHeight,
             id: timeline.id,
             timeline: timeline.id,
             type: 'scalar'
           })
         }
-        const startRow = this.numTimelines
+        offset += trackHeight
+
         if (timeline.vocabulary && this.tempStore.timelinesFold[timeline.id].visible) {
           for (const category of this.tempStore.timelinesFold[timeline.id].categories) {
-            this.numTimelines += 1
+            timelineRowRects.push({ height: CATEGORY_HEADER_HEIGHT, y: offset })
+            offset += CATEGORY_HEADER_HEIGHT
             if (category.visible) {
               for (const tag of category.tags) {
-                this.numTimelines += 1
+                const tagRowY = offset
+                timelineRowRects.push({ height: trackHeight, y: tagRowY })
                 //TODO: reduce nesting and complexity here
                 /* eslint-disable max-depth */
                 for (const shot of timeline.data) {
@@ -694,7 +716,7 @@ export default {
 
                   data.push({
                     fill: color,
-                    height: 44,
+                    height: segmentHeight,
                     id: shot.id,
                     locked: timeline.locked,
                     tag: tag.id,
@@ -702,22 +724,21 @@ export default {
                     type: 'select',
                     width: shot.end - shot.start + 1,
                     x: shot.start,
-                    y: this.numTimelines * TIMELINE_HEIGHT
+                    y: tagRowY
                   })
                 }
                 /* eslint-enable max-depth */
+                offset += trackHeight
               }
             }
           }
         }
         if (timeline.locked) {
-          for (let row = startRow; row <= this.numTimelines; row += 1) {
-            lockedRows.push(row * TIMELINE_HEIGHT)
-          }
+          lockedRows.push(...timelineRowRects)
         }
-        this.numTimelines += 1
       }
 
+      this.contentHeight = offset
       this.lockedRows = lockedRows
       this.zoom = d3
         .zoom()
@@ -783,7 +804,6 @@ export default {
       hCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
       const selectedSegments = new Set(this.tempStore.selectedSegments.keys())
       ctx.textAlign = 'left'
-      ctx.font = '15px Arial'
       ctx.textBaseline = 'top'
 
       const movingId = this.tempStore.tmpShot?.moving
@@ -814,15 +834,15 @@ export default {
       ctx.strokeStyle = 'rgba(0,0,0,0.22)'
       ctx.lineWidth = 4
       const step = 16
-      for (const y of this.lockedRows) {
+      for (const row of this.lockedRows) {
         ctx.save()
         ctx.beginPath()
-        ctx.rect(0, y, this.canvasWidth, TIMELINE_HEIGHT - 5)
+        ctx.rect(0, row.y, this.canvasWidth, row.height - 5)
         ctx.clip()
-        for (let xi = -TIMELINE_HEIGHT; xi < this.canvasWidth + step; xi += step) {
+        for (let xi = -row.height; xi < this.canvasWidth + step; xi += step) {
           ctx.beginPath()
-          ctx.moveTo(xi, y)
-          ctx.lineTo(xi + TIMELINE_HEIGHT, y + TIMELINE_HEIGHT)
+          ctx.moveTo(xi, row.y)
+          ctx.lineTo(xi + row.height, row.y + row.height)
           ctx.stroke()
         }
         ctx.restore()
@@ -832,7 +852,7 @@ export default {
         const activeEntry = data.find((d) => d.timeline === this.selectedTimelineId)
         if (activeEntry) {
           const y = activeEntry.y
-          const bottom = y + TIMELINE_HEIGHT - 5
+          const bottom = y + this.trackHeight - 5
           ctx.save()
           ctx.strokeStyle = '#2196f3'
           ctx.lineWidth = 2
@@ -930,16 +950,16 @@ export default {
       let offset = 0
 
       for (const timeline of this.undoableStore.timelines) {
-        offset += TIMELINE_HEIGHT
+        offset += this.trackHeight
         if (offset > y) break
 
         const fold = this.tempStore.timelinesFold[timeline.id]
         if (fold.visible) {
           for (const category of fold.categories) {
-            offset += TIMELINE_HEIGHT
+            offset += CATEGORY_HEADER_HEIGHT
             if (offset > y) break
             if (category.visible) {
-              offset += category.tags.length * TIMELINE_HEIGHT
+              offset += category.tags.length * this.trackHeight
             }
           }
         }
@@ -950,17 +970,17 @@ export default {
     },
 
     getTimelineRowY(timelineId) {
-      let rows = 0
+      let offset = 0
       for (const timeline of this.undoableStore.timelines) {
-        if (timeline.id === timelineId) return rows * TIMELINE_HEIGHT
+        if (timeline.id === timelineId) return offset
         const fold = this.tempStore.timelinesFold[timeline.id]
         if (fold?.visible && fold.categories) {
           for (const category of fold.categories) {
-            rows += 1
-            if (category.visible) rows += category.tags.length
+            offset += CATEGORY_HEADER_HEIGHT
+            if (category.visible) offset += category.tags.length * this.trackHeight
           }
         }
-        rows += 1
+        offset += this.trackHeight
       }
       return null
     },
@@ -989,7 +1009,7 @@ export default {
         window.addEventListener('mouseup', this.mouseup)
         this.tempStore.tmpShot = {
           end: entry.x + entry.width - 1,
-          height: 44,
+          height: this.segmentHeight,
           max: this.mainStore.numFrames,
           min: 0,
           origin: leftSide ? entry.x + entry.width - 1 : entry.x,
@@ -1015,7 +1035,7 @@ export default {
                 : adjacent.x - (entry.x + entry.width - 1),
 
               end: adjacent.x + adjacent.width - 1,
-              height: 44,
+              height: this.segmentHeight,
               leftSide,
               originalShot: adjacent,
               start: adjacent.x,
@@ -1034,7 +1054,7 @@ export default {
         this.tempStore.tmpShot = {
           dragOffset: xNew - entry.x,
           end: entry.x + entry.width - 1,
-          height: 44,
+          height: this.segmentHeight,
           max: this.mainStore.numFrames,
           min: 0,
           moving: true,
@@ -1047,12 +1067,12 @@ export default {
       }
 
       // Create new segment
-      const height = coordY - (coordY % TIMELINE_HEIGHT)
+      const height = this.getTimelineRowY(this.undoableStore.timelines[timelineIndex].id)
       const start = this.transform.rescaleX(this.scale).invert(coordX)
       window.addEventListener('mouseup', this.mouseup)
       this.tempStore.tmpShot = {
         end: start,
-        height: 44,
+        height: this.segmentHeight,
         max: this.mainStore.numFrames,
         min: 0,
         origin: start,
@@ -1208,7 +1228,7 @@ export default {
       // Get the display size of the canvas
       const container = this.$refs.canvas.parentElement
       const displayWidth = container.clientWidth
-      const displayHeight = this.numTimelines * TIMELINE_HEIGHT
+      const displayHeight = this.contentHeight
 
       // Set the canvas display size
       this.canvasWidth = displayWidth
@@ -1267,7 +1287,7 @@ export default {
       const start = adjacent ? playHead + 1 : playHead
       const tmpShot = {
         end: start,
-        height: 44,
+        height: this.segmentHeight,
         ioPending: true,
         originalShot: null,
         start,
