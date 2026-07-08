@@ -234,6 +234,8 @@
     "timelines": {
       "tooltips": {
         "addSegment": "Neues Segment an der Abspielposition hinzufügen",
+        "setInPoint": "Start eines neuen Segments an der Abspielposition markieren (i)",
+        "setOutPoint": "Ende des ausstehenden Segments an der Abspielposition markieren (o)",
         "deleteSelectedSegment": "Ausgewähltes Segment löschen",
         "splitSelectedSegment": "Ausgewähltes Segment teilen",
         "mergeSelectedSegments": "Ausgewählte Segmente zusammenführen",

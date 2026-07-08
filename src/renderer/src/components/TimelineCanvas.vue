@@ -1237,7 +1237,9 @@ export default {
       if (!timeline || timeline.type !== 'shots' || timeline.locked) return
       const y = this.getTimelineRowY(timelineId)
       if (y === null) return
-      const start = this.playHeadFrame()
+      const playHead = this.playHeadFrame()
+      const adjacent = timeline.data.find((s) => s.end === playHead)
+      const start = adjacent ? playHead + 1 : playHead
       const tmpShot = {
         end: start,
         height: 44,

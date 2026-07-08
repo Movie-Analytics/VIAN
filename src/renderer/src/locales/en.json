@@ -232,6 +232,8 @@
     "timelines": {
       "tooltips": {
         "addSegment": "Add new segment at playhead",
+        "setInPoint": "Mark the start of a new segment at the playhead (i)",
+        "setOutPoint": "Mark the end of the pending segment at the playhead (o)",
         "deleteSelectedSegment": "Delete selected segment",
         "splitSelectedSegment": "Split selected segment",
         "mergeSelectedSegments": "Merge selected segments",

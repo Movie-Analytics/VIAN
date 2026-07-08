@@ -21,6 +21,42 @@
 
       <span
         v-tooltip="{
+          text: $t('components.timelines.tooltips.setInPoint'),
+          location: 'bottom'
+        }"
+      >
+        <v-btn
+          density="compact"
+          variant="text"
+          :disabled="!inPointSettable"
+          icon
+          :aria-label="$t('components.timelines.tooltips.setInPoint')"
+          @click="$refs.timelineCanvas.setInPoint()"
+        >
+          <v-icon>mdi-login</v-icon>
+        </v-btn>
+      </span>
+
+      <span
+        v-tooltip="{
+          text: $t('components.timelines.tooltips.setOutPoint'),
+          location: 'bottom'
+        }"
+      >
+        <v-btn
+          density="compact"
+          variant="text"
+          :disabled="!outPointSettable"
+          icon
+          :aria-label="$t('components.timelines.tooltips.setOutPoint')"
+          @click="$refs.timelineCanvas.setOutPoint()"
+        >
+          <v-icon>mdi-logout</v-icon>
+        </v-btn>
+      </span>
+
+      <span
+        v-tooltip="{
           text: $t('components.timelines.tooltips.deleteSelectedSegment'),
           location: 'bottom'
         }"
@@ -273,7 +309,7 @@
         </template>
 
         <template #panel2>
-          <TimelineCanvas></TimelineCanvas>
+          <TimelineCanvas ref="timelineCanvas"></TimelineCanvas>
         </template>
       </SplitterContainer>
     </div>
@@ -353,6 +389,11 @@ export default {
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
 
+    inPointSettable() {
+      const timeline = this.undoableStore.getTimelineById(this.tempStore.selectedTimelineId)
+      return Boolean(timeline) && timeline.type === 'shots' && !timeline.locked
+    },
+
     openedItems() {
       const openedTimelines = Object.entries(this.tempStore.timelinesFold)
         .filter((e) => e[1].visible)
@@ -362,6 +403,10 @@ export default {
         .map((v) => v.categories.filter((c) => c.visible).map((c) => c.id))
         .flat()
       return openedTimelines.concat(openedCategories)
+    },
+
+    outPointSettable() {
+      return Boolean(this.tempStore.tmpShot?.ioPending)
     },
 
     segmentAddable() {
