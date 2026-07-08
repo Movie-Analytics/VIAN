@@ -97,6 +97,7 @@
         "layout": "Layout",
         "tabbedLayout": "Tabbed Layout",
         "draggableLayout": "Draggable Layout",
+        "shortcuts": "Shortcuts",
         "tooltips": {
           "shotBoundaryDetection": "Automatically detect shot boundaries in the video",
           "loadSubtitles": "Import a subtitle file and add it as a track",
@@ -108,7 +109,8 @@
           "switchToDarkMode": "Switch the interface to dark mode",
           "switchToGerman": "Switch the interface to German",
           "switchToEnglish": "Switch the interface to English",
-          "layout": "Change the panel layout of the workspace"
+          "layout": "Change the panel layout of the workspace",
+          "shortcuts": "Show the list of keyboard shortcuts"
         }
       },
 
@@ -130,6 +132,9 @@
           "description": "You can either export all screenshots at once or select individual screenshots from the timeline and export only those.",
           "exportAll": "Export all",
           "exportIndividually": "Export individually"
+        },
+        "shortcuts": {
+          "title": "Shortcuts"
         }
       },
 
@@ -256,6 +261,41 @@
         "toggleAnnotation": "Toggle annotation",
         "merge": "Merge selected segments",
         "removeSegment": "Remove segment"
+      }
+    },
+
+    "shortcutsList": {
+      "headers": {
+        "shortcut": "Shortcut",
+        "description": "Description"
+      },
+      "groups": {
+        "playback": "Playback",
+        "segmentation": "Segmentation",
+        "shotMarking": "Shot marking",
+        "editing": "Editing"
+      },
+      "playback": {
+        "playPause": "Play/pause toggle",
+        "nextFrame": "Step one frame forward",
+        "previousFrame": "Step one frame backward",
+        "stop": "Stop playback and reset speed",
+        "playForward": "Play forward, press repeatedly to increase speed",
+        "previousSegment": "Jump to previous segment",
+        "nextSegment": "Jump to next segment"
+      },
+      "segmentation": {
+        "deleteSegment": "Delete selected segment(s)",
+        "mergeSegments": "Merge selected segments",
+        "splitSegment": "Split selected segment at playhead"
+      },
+      "shotMarking": {
+        "setInPoint": "Set in-point of a new shot at the playhead",
+        "setOutPoint": "Set out-point, completing the shot"
+      },
+      "editing": {
+        "undo": "Undo",
+        "redo": "Redo"
       }
     }
   }

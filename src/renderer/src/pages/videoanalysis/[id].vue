@@ -219,6 +219,13 @@
         >
         </v-list-item>
       </v-list-group>
+
+      <v-list-item
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.shortcuts'), location: 'left' }"
+        prepend-icon="mdi-keyboard"
+        :title="$t('pages.video.drawer.shortcuts')"
+        @click="shortcutsDialog = true"
+      ></v-list-item>
     </v-list>
   </v-navigation-drawer>
 
@@ -321,6 +328,20 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="shortcutsDialog" max-width="600" scrollable>
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.shortcuts.title') }}</v-card-title>
+
+        <v-card-text>
+          <ShortcutsList></ShortcutsList>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="shortcutsDialog = false">{{ $t('common.close') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <VocabularyDialog ref="vocabularyDialog"></VocabularyDialog>
   </v-main>
 </template>
@@ -330,6 +351,7 @@ import { mapStores } from 'pinia'
 
 import LayoutDraggable from '@renderer/components/LayoutDraggable.vue'
 import LayoutTibava from '@renderer/components/LayoutTibava.vue'
+import ShortcutsList from '@renderer/components/ShortcutsList.vue'
 import VocabularyDialog from '@renderer/components/VocabularyDialog.vue'
 import api from '@renderer/api'
 import { exportAnnotations } from '@renderer/importexport'
@@ -341,7 +363,7 @@ import { useUndoableStore } from '@renderer/stores/undoable'
 
 export default {
   name: 'Id',
-  components: { LayoutDraggable, LayoutTibava, VocabularyDialog },
+  components: { LayoutDraggable, LayoutTibava, ShortcutsList, VocabularyDialog },
 
   data: () => ({
     drawerGroupsOpen: [],
@@ -353,6 +375,7 @@ export default {
     screenshotInterval: 10,
     screenshotPerShot: false,
     screenshotShotTimeline: null,
+    shortcutsDialog: false,
     shotBoundaryDialog: false
   }),
 

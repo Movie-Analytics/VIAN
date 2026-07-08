@@ -99,6 +99,7 @@
         "layout": "Layout",
         "tabbedLayout": "Tab-Layout",
         "draggableLayout": "Verschiebbares Layout",
+        "shortcuts": "Tastenkürzel",
         "tooltips": {
           "shotBoundaryDetection": "Shotgrenzen im Video automatisch erkennen",
           "loadSubtitles": "Untertiteldatei importieren und als Spur hinzufügen",
@@ -110,7 +111,8 @@
           "switchToDarkMode": "Zur dunklen Benutzeroberfläche wechseln",
           "switchToGerman": "Benutzeroberfläche auf Deutsch umstellen",
           "switchToEnglish": "Benutzeroberfläche auf Englisch umstellen",
-          "layout": "Panel-Layout des Arbeitsbereichs ändern"
+          "layout": "Panel-Layout des Arbeitsbereichs ändern",
+          "shortcuts": "Liste der Tastenkürzel anzeigen"
         }
       },
 
@@ -132,6 +134,9 @@
           "description": "Du kannst entweder alle Screenshots auf einmal exportieren oder sie in einer Timeline einzeln auswählen und nur diese exportieren.",
           "exportAll": "Alle exportieren",
           "exportIndividually": "Einzeln exportieren"
+        },
+        "shortcuts": {
+          "title": "Tastenkürzel"
         }
       },
 
@@ -258,6 +263,41 @@
         "toggleAnnotation": "Annotation umschalten",
         "merge": "Ausgewählte Segmente zusammenführen",
         "removeSegment": "Segment entfernen"
+      }
+    },
+
+    "shortcutsList": {
+      "headers": {
+        "shortcut": "Tastenkürzel",
+        "description": "Beschreibung"
+      },
+      "groups": {
+        "playback": "Wiedergabe",
+        "segmentation": "Segmentierung",
+        "shotMarking": "Shot-Markierung",
+        "editing": "Bearbeiten"
+      },
+      "playback": {
+        "playPause": "Wiedergabe starten/pausieren",
+        "nextFrame": "Ein Bild vorwärts springen",
+        "previousFrame": "Ein Bild zurückspringen",
+        "stop": "Wiedergabe stoppen und Geschwindigkeit zurücksetzen",
+        "playForward": "Vorwärts abspielen, mehrfach drücken um die Geschwindigkeit zu erhöhen",
+        "previousSegment": "Zum vorherigen Segment springen",
+        "nextSegment": "Zum nächsten Segment springen"
+      },
+      "segmentation": {
+        "deleteSegment": "Ausgewählte(s) Segment(e) löschen",
+        "mergeSegments": "Ausgewählte Segmente zusammenführen",
+        "splitSegment": "Ausgewähltes Segment an der Abspielposition teilen"
+      },
+      "shotMarking": {
+        "setInPoint": "Startpunkt eines neuen Shots an der Abspielposition setzen",
+        "setOutPoint": "Endpunkt setzen und den Shot abschließen"
+      },
+      "editing": {
+        "undo": "Rückgängig machen",
+        "redo": "Wiederholen"
       }
     }
   }
