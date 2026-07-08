@@ -77,6 +77,12 @@
               @click="contextMenuMerge"
             />
 
+            <v-list-item
+              :disabled="!contextMenuSplitable"
+              :title="$t('components.timelineCanvas.contextMenu.split')"
+              @click="contextMenuSplit"
+            />
+
             <v-divider />
 
             <v-list-item
@@ -262,6 +268,14 @@ export default {
         .map((s) => timelineDataIds.indexOf(s))
         .sort((a, b) => a - b)
       return indices[indices.length - 1] - indices[0] === indices.length - 1
+    },
+
+    contextMenuSplitable() {
+      if (this.tempStore.selectedSegments.size !== 1) return false
+      const playFps = Math.round(this.tempStore.playPosition * this.mainStore.fps)
+      const [shotId, timelineId] = this.tempStore.selectedSegments.entries().next().value
+      const segment = this.undoableStore.getSegmentForId(timelineId, shotId)
+      return segment.start < playFps && segment.end > playFps
     },
 
     scrollMax() {
@@ -480,6 +494,17 @@ export default {
       if (!this.contextMenuMergable) return
       const segments = this.tempStore.selectedSegments
       this.undoableStore.mergeSegments(segments.values().next().value, Array.from(segments.keys()))
+      this.tempStore.selectedSegments = new Map()
+    },
+
+    contextMenuSplit() {
+      if (!this.contextMenuSplitable) return
+      const [shotId, timelineId] = this.tempStore.selectedSegments.entries().next().value
+      this.undoableStore.splitSegment(
+        timelineId,
+        shotId,
+        Math.round(this.tempStore.playPosition * this.mainStore.fps)
+      )
       this.tempStore.selectedSegments = new Map()
     },
 

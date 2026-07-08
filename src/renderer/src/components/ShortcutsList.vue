@@ -54,7 +54,7 @@ export default {
               key: 'Delete / Backspace'
             },
             { action: this.$t('components.shortcutsList.segmentation.mergeSegments'), key: 'm' },
-            { action: this.$t('components.shortcutsList.segmentation.splitSegment'), key: 's' }
+            { action: this.$t('components.shortcutsList.segmentation.splitSegment'), key: 'c' }
           ],
 
           title: this.$t('components.shortcutsList.groups.segmentation')

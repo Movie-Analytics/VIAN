@@ -262,7 +262,8 @@
         "addTextAnnotation": "Textannotation hinzufügen",
         "toggleAnnotation": "Annotation umschalten",
         "merge": "Ausgewählte Segmente zusammenführen",
-        "removeSegment": "Segment entfernen"
+        "removeSegment": "Segment entfernen",
+        "split": "Dieses Segment am Abspielkopf teilen"
       }
     },
 

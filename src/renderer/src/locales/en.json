@@ -260,7 +260,8 @@
         "addTextAnnotation": "Add text annotation",
         "toggleAnnotation": "Toggle annotation",
         "merge": "Merge selected segments",
-        "removeSegment": "Remove segment"
+        "removeSegment": "Remove segment",
+        "split": "Split this segment at play head"
       }
     },
 

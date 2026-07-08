@@ -490,7 +490,7 @@ export default {
     shortcuts.register('Delete', this.segmentDelete)
     shortcuts.register('Backspace', this.segmentDelete)
     shortcuts.register('m', this.segmentMerge)
-    shortcuts.register('s', this.segmentSplit)
+    shortcuts.register('c', this.segmentSplit)
     api.onSegmentDelete(this.segmentDelete)
     api.onSegmentMerge(this.segmentMerge)
     api.onSegmentSplit(this.segmentSplit)
@@ -499,7 +499,7 @@ export default {
 
   beforeUnmount() {
     this.trackListResizeObserver?.disconnect()
-    for (const key of ['m', 's', 'Delete', 'Backspace']) {
+    for (const key of ['m', 'c', 'Delete', 'Backspace']) {
       shortcuts.clear(key)
     }
   },

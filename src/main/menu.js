@@ -114,7 +114,7 @@ export const createMenu = () => {
           label: 'Delete Segment'
         },
         {
-          accelerator: 's',
+          accelerator: 'c',
           click: (_item, _window, event) => {
             if (!event.triggeredByAccelerator) {
               BrowserWindow.getFocusedWindow()?.webContents.send('segment-split')
