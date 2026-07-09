@@ -147,14 +147,16 @@ ipcMain.handle('load-subtitles', (_event, projectId) => loadSubtitles(projectId)
 ipcMain.on('terminate-job', (channel, jobId) => terminateJob(channel, jobId))
 ipcMain.handle('load-store', (_event, name, id) => loadStore(name, id))
 ipcMain.on('save-store', (_channel, name, store) => saveStore(name, store))
-ipcMain.on('run-shotboundary-detection', (channel, path) => runShotBoundaryDetection(channel, path))
+ipcMain.on('run-shotboundary-detection', (channel, path, projectId) =>
+  runShotBoundaryDetection(channel, path, projectId)
+)
 ipcMain.on('run-screenshots-generation', (channel, path, frames, videoId) =>
   runScreenshotsGeneration(channel, path, frames, videoId)
 )
 ipcMain.on('run-screenshot-generation', (channel, path, frame, videoId) =>
   runScreenshotGeneration(channel, path, frame, videoId)
 )
-ipcMain.on('get-video-info', (channel, path) => getVideoInfo(channel, path))
+ipcMain.on('get-video-info', (channel, path, projectId) => getVideoInfo(channel, path, projectId))
 ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnotations) =>
   exportScreenshot(channel, projectId, screenshot, associatedAnnotations)
 )

@@ -32,7 +32,7 @@
       </template>
 
       <v-list>
-        <v-list-item v-for="(job, i) in tempStore.jobs" :key="i">
+        <v-list-item v-for="(job, i) in projectJobs" :key="i">
           <v-list-item-title>{{ job.type }}</v-list-item-title>
 
           <template #append>
@@ -234,6 +234,26 @@
 
     <LayoutDraggable v-else-if="layout === 'draggable'"></LayoutDraggable>
 
+    <v-dialog v-model="leaveProjectDialog" persistent max-width="400">
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.leaveProject.title') }}</v-card-title>
+
+        <v-card-text>
+          {{ $t('pages.video.dialogs.leaveProject.description') }}
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="leaveProjectDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn color="primary" @click="leaveProject">
+            {{ $t('pages.video.dialogs.leaveProject.confirm') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="shotBoundaryDialog" persistent max-width="400">
       <v-card>
         <v-card-title>{{ $t('pages.video.dialogs.shotBoundaryDetection.title') }}</v-card-title>
@@ -373,6 +393,7 @@ export default {
     jobMenuHideTimeout: null,
     jobMenuVisible: false,
     layout: 'tibava',
+    leaveProjectDialog: false,
     screenshotInterval: 10,
     screenshotPerShot: false,
     screenshotShotTimeline: null,
@@ -399,7 +420,7 @@ export default {
     },
 
     hasJobs() {
-      return this.tempStore.jobs.length > 0
+      return this.projectJobs.length > 0
     },
 
     isGerman() {
@@ -414,8 +435,15 @@ export default {
       return this.undoStore.isUndoable('undoable')
     },
 
+    // The web backend already scopes jobs to the open project server-side;
+    // only the Electron job list needs filtering here.
+    projectJobs() {
+      if (!IS_ELECTRON) return this.tempStore.jobs
+      return this.tempStore.jobs.filter((j) => j.projectId === this.mainStore.id)
+    },
+
     runningJobs() {
-      return this.tempStore.jobs.some((j) => j.status === 'RUNNING')
+      return this.projectJobs.some((j) => j.status === 'RUNNING')
     }
   },
 
@@ -427,11 +455,16 @@ export default {
     },
 
     'tempStore.jobs'(newVal, oldVal) {
-      const numNewErrors = newVal.filter((j) => j.status === 'ERROR').length
-      const numOldErrors = oldVal.filter((j) => j.status === 'ERROR').length
+      const filterProject = (jobs) =>
+        IS_ELECTRON ? jobs.filter((j) => j.projectId === this.mainStore.id) : jobs
+      const newProjectJobs = filterProject(newVal)
+      const oldProjectJobs = filterProject(oldVal)
 
-      const numNewRunning = newVal.filter((j) => j.status === 'RUNNING').length
-      const numOldRunning = oldVal.filter((j) => j.status === 'RUNNING').length
+      const numNewErrors = newProjectJobs.filter((j) => j.status === 'ERROR').length
+      const numOldErrors = oldProjectJobs.filter((j) => j.status === 'ERROR').length
+
+      const numNewRunning = newProjectJobs.filter((j) => j.status === 'RUNNING').length
+      const numOldRunning = oldProjectJobs.filter((j) => j.status === 'RUNNING').length
       if (numNewErrors !== numOldErrors || numNewRunning !== numOldRunning) {
         this.jobMenuVisible = true
       }
@@ -499,9 +532,6 @@ export default {
     shortcuts.clear('z', true, false, true)
     shortcuts.clear('z', false, false, true)
     clearTimeout(this.jobMenuHideTimeout)
-    this.tempStore.jobs
-      .filter((j) => j.status === 'RUNNING')
-      .forEach((j) => this.tempStore.terminateJob(j.id))
     api.unregisterVideoViewCallbacks()
   },
 
@@ -560,11 +590,11 @@ export default {
     },
 
     homeClicked() {
-      this.$router.push('/')
-      this.mainStore.$reset()
-      this.tempStore.$reset()
-      this.undoableStore.$reset()
-      this.undoStore.reset()
+      if (this.runningJobs) {
+        this.leaveProjectDialog = true
+        return
+      }
+      this.leaveProject()
     },
 
     importAnnotations() {
@@ -573,6 +603,18 @@ export default {
 
     importTibava() {
       this.undoableStore.importTibava()
+    },
+
+    leaveProject() {
+      this.leaveProjectDialog = false
+      this.projectJobs
+        .filter((j) => j.status === 'RUNNING')
+        .forEach((j) => this.tempStore.terminateJob(j.id))
+      this.$router.push('/')
+      this.mainStore.$reset()
+      this.tempStore.$reset()
+      this.undoableStore.$reset()
+      this.undoStore.reset()
     },
 
     loadSubtitles() {

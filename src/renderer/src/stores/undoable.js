@@ -293,7 +293,7 @@ export const useUndoableStore = defineStore('undoable', {
       this.timelines = items
     },
     runShotBoundaryDetection() {
-      api.runShotBoundaryDetection(useMainStore().video)
+      api.runShotBoundaryDetection(useMainStore().video, useMainStore().id)
     },
     splitSegment(timelineId, segmentId, position) {
       const timeline = this.getTimelineById(timelineId)

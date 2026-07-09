@@ -31,10 +31,11 @@ class JobManager {
     this.jobs = new Map()
   }
 
-  createJob(type, worker) {
+  createJob(type, worker, projectId) {
     const job = {
       creation: Date.now(),
       id: this.jobs.size,
+      projectId,
       status: 'RUNNING',
       type,
       worker
@@ -70,8 +71,8 @@ class JobManager {
     channel.sender.send('jobs-update', JSON.parse(JSON.stringify(Array.from(this.jobs.values()))))
   }
 
-  createWorkerJob(channel, type, worker) {
-    const job = this.createJob(type, worker)
+  createWorkerJob(channel, type, worker, projectId) {
+    const job = this.createJob(type, worker, projectId)
 
     worker.on('error', (error) => {
       console.error(`Worker error in ${type}:`, error)
@@ -155,9 +156,9 @@ export const saveStore = (name, store) => {
   fs.writeFileSync(storePath, JSON.stringify(store))
 }
 
-export const runShotBoundaryDetection = (channel, videoPath) => {
+export const runShotBoundaryDetection = (channel, videoPath, projectId) => {
   const worker = shotBoundaryWorker({ workerData: videoPath.replace('app://', '') })
-  const job = jobManager.createWorkerJob(channel, 'shotboundary-detection', worker)
+  const job = jobManager.createWorkerJob(channel, 'shotboundary-detection', worker, projectId)
 
   worker.on('message', (data) => {
     jobManager.updateJobStatus(channel, job.id, data.status)
@@ -174,7 +175,7 @@ export const runScreenshotsGeneration = (channel, videoPath, frames, videoId) =>
   const worker = screenshotsGenerationWorker({
     workerData: { directory: dataPath, frames, videoPath: videoPath.replace('app://', '') }
   })
-  const job = jobManager.createWorkerJob(channel, 'screenshots-generation', worker)
+  const job = jobManager.createWorkerJob(channel, 'screenshots-generation', worker, videoId)
 
   worker.on('message', (data) => {
     jobManager.updateJobStatus(channel, job.id, data.status)
@@ -191,7 +192,7 @@ export const runScreenshotGeneration = (channel, videoPath, frame, videoId) => {
   const worker = screenshotGenerationWorker({
     workerData: { directory: dataPath, frame, videoPath: videoPath.replace('app://', '') }
   })
-  const job = jobManager.createWorkerJob(channel, 'screenshot-generation', worker)
+  const job = jobManager.createWorkerJob(channel, 'screenshot-generation', worker, videoId)
 
   worker.on('message', (data) => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
@@ -199,9 +200,9 @@ export const runScreenshotGeneration = (channel, videoPath, frame, videoId) => {
   })
 }
 
-export const getVideoInfo = (channel, videoPath) => {
+export const getVideoInfo = (channel, videoPath, projectId) => {
   const worker = videoInfoWorker({ workerData: videoPath.replace('app://', '') })
-  const job = jobManager.createWorkerJob(channel, 'video-info', worker)
+  const job = jobManager.createWorkerJob(channel, 'video-info', worker, projectId)
 
   worker.on('message', (data) => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
@@ -219,7 +220,7 @@ export const exportScreenshot = (channel, projectId, screenshot, associatedAnnot
   const worker = exportScreenshotWorker({
     workerData: { associatedAnnotations, location, screenshot, storePath: getDataPath(projectId) }
   })
-  const job = jobManager.createWorkerJob(channel, 'export-screenshot', worker)
+  const job = jobManager.createWorkerJob(channel, 'export-screenshot', worker, projectId)
 
   worker.on('message', () => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
@@ -236,7 +237,7 @@ export const exportScreenshots = (channel, projectId, frames) => {
   const worker = exportScreenshotsWorker({
     workerData: { frames, location, storePath: getDataPath(projectId) }
   })
-  const job = jobManager.createWorkerJob(channel, 'export-screenshots', worker)
+  const job = jobManager.createWorkerJob(channel, 'export-screenshots', worker, projectId)
 
   worker.on('message', () => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
@@ -252,7 +253,7 @@ export const exportProject = (channel, projectId) => {
   const projectPath = getDataPath(projectId)
 
   const worker = exportProjectWorker({ workerData: { location, projectPath } })
-  const job = jobManager.createWorkerJob(channel, 'export-project', worker)
+  const job = jobManager.createWorkerJob(channel, 'export-project', worker, projectId)
 
   worker.on('message', () => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')

@@ -137,6 +137,11 @@
         },
         "shortcuts": {
           "title": "Tastenkürzel"
+        },
+        "leaveProject": {
+          "title": "Projekt verlassen",
+          "description": "Für dieses Projekt laufen noch Jobs. Wenn du jetzt gehst, werden sie abgebrochen.",
+          "confirm": "Verlassen und Jobs abbrechen"
         }
       },
 

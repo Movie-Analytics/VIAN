@@ -44,7 +44,7 @@ export const useMainStore = defineStore('main', {
       this.video = video
 
       if (this.video !== null) {
-        api.getVideoInfo(this.video)
+        api.getVideoInfo(this.video, this.id)
       }
     },
     timeReadableFrame(frame, framenum = false) {

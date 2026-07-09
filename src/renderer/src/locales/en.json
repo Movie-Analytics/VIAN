@@ -135,6 +135,11 @@
         },
         "shortcuts": {
           "title": "Shortcuts"
+        },
+        "leaveProject": {
+          "title": "Leave Project",
+          "description": "There are still jobs running for this project. Leaving now will cancel them.",
+          "confirm": "Leave and Cancel Jobs"
         }
       },
 

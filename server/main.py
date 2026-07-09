@@ -349,6 +349,18 @@ async def terminate_job(
     return {'message': 'Job not running'}
 
 
+# TODO: bulk-cancel endpoint for the web build's leave-project warning
+# (see [id].vue leaveProject()). Not implemented yet; the Electron build
+# terminates each running job individually via terminate-job instead.
+@app.get(API_PREFIX + 'cancel-project-jobs/{projectid}')
+async def cancel_project_jobs(
+    projectid: str,
+    session: db.SessionDep,
+    current_account: auth.AccountDep
+) -> dict:
+    raise HTTPException(status_code=501, detail='Not implemented')
+
+
 @app.post(API_PREFIX + 'export-screenshots')
 async def export_screenshots(
     export: ScreenshotExport,
