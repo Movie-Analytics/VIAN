@@ -638,6 +638,7 @@ export default {
 
       let offset = 0
       for (const timeline of this.undoableStore.timelines) {
+        if (timeline.hidden) continue // eslint-disable-line no-continue
         const mainRowY = offset
         const timelineRowRects = [{ height: trackHeight, y: mainRowY }]
 
@@ -950,6 +951,12 @@ export default {
       let offset = 0
 
       for (const timeline of this.undoableStore.timelines) {
+        if (timeline.hidden) {
+          index += 1
+          // eslint-disable-next-line no-continue
+          continue
+        }
+
         offset += this.trackHeight
         if (offset > y) break
 
@@ -972,6 +979,7 @@ export default {
     getTimelineRowY(timelineId) {
       let offset = 0
       for (const timeline of this.undoableStore.timelines) {
+        if (timeline.hidden) continue // eslint-disable-line no-continue
         if (timeline.id === timelineId) return offset
         const fold = this.tempStore.timelinesFold[timeline.id]
         if (fold?.visible && fold.categories) {
@@ -982,6 +990,7 @@ export default {
         }
         offset += this.trackHeight
       }
+
       return null
     },
 

@@ -41,6 +41,7 @@ export const useUndoableStore = defineStore('undoable', {
     addNewTimeline() {
       this.timelines.push({
         data: [],
+        hidden: false,
         id: crypto.randomUUID(),
         locked: false,
         name: 'Track ' + (this.timelines.length + 1),

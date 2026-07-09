@@ -6,10 +6,6 @@
   height: fit-content;
 }
 
-.mt-1px {
-  margin-top: 1px;
-}
-
 .full-width-snackbar-content .v-snackbar__content {
   width: 100%;
 }

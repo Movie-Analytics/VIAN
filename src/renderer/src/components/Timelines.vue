@@ -146,10 +146,10 @@
             :opened="openedItems"
           >
             <v-list-group
-              v-for="(timeline, id) in tempStore.timelinesFold"
+              v-for="(timeline, id) in visibleTimelinesFold"
               :key="id"
               :value="id"
-              class="border-b-sm"
+              class="track-group-separator"
             >
               <template #activator>
                 <v-list-item
@@ -280,6 +280,15 @@
                             :disabled="!canLinkVocabulary(id)"
                             @click="linkVocabDialogOpen(id)"
                           ></v-list-item>
+
+                          <v-list-item
+                            v-tooltip="{
+                              text: $t('components.timelines.tooltips.hideTrack'),
+                              location: 'right'
+                            }"
+                            :title="$t('pages.video.timelines.hideTrack')"
+                            @click="toggleTimelineHidden(id)"
+                          ></v-list-item>
                         </v-list>
                       </v-menu>
                     </v-list-item-action>
@@ -296,7 +305,7 @@
                   >
                     <template #activator>
                       <v-list-item
-                        class="bg-surface-light border-t-sm category-header-row mt-1px"
+                        class="bg-surface-light border-t-sm category-header-row"
                         :style="{
                           height: categoryHeaderHeight + 'px',
                           minHeight: categoryHeaderHeight + 'px',
@@ -328,7 +337,7 @@
                       v-for="tag in category.tags"
                       :key="tag.id"
                       :title="tag.name"
-                      class="border-t-sm mt-1px"
+                      class="border-t-sm"
                       :style="{
                         height: trackHeight + 'px',
                         minHeight: trackHeight + 'px',
@@ -343,6 +352,42 @@
 
             <v-list-item v-tooltip="$t('pages.video.timelines.addTrack')" @click="addTimeline">
               <v-icon>mdi-playlist-plus</v-icon>
+            </v-list-item>
+
+            <v-list-item v-if="hiddenTimelineIds.length > 0">
+              <v-menu>
+                <template #activator="{ props }">
+                  <v-btn
+                    variant="text"
+                    density="compact"
+                    prepend-icon="mdi-eye-off-outline"
+                    :aria-label="
+                      $t('pages.video.timelines.hiddenTracks', {
+                        count: hiddenTimelineIds.length
+                      })
+                    "
+                    v-bind="props"
+                  >
+                    {{
+                      $t('pages.video.timelines.hiddenTracks', { count: hiddenTimelineIds.length })
+                    }}
+                  </v-btn>
+                </template>
+
+                <v-list>
+                  <v-list-item
+                    v-for="id in hiddenTimelineIds"
+                    :key="id"
+                    v-tooltip="{
+                      text: $t('components.timelines.tooltips.showTrack'),
+                      location: 'right'
+                    }"
+                    :title="undoableStore.getTimelineById(id)?.name"
+                    append-icon="mdi-eye"
+                    @click="toggleTimelineHidden(id)"
+                  ></v-list-item>
+                </v-list>
+              </v-menu>
             </v-list-item>
           </v-list>
         </template>
@@ -439,6 +484,12 @@ export default {
       return Math.max(10, Math.round(16 * (CATEGORY_HEADER_HEIGHT / BASE_TRACK_HEIGHT)))
     },
 
+    hiddenTimelineIds() {
+      return Object.keys(this.tempStore.timelinesFold).filter(
+        (id) => this.undoableStore.getTimelineById(id)?.hidden
+      )
+    },
+
     inPointSettable() {
       const timeline = this.undoableStore.getTimelineById(this.tempStore.selectedTimelineId)
       return Boolean(timeline) && timeline.type === 'shots' && !timeline.locked
@@ -512,6 +563,14 @@ export default {
 
     trackNameFontSize() {
       return Math.max(10, Math.round(16 * (this.trackHeight / BASE_TRACK_HEIGHT)))
+    },
+
+    visibleTimelinesFold() {
+      return Object.fromEntries(
+        Object.entries(this.tempStore.timelinesFold).filter(
+          ([id]) => !this.undoableStore.getTimelineById(id)?.hidden
+        )
+      )
     },
 
     vocabularies() {
@@ -712,6 +771,11 @@ export default {
       this.tempStore.activeTimelineId = id
     },
 
+    toggleTimelineHidden(id) {
+      const timeline = this.undoableStore.getTimelineById(id)
+      timeline.hidden = !timeline.hidden
+    },
+
     toggleTimelineLock(id) {
       const timeline = this.undoableStore.getTimelineById(id)
       timeline.locked = !timeline.locked
@@ -723,6 +787,10 @@ export default {
 <style scoped>
 .track-height-slider {
   width: 130px;
+}
+
+.track-group-separator {
+  box-shadow: 0 1px 0 0 rgba(var(--v-border-color), var(--v-border-opacity));
 }
 
 .category-header-row {
