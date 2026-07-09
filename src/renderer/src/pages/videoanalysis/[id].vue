@@ -370,6 +370,7 @@ export default {
     drawerRail: true,
     exportScreenshotsDialog: false,
     genScreenshotDialog: false,
+    jobMenuHideTimeout: null,
     jobMenuVisible: false,
     layout: 'tibava',
     screenshotInterval: 10,
@@ -434,6 +435,14 @@ export default {
       if (numNewErrors !== numOldErrors || numNewRunning !== numOldRunning) {
         this.jobMenuVisible = true
       }
+
+      clearTimeout(this.jobMenuHideTimeout)
+      if (numNewRunning === 0) {
+        this.jobMenuHideTimeout = setTimeout(() => {
+          this.jobMenuVisible = false
+          this.jobMenuHideTimeout = null
+        }, 2000)
+      }
     }
   },
 
@@ -489,6 +498,7 @@ export default {
     shortcuts.clear('z', true, true)
     shortcuts.clear('z', true, false, true)
     shortcuts.clear('z', false, false, true)
+    clearTimeout(this.jobMenuHideTimeout)
     this.tempStore.jobs
       .filter((j) => j.status === 'RUNNING')
       .forEach((j) => this.tempStore.terminateJob(j.id))
