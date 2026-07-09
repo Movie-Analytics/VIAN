@@ -390,6 +390,7 @@ export default {
     drawerRail: true,
     exportScreenshotsDialog: false,
     genScreenshotDialog: false,
+    jobMenuHideTimeout: null,
     jobMenuVisible: false,
     layout: 'tibava',
     leaveProjectDialog: false,
@@ -450,6 +451,16 @@ export default {
     drawerRail(newVal) {
       if (newVal) {
         this.drawerGroupsOpen = []
+      }
+    },
+
+    jobMenuVisible(newVal) {
+      clearTimeout(this.jobMenuHideTimeout)
+      if (newVal) {
+        this.jobMenuHideTimeout = setTimeout(() => {
+          this.jobMenuVisible = false
+          this.jobMenuHideTimeout = null
+        }, 1000)
       }
     },
 
@@ -522,6 +533,7 @@ export default {
     shortcuts.clear('z', true, true)
     shortcuts.clear('z', true, false, true)
     shortcuts.clear('z', false, false, true)
+    clearTimeout(this.jobMenuHideTimeout)
     api.unregisterVideoViewCallbacks()
   },
 
