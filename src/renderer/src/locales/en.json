@@ -285,6 +285,7 @@
         "playback": "Playback",
         "segmentation": "Segmentation",
         "shotMarking": "Shot marking",
+        "annotation": "Annotation",
         "editing": "Editing"
       },
       "playback": {
@@ -299,7 +300,10 @@
       "segmentation": {
         "deleteSegment": "Delete selected segment(s)",
         "mergeSegments": "Merge selected segments",
-        "splitSegment": "Split selected segment at playhead"
+        "splitSegment": "Split selected segment at playhead",
+        "rangeSelect": "Range select segments between anchor and click",
+        "toggleSelect": "Toggle segment in/out of multi-selection",
+        "zoomTimeline": "Zoom the timeline"
       },
       "shotMarking": {
         "setInPoint": "Set in-point of a new segment at the playhead",
@@ -308,6 +312,10 @@
       "editing": {
         "undo": "Undo",
         "redo": "Redo"
+      },
+      "annotation": {
+        "closeOverlay": "Close annotation overlay",
+        "commitAnnotation": "Commit annotation text / save edited vocabulary field"
       }
     }
   }

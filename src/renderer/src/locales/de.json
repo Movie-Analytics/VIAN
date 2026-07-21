@@ -287,6 +287,7 @@
         "playback": "Wiedergabe",
         "segmentation": "Segmentierung",
         "shotMarking": "Shot-Markierung",
+        "annotation": "Annotation",
         "editing": "Bearbeiten"
       },
       "playback": {
@@ -301,7 +302,10 @@
       "segmentation": {
         "deleteSegment": "Ausgewählte(s) Segment(e) löschen",
         "mergeSegments": "Ausgewählte Segmente zusammenführen",
-        "splitSegment": "Ausgewähltes Segment an der Abspielposition teilen"
+        "splitSegment": "Ausgewähltes Segment an der Abspielposition teilen",
+        "rangeSelect": "Bereichsauswahl zwischen Anker und Klick",
+        "toggleSelect": "Segment zur Mehrfachauswahl hinzufügen oder entfernen",
+        "zoomTimeline": "Timeline zoomen"
       },
       "shotMarking": {
         "setInPoint": "Startpunkt eines neuen Segments an der Abspielposition setzen",
@@ -310,6 +314,10 @@
       "editing": {
         "undo": "Rückgängig machen",
         "redo": "Wiederholen"
+      },
+      "annotation": {
+        "closeOverlay": "Annotationsüberlagerung schließen",
+        "commitAnnotation": "Annotationstext bestätigen / bearbeitetes Vokabelfeld speichern"
       }
     }
   }
