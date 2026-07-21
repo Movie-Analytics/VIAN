@@ -212,7 +212,7 @@
                         "
                         @click="timeline.visible = !timeline.visible"
                       >
-                        <v-icon>mdi-expand-all</v-icon>
+                        <v-icon :size="trackIconSize">mdi-expand-all</v-icon>
                       </v-btn>
 
                       <v-btn
@@ -226,7 +226,7 @@
                         :aria-label="$t('components.timelines.tooltips.lockTrack')"
                         @click.stop="toggleTimelineLock(id)"
                       >
-                        <v-icon size="x-small">{{
+                        <v-icon :size="trackIconSize">{{
                           undoableStore.getTimelineById(id).locked
                             ? 'mdi-lock'
                             : 'mdi-lock-open-outline'
@@ -246,7 +246,7 @@
                             :aria-label="$t('components.timelines.tooltips.timelineOptions')"
                             v-bind="props"
                           >
-                            <v-icon>mdi-dots-vertical</v-icon>
+                            <v-icon :size="trackIconSize">mdi-dots-vertical</v-icon>
                           </v-btn>
                         </template>
 
@@ -574,6 +574,10 @@ export default {
       return Math.max(10, Math.round(16 * (this.trackHeight / BASE_TRACK_HEIGHT)))
     },
 
+    trackIconSize() {
+      return Math.max(12, Math.round(20 * (this.trackHeight / BASE_TRACK_HEIGHT)))
+    },
+
     visibleTimelinesFold() {
       return Object.fromEntries(
         Object.entries(this.tempStore.timelinesFold).filter(
@@ -886,6 +890,12 @@ export default {
 
 #timeline-list :deep(.v-list-item-title) {
   font-size: var(--row-font-size, 1rem);
+}
+
+#timeline-list :deep(.v-list-item) {
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: center;
 }
 
 .track-name-wrap {
