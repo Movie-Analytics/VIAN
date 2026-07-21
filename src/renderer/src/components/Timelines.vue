@@ -3,6 +3,76 @@
     <div class="d-flex flex-row flex-1-1 height-min-0">
       <!-- Vertical segment toolbar -->
       <div class="d-flex flex-column align-center segment-toolbar">
+        <!-- Eye: hidden tracks -->
+        <v-menu location="right">
+          <template #activator="{ props }">
+            <span
+              v-tooltip="{
+                text: $t('pages.video.timelines.hiddenTracks', { count: hiddenTimelineIds.length }),
+                location: 'right'
+              }"
+            >
+              <v-btn
+                density="compact"
+                variant="text"
+                icon
+                :disabled="hiddenTimelineIds.length === 0"
+                :aria-label="$t('pages.video.timelines.hiddenTracks', { count: hiddenTimelineIds.length })"
+                v-bind="props"
+              >
+                <span class="eye-btn-wrap">
+                  <v-icon size="small">mdi-eye-outline</v-icon>
+                  <span v-if="hiddenTimelineIds.length > 0" class="eye-count">{{ hiddenTimelineIds.length }}</span>
+                </span>
+              </v-btn>
+            </span>
+          </template>
+
+          <v-list>
+            <v-list-item
+              v-for="id in hiddenTimelineIds"
+              :key="id"
+              v-tooltip="{
+                text: $t('components.timelines.tooltips.showTrack'),
+                location: 'right'
+              }"
+              :title="undoableStore.getTimelineById(id)?.name"
+              append-icon="mdi-eye"
+              @click="toggleTimelineHidden(id)"
+            ></v-list-item>
+          </v-list>
+        </v-menu>
+
+        <!-- Track height -->
+        <div class="track-height-control">
+          <v-btn
+            density="compact"
+            variant="text"
+            icon
+            :aria-label="$t('components.timelines.tooltips.trackHeight')"
+          >
+            <v-icon size="small">mdi-arrow-expand-vertical</v-icon>
+          </v-btn>
+
+          <div class="track-height-slider-popup">
+            <v-slider
+              :model-value="tempStore.trackScale"
+              :aria-label="$t('components.timelines.tooltips.trackHeight')"
+              :step="0.05"
+              :min="0.5"
+              :max="1"
+              thumb-size="12"
+              track-size="3"
+              hide-details
+              class="track-height-slider"
+              @end="tempStore.trackScale = $event"
+            ></v-slider>
+          </div>
+        </div>
+
+        <v-divider class="toolbar-divider"></v-divider>
+
+        <!-- Segment actions -->
         <span
           v-tooltip="{
             text: $t('components.timelines.tooltips.addSegment'),
@@ -110,32 +180,6 @@
             <v-icon>mdi-table-merge-cells</v-icon>
           </v-btn>
         </span>
-
-        <div class="track-height-control">
-          <v-btn
-            density="compact"
-            variant="text"
-            icon
-            :aria-label="$t('components.timelines.tooltips.trackHeight')"
-          >
-            <v-icon size="small">mdi-arrow-expand-vertical</v-icon>
-          </v-btn>
-
-          <div class="track-height-slider-popup">
-            <v-slider
-              :model-value="tempStore.trackScale"
-              :aria-label="$t('components.timelines.tooltips.trackHeight')"
-              :step="0.05"
-              :min="0.5"
-              :max="1"
-              thumb-size="12"
-              track-size="3"
-              hide-details
-              class="track-height-slider"
-              @end="tempStore.trackScale = $event"
-            ></v-slider>
-          </div>
-        </div>
       </div>
 
       <!-- Axes + tracks -->
@@ -361,41 +405,6 @@
               <v-icon>mdi-playlist-plus</v-icon>
             </v-list-item>
 
-            <v-list-item v-if="hiddenTimelineIds.length > 0">
-              <v-menu>
-                <template #activator="{ props }">
-                  <v-btn
-                    variant="text"
-                    density="compact"
-                    prepend-icon="mdi-eye-off-outline"
-                    :aria-label="
-                      $t('pages.video.timelines.hiddenTracks', {
-                        count: hiddenTimelineIds.length
-                      })
-                    "
-                    v-bind="props"
-                  >
-                    {{
-                      $t('pages.video.timelines.hiddenTracks', { count: hiddenTimelineIds.length })
-                    }}
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item
-                    v-for="id in hiddenTimelineIds"
-                    :key="id"
-                    v-tooltip="{
-                      text: $t('components.timelines.tooltips.showTrack'),
-                      location: 'right'
-                    }"
-                    :title="undoableStore.getTimelineById(id)?.name"
-                    append-icon="mdi-eye"
-                    @click="toggleTimelineHidden(id)"
-                  ></v-list-item>
-                </v-list>
-              </v-menu>
-            </v-list-item>
           </v-list>
         </template>
 
@@ -807,6 +816,30 @@ export default {
   flex-shrink: 0;
   padding: 4px 0;
   width: 36px;
+}
+
+.toolbar-divider {
+  width: 60%;
+  margin: 4px 0;
+  opacity: 0.4;
+}
+
+.eye-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 600;
+  color: currentColor;
+  pointer-events: none;
 }
 
 .track-height-control {
