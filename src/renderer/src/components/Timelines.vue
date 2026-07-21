@@ -1,142 +1,149 @@
 <template>
   <v-sheet class="d-flex flex-1-1 flex-column height-min-0">
-    <div class="align-center d-flex">
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.addSegment'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!segmentAddable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.addSegment')"
-          @click="segmentAdd"
+    <div class="d-flex flex-row flex-1-1 height-min-0">
+      <!-- Vertical segment toolbar -->
+      <div class="d-flex flex-column align-center segment-toolbar">
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.addSegment'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-shape-square-plus</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!segmentAddable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.addSegment')"
+            @click="segmentAdd"
+          >
+            <v-icon>mdi-shape-square-plus</v-icon>
+          </v-btn>
+        </span>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.setInPoint'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!inPointSettable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.setInPoint')"
-          @click="$refs.timelineCanvas.setInPoint()"
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.setInPoint'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-logout</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!inPointSettable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.setInPoint')"
+            @click="$refs.timelineCanvas.setInPoint()"
+          >
+            <v-icon>mdi-logout</v-icon>
+          </v-btn>
+        </span>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.setOutPoint'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!outPointSettable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.setOutPoint')"
-          @click="$refs.timelineCanvas.setOutPoint()"
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.setOutPoint'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-login</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!outPointSettable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.setOutPoint')"
+            @click="$refs.timelineCanvas.setOutPoint()"
+          >
+            <v-icon>mdi-login</v-icon>
+          </v-btn>
+        </span>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.deleteSelectedSegment'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!segmentDeletable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.deleteSelectedSegment')"
-          @click="segmentDelete"
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.deleteSelectedSegment'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!segmentDeletable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.deleteSelectedSegment')"
+            @click="segmentDelete"
+          >
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </span>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.splitSelectedSegment'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!segmentSplitable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.splitSelectedSegment')"
-          @click="segmentSplit"
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.splitSelectedSegment'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-table-split-cell</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!segmentSplitable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.splitSelectedSegment')"
+            @click="segmentSplit"
+          >
+            <v-icon>mdi-table-split-cell</v-icon>
+          </v-btn>
+        </span>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.mergeSelectedSegments'),
-          location: 'bottom'
-        }"
-      >
-        <v-btn
-          density="compact"
-          variant="text"
-          :disabled="!segmentMergable"
-          icon
-          :aria-label="$t('components.timelines.tooltips.mergeSelectedSegments')"
-          @click="segmentMerge"
+        <span
+          v-tooltip="{
+            text: $t('components.timelines.tooltips.mergeSelectedSegments'),
+            location: 'right'
+          }"
         >
-          <v-icon>mdi-table-merge-cells</v-icon>
-        </v-btn>
-      </span>
+          <v-btn
+            density="compact"
+            variant="text"
+            :disabled="!segmentMergable"
+            icon
+            :aria-label="$t('components.timelines.tooltips.mergeSelectedSegments')"
+            @click="segmentMerge"
+          >
+            <v-icon>mdi-table-merge-cells</v-icon>
+          </v-btn>
+        </span>
 
-      <v-spacer></v-spacer>
+        <div class="track-height-control">
+          <v-btn
+            density="compact"
+            variant="text"
+            icon
+            :aria-label="$t('components.timelines.tooltips.trackHeight')"
+          >
+            <v-icon size="small">mdi-arrow-expand-vertical</v-icon>
+          </v-btn>
 
-      <span
-        v-tooltip="{
-          text: $t('components.timelines.tooltips.trackHeight'),
-          location: 'bottom'
-        }"
-        class="align-center d-flex mr-2 track-height-slider"
-      >
-        <v-icon size="small">mdi-arrow-expand-vertical</v-icon>
+          <div class="track-height-slider-popup">
+            <v-slider
+              :model-value="tempStore.trackScale"
+              :aria-label="$t('components.timelines.tooltips.trackHeight')"
+              :step="0.05"
+              :min="0.5"
+              :max="1"
+              thumb-size="12"
+              track-size="3"
+              hide-details
+              class="track-height-slider"
+              @end="tempStore.trackScale = $event"
+            ></v-slider>
+          </div>
+        </div>
+      </div>
 
-        <v-slider
-          :model-value="tempStore.trackScale"
-          :aria-label="$t('components.timelines.tooltips.trackHeight')"
-          density="compact"
-          hide-details
-          :max="1"
-          :min="0.5"
-          :step="0.05"
-          class="ml-1"
-          @end="tempStore.trackScale = $event"
-        ></v-slider>
-      </span>
-    </div>
+      <!-- Axes + tracks -->
+      <div class="d-flex flex-column flex-1-1 height-min-0">
 
-    <div id="timelineAxesContainer"></div>
+        <div id="timelineAxesContainer"></div>
 
-    <div id="timelineSplitter" class="flex-1-1 overflow-y-auto">
+        <div id="timelineSplitter" class="flex-1-1 overflow-y-auto">
       <SplitterContainer :inital-panel1-percent="30" class="overflow-y-auto">
         <template #panel1>
           <v-list
@@ -396,6 +403,8 @@
           <TimelineCanvas ref="timelineCanvas"></TimelineCanvas>
         </template>
       </SplitterContainer>
+        </div>
+      </div>
     </div>
 
     <div id="timelineScrollbarContainer"></div>
@@ -787,6 +796,42 @@ export default {
 <style scoped>
 .track-height-slider {
   width: 130px;
+}
+
+.segment-toolbar {
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  flex-shrink: 0;
+  padding: 4px 0;
+  width: 36px;
+}
+
+.track-height-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track-height-slider-popup {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  align-items: center;
+  padding: 4px 8px;
+  background-color: rgb(var(--v-theme-surface));
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.track-height-control:hover .track-height-slider-popup {
+  display: flex;
+}
+
+.track-height-slider :deep(> .v-input__control) {
+  min-width: 80px;
 }
 
 .track-group-separator {
