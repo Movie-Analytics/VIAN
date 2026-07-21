@@ -54,18 +54,12 @@ export default {
               key: 'Delete / Backspace'
             },
             { action: this.$t('components.shortcutsList.segmentation.mergeSegments'), key: 'm' },
-            { action: this.$t('components.shortcutsList.segmentation.splitSegment'), key: 'c' }
-          ],
-
-          title: this.$t('components.shortcutsList.groups.segmentation')
-        },
-        {
-          entries: [
+            { action: this.$t('components.shortcutsList.segmentation.splitSegment'), key: 'c' },
             { action: this.$t('components.shortcutsList.shotMarking.setInPoint'), key: 'i' },
             { action: this.$t('components.shortcutsList.shotMarking.setOutPoint'), key: 'o' }
           ],
 
-          title: this.$t('components.shortcutsList.groups.shotMarking')
+          title: this.$t('components.shortcutsList.groups.segmentation')
         },
         {
           entries: [

@@ -302,8 +302,8 @@
         "splitSegment": "Split selected segment at playhead"
       },
       "shotMarking": {
-        "setInPoint": "Set in-point of a new shot at the playhead",
-        "setOutPoint": "Set out-point, completing the shot"
+        "setInPoint": "Set in-point of a new segment at the playhead",
+        "setOutPoint": "Set out-point, completing the segment"
       },
       "editing": {
         "undo": "Undo",

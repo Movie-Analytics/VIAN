@@ -304,8 +304,8 @@
         "splitSegment": "Ausgewähltes Segment an der Abspielposition teilen"
       },
       "shotMarking": {
-        "setInPoint": "Startpunkt eines neuen Shots an der Abspielposition setzen",
-        "setOutPoint": "Endpunkt setzen und den Shot abschließen"
+        "setInPoint": "Startpunkt eines neuen Segments an der Abspielposition setzen",
+        "setOutPoint": "Endpunkt setzen und den Segment abschließen"
       },
       "editing": {
         "undo": "Rückgängig machen",
