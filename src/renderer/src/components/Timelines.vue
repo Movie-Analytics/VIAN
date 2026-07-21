@@ -33,7 +33,7 @@
           :aria-label="$t('components.timelines.tooltips.setInPoint')"
           @click="$refs.timelineCanvas.setInPoint()"
         >
-          <v-icon>mdi-login</v-icon>
+          <v-icon>mdi-logout</v-icon>
         </v-btn>
       </span>
 
@@ -51,7 +51,7 @@
           :aria-label="$t('components.timelines.tooltips.setOutPoint')"
           @click="$refs.timelineCanvas.setOutPoint()"
         >
-          <v-icon>mdi-logout</v-icon>
+          <v-icon>mdi-login</v-icon>
         </v-btn>
       </span>
 
