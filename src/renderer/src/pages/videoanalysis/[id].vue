@@ -460,7 +460,7 @@ export default {
         this.jobMenuHideTimeout = setTimeout(() => {
           this.jobMenuVisible = false
           this.jobMenuHideTimeout = null
-        }, 1000)
+        }, 3000)
       }
     },
 
