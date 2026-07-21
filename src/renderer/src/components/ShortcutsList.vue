@@ -57,9 +57,18 @@ export default {
             { action: this.$t('components.shortcutsList.segmentation.splitSegment'), key: 'c' },
             { action: this.$t('components.shortcutsList.shotMarking.setInPoint'), key: 'i' },
             { action: this.$t('components.shortcutsList.shotMarking.setOutPoint'), key: 'o' },
-            { action: this.$t('components.shortcutsList.segmentation.rangeSelect'), key: 'Shift + Click' },
-            { action: this.$t('components.shortcutsList.segmentation.toggleSelect'), key: 'Ctrl/Cmd + Click' },
-            { action: this.$t('components.shortcutsList.segmentation.zoomTimeline'), key: 'Ctrl + Scroll' }
+            {
+              action: this.$t('components.shortcutsList.segmentation.rangeSelect'),
+              key: 'Shift + Click'
+            },
+            {
+              action: this.$t('components.shortcutsList.segmentation.toggleSelect'),
+              key: 'Ctrl/Cmd + Click'
+            },
+            {
+              action: this.$t('components.shortcutsList.segmentation.zoomTimeline'),
+              key: 'Ctrl + Scroll'
+            }
           ],
 
           title: this.$t('components.shortcutsList.groups.segmentation')
@@ -67,7 +76,10 @@ export default {
         {
           entries: [
             { action: this.$t('components.shortcutsList.annotation.closeOverlay'), key: 'Esc' },
-            { action: this.$t('components.shortcutsList.annotation.commitAnnotation'), key: 'Enter' }
+            {
+              action: this.$t('components.shortcutsList.annotation.commitAnnotation'),
+              key: 'Enter'
+            }
           ],
 
           title: this.$t('components.shortcutsList.groups.annotation')
