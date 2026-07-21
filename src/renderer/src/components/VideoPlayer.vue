@@ -395,12 +395,14 @@ export default {
           .next().value
         const timeline = this.undoableStore.timelines.find((t) => t.id === selectedTimelId)
         const segmentIndex = timeline.data.findIndex((s) => s.id === selectedSegId)
-        const nextSegment = timeline.data[segmentIndex + 1] || timeline.data[0]
-        this.$refs.video.currentTime = (nextSegment.start || nextSegment.frame) / this.mainStore.fps
+        const nextSegment = timeline.data[segmentIndex + 1]
+        if (!nextSegment) return
+        this.$refs.video.currentTime = (nextSegment.start ?? nextSegment.frame) / this.mainStore.fps
         this.tempStore.selectedSegments = new Map([[nextSegment.id, timeline.id]])
       } else if (this.undoableStore.shotTimelines.length > 0) {
         const timeline = this.undoableStore.shotTimelines[0]
-        const segment = timeline.data.filter((s) => s.start > currentTime)[0] || timeline.data[0]
+        const segment = timeline.data.filter((s) => s.start > currentTime)[0]
+        if (!segment) return
         this.$refs.video.currentTime = segment.start / this.mainStore.fps
         this.tempStore.selectedSegments = new Map([[segment.id, timeline.id]])
       }
@@ -415,13 +417,15 @@ export default {
           .next().value
         const timeline = this.undoableStore.timelines.find((t) => t.id === selectedTimelId)
         const segIndex = timeline.data.findIndex((s) => s.id === selectedSegId)
-        const nextSegment = timeline.data[segIndex - 1] || timeline.data[timeline.data.length - 1]
-        this.$refs.video.currentTime = (nextSegment.start || nextSegment.frame) / this.mainStore.fps
+        const nextSegment = timeline.data[segIndex - 1]
+        if (!nextSegment) return
+        this.$refs.video.currentTime = (nextSegment.start ?? nextSegment.frame) / this.mainStore.fps
         this.tempStore.selectedSegments = new Map([[nextSegment.id, timeline.id]])
       } else if (this.undoableStore.shotTimelines.length > 0) {
         const timeline = this.undoableStore.shotTimelines[0]
         const filtered = timeline.data.filter((s) => s.start < currentTime)
-        const segment = filtered[filtered.length - 1] || timeline.data[timeline.data.length - 1]
+        const segment = filtered[filtered.length - 1]
+        if (!segment) return
         this.$refs.video.currentTime = segment.start / this.mainStore.fps
         this.tempStore.selectedSegments = new Map([[segment.id, timeline.id]])
       }
