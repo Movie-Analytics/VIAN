@@ -1,56 +1,25 @@
 const { workerData, parentPort } = require('worker_threads')
-const fs = require('fs')
-const path = require('path')
 // VIAN-specific glue lives here; the generic writer/track builders live in
 // libs/mava-exchange-js (linked via a `file:` dependency, not a relative
 // path — the main-process build flattens src/main/workers/* into out/main/*,
 // which breaks relative paths into libs/) so that package can be extracted
 // on its own later.
 const mava = require('mava-exchange-js')
+import {
+  buildVocabIndex,
+  makeUniqueNamer,
+  readVianStore,
+  sortedByStart,
+  tagCategoryLabel
+} from './annotation_export_helpers'
 
 // Row objects below are keyed by mava-exchange's spec column names
 // (start_seconds, end_seconds, annotations), not VIAN's own naming
 // convention — see libs/mava-exchange-js/README.md.
 /* eslint-disable camelcase */
 
-const slugify = (s) => {
-  const slug = s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gu, '_')
-    .replace(/^_+|_+$/gu, '')
-  return slug || 'track'
-}
-
-// Tags encode their category as `categoryName/tagName` in the exported
-// string, since AnnotationListSeries has no column for category hierarchy —
-// see applyTags() in import_mediapkg_worker.js, which splits it back apart.
-const buildVocabIndex = (vocabularies) => {
-  const tagIndex = new Map()
-  const vocabNameById = new Map()
-  for (const vocab of vocabularies || []) {
-    vocabNameById.set(vocab.id, vocab.name)
-    for (const category of vocab.categories || []) {
-      for (const tag of category.tags || []) {
-        tagIndex.set(tag.id, `${category.name}/${tag.name}`)
-      }
-    }
-  }
-  return { tagIndex, vocabNameById }
-}
-
-/** Guarantees unique, spec-compliant (lowercase, no-space) track names. */
-const makeTrackNamer = () => {
-  const used = new Set()
-  return (name, id) => {
-    let slug = slugify(name)
-    if (used.has(slug)) slug = `${slug}_${id.slice(0, 8)}`
-    used.add(slug)
-    return slug
-  }
-}
-
 const addShotsTimeline = (writer, videoId, timeline, fps, vocabIndex, trackName) => {
-  const segments = timeline.data.slice().sort((a, b) => a.start - b.start)
+  const segments = sortedByStart(timeline)
   const name = trackName(timeline.name, timeline.id)
   const rows = segments.map((s) => ({
     annotations: s.annotation || '',
@@ -70,9 +39,11 @@ const addShotsTimeline = (writer, videoId, timeline, fps, vocabIndex, trackName)
   const hasTags = segments.some((s) => s.vocabAnnotation && s.vocabAnnotation.length)
   if (!hasTags) return
 
-  const { tagIndex, vocabNameById } = vocabIndex
+  const { tagInfo, vocabNameById } = vocabIndex
   const tagRows = segments.map((s) => ({
-    annotations: (s.vocabAnnotation || []).map((id) => tagIndex.get(id)).filter(Boolean),
+    annotations: (s.vocabAnnotation || [])
+      .map((id) => tagCategoryLabel(tagInfo, id))
+      .filter(Boolean),
     end_seconds: s.end / fps,
     start_seconds: s.start / fps
   }))
@@ -128,8 +99,7 @@ const addScreenshotsTimeline = (writer, videoId, timeline, fps, trackName) => {
 }
 
 const exportMediaPkg = async (storePath, location, videoId) => {
-  const undoableStore = JSON.parse(fs.readFileSync(path.join(storePath, 'undoable.json'), 'utf8'))
-  const mainStore = JSON.parse(fs.readFileSync(path.join(storePath, 'main.json'), 'utf8'))
+  const { mainStore, undoableStore } = readVianStore(storePath)
   const { fps } = mainStore
 
   const finalLocation = location.endsWith('.mediapkg') ? location : `${location}.mediapkg`
@@ -145,7 +115,7 @@ const exportMediaPkg = async (storePath, location, videoId) => {
   })
 
   const vocabIndex = buildVocabIndex(undoableStore.vocabularies)
-  const trackName = makeTrackNamer()
+  const trackName = makeUniqueNamer()
 
   for (const timeline of undoableStore.timelines || []) {
     if (timeline.type === 'shots') {

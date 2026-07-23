@@ -94,7 +94,7 @@
         "importTibavaWip": "Daten importieren (.tsv)",
         "exportData": "Daten exportieren",
         "exportElan": "Als ELAN-Annotationen exportieren (.eaf)",
-        "exportCsv": "Annotationen als .csv exportieren",
+        "exportCsv": "Annotationen als .csv exportieren (.zip)",
         "exportScreenshots": "Screenshots exportieren",
         "exportProjectZip": "Projekt als .zip exportieren",
         "exportMediapkg": "Als .mediapkg exportieren",

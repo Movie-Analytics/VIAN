@@ -3,24 +3,12 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const archiver = require('archiver')
-
-const timeSec = (t) => {
-  const hours = Math.floor(t / 3600)
-  const minutes = Math.floor((t % 3600) / 60)
-  const seconds = (t % 60).toFixed(2).replace('.', ',')
-
-  const formattedHours = String(hours).padStart(2, '0')
-  const formattedMinutes = String(minutes).padStart(2, '0')
-  const formattedSeconds = String(seconds).padStart(2, '0')
-
-  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
-}
+import { readVianStore, screenshotFileName } from './annotation_export_helpers'
 
 const exportScreenshots = async (storePath, location, frames) => {
   const tmpPath = fs.mkdtempSync(path.join(os.tmpdir(), 'vian-screenshots-'))
 
-  const undoableStore = JSON.parse(fs.readFileSync(path.join(storePath, 'undoable.json'), 'utf8'))
-  const mainStore = JSON.parse(fs.readFileSync(path.join(storePath, 'main.json'), 'utf8'))
+  const { mainStore, undoableStore } = readVianStore(storePath)
 
   let copied = 0
   undoableStore.timelines.forEach((t) => {
@@ -31,9 +19,7 @@ const exportScreenshots = async (storePath, location, frames) => {
       if (frames && !frames.includes(s.frame)) return
       const imagePath = s.image.replace('app://', '')
 
-      const newImageName = (timeSec(s.frame / mainStore.fps) + '.jpg')
-        .replaceAll(':', '-')
-        .replace(',', '_')
+      const newImageName = screenshotFileName(s.frame, mainStore.fps)
       try {
         fs.copyFileSync(imagePath, path.join(timelinePath, newImageName))
         copied += 1

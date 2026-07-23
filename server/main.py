@@ -394,6 +394,15 @@ async def export_mediapkg(
     raise HTTPException(status_code=501, detail='Not implemented')
 
 
+@app.post(API_PREFIX + 'export-annotations')
+async def export_annotations(
+    export: ProjectExport,
+    session: db.SessionDep,
+    current_account: auth.AccountDep
+) -> dict:
+    raise HTTPException(status_code=501, detail='Not implemented')
+
+
 @app.post(API_PREFIX + 'export-project')
 async def export_project(
     export: ProjectExport,

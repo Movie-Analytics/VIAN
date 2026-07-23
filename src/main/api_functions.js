@@ -5,6 +5,7 @@ import fs from 'fs'
 import path from 'path'
 
 import cleanUpWorker from './workers/cleanup_worker?nodeWorker'
+import exportAnnotationsWorker from './workers/export_annotations_worker?nodeWorker'
 import exportMediaPkgWorker from './workers/export_mediapkg_worker?nodeWorker'
 import exportProjectWorker from './workers/export_project_worker?nodeWorker'
 import exportScreenshotWorker from './workers/export_screenshot_worker?nodeWorker'
@@ -240,6 +241,26 @@ export const exportScreenshots = (channel, projectId, frames) => {
     workerData: { frames, location, storePath: getDataPath(projectId) }
   })
   const job = jobManager.createWorkerJob(channel, 'export-screenshots', worker, projectId)
+
+  worker.on('message', () => {
+    jobManager.updateJobStatus(channel, job.id, 'DONE')
+  })
+}
+
+export const exportAnnotations = (channel, projectId) => {
+  const location = dialog.showSaveDialogSync(null, {
+    defaultPath: 'annotations.zip',
+    title: 'Select export location'
+  })
+  if (!location) return
+
+  const meta = loadStore('meta')
+  const projectName = meta?.projects?.find((p) => p.id === projectId)?.name || projectId
+
+  const worker = exportAnnotationsWorker({
+    workerData: { location, projectName, storePath: getDataPath(projectId) }
+  })
+  const job = jobManager.createWorkerJob(channel, 'export-annotations', worker, projectId)
 
   worker.on('message', () => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')

@@ -5,6 +5,7 @@ import { join } from 'path'
 
 import {
   cleanUp,
+  exportAnnotations,
   exportMediaPkg,
   exportProject,
   exportScreenshot,
@@ -165,6 +166,7 @@ ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnot
 ipcMain.on('export-screenshots', (channel, projectId, frames) =>
   exportScreenshots(channel, projectId, frames)
 )
+ipcMain.on('export-annotations', (channel, projectId) => exportAnnotations(channel, projectId))
 ipcMain.on('export-project', (channel, projectId) => exportProject(channel, projectId))
 ipcMain.on('export-mediapkg', (channel, projectId) => exportMediaPkg(channel, projectId))
 ipcMain.on('import-project', (channel, videoFile, zipFile) =>

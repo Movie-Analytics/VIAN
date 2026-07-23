@@ -139,13 +139,13 @@
         <v-list-item
           prepend-icon="mdi-alpha-e-box"
           :title="$t('pages.video.drawer.exportElan')"
-          @click="exportAnnotations(false)"
+          @click="exportElan"
         />
 
         <v-list-item
           prepend-icon="mdi-file-delimited"
           :title="$t('pages.video.drawer.exportCsv')"
-          @click="exportAnnotations(true)"
+          @click="exportAnnotationsCsv"
         />
 
         <v-list-item
@@ -380,7 +380,7 @@ import LayoutTibava from '@renderer/components/LayoutTibava.vue'
 import ShortcutsList from '@renderer/components/ShortcutsList.vue'
 import VocabularyDialog from '@renderer/components/VocabularyDialog.vue'
 import api from '@renderer/api'
-import { exportAnnotations } from '@renderer/importexport'
+import { exportElanAnnotations } from '@renderer/importexport'
 import shortcuts from '@renderer/shortcuts'
 import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
@@ -544,8 +544,12 @@ export default {
   },
 
   methods: {
-    exportAnnotations(csv) {
-      exportAnnotations(csv)
+    exportAnnotationsCsv() {
+      api.exportAnnotations(this.mainStore.id)
+    },
+
+    exportElan() {
+      exportElanAnnotations()
     },
 
     exportMediaPkg() {

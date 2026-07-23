@@ -445,6 +445,22 @@ class RemoteApi {
     document.body.removeChild(a)
   }
 
+  async exportAnnotations(projectId) {
+    const response = await fetch(this.baseApi + 'export-annotations', {
+      body: JSON.stringify({
+        id: projectId
+      }),
+      headers: {
+        Authorization: `Bearer ${this.bearerToken}`,
+        'Content-type': 'application/json; charset=UTF-8'
+      },
+      method: 'POST'
+    })
+    this.startJobUpdateFetch()
+
+    return response.ok
+  }
+
   async exportProject(projectId) {
     const response = await fetch(this.baseApi + 'export-project', {
       body: JSON.stringify({
