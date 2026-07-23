@@ -114,18 +114,44 @@
         <v-card>
           <v-card-title>{{ $t('pages.index.importDialog.title') }}</v-card-title>
 
-          <v-card-text>
-            <v-file-input
-              v-model="importVideoFile"
-              :label="$t('pages.index.importDialog.video')"
-              accept="video/mp4"
-            ></v-file-input>
+          <v-tabs v-model="importTab">
+            <v-tab value="vian">{{ $t('pages.index.importDialog.tabs.vian') }}</v-tab>
 
-            <v-file-input
-              v-model="importZipFile"
-              :label="$t('pages.index.importDialog.projectFile')"
-              accept="application/zip"
-            ></v-file-input>
+            <v-tab v-if="electron" value="mediapkg">
+              {{ $t('pages.index.importDialog.tabs.mediapkg') }}
+            </v-tab>
+          </v-tabs>
+
+          <v-card-text>
+            <v-tabs-window v-model="importTab">
+              <v-tabs-window-item value="vian">
+                <v-file-input
+                  v-model="importVideoFile"
+                  :label="$t('pages.index.importDialog.video')"
+                  accept="video/mp4"
+                ></v-file-input>
+
+                <v-file-input
+                  v-model="importZipFile"
+                  :label="$t('pages.index.importDialog.projectFile')"
+                  accept="application/zip"
+                ></v-file-input>
+              </v-tabs-window-item>
+
+              <v-tabs-window-item value="mediapkg">
+                <v-file-input
+                  v-model="importMediaPkgVideoFile"
+                  :label="$t('pages.index.importDialog.video')"
+                  accept="video/mp4"
+                ></v-file-input>
+
+                <v-file-input
+                  v-model="importMediaPkgFile"
+                  :label="$t('pages.index.importDialog.mediaPkgFile')"
+                  accept=".mediapkg"
+                ></v-file-input>
+              </v-tabs-window-item>
+            </v-tabs-window>
           </v-card-text>
 
           <v-card-actions>
@@ -172,6 +198,9 @@ export default {
       currentProjectId: null,
       importDialog: false,
       importDisabled: false,
+      importMediaPkgFile: null,
+      importMediaPkgVideoFile: null,
+      importTab: 'vian',
       importVideoFile: null,
       importZipFile: null,
       projectName: '',
@@ -189,6 +218,9 @@ export default {
     },
 
     importButtonDisabled() {
+      if (this.importTab === 'mediapkg') {
+        return this.importMediaPkgVideoFile === null || this.importMediaPkgFile === null
+      }
       return this.importVideoFile === null || this.importZipFile === null
     },
 
@@ -197,9 +229,10 @@ export default {
     }
   },
 
-  watcher: {
+  watch: {
     'tempStore.jobs'(val) {
-      if (val[0]?.type === 'import-project' && val[0].status !== 'RUNNING') {
+      const importJobTypes = ['import-project', 'import-mediapkg']
+      if (importJobTypes.includes(val[0]?.type) && val[0].status !== 'RUNNING') {
         this.importDisabled = false
         this.importDialog = false
         this.tempStore.$reset()
@@ -238,7 +271,12 @@ export default {
 
     importProject() {
       this.tempStore.$reset()
-      if (IS_ELECTRON) {
+      if (this.importTab === 'mediapkg') {
+        this.metaStore.importMediaPkg(
+          this.importMediaPkgVideoFile.path,
+          this.importMediaPkgFile.path
+        )
+      } else if (IS_ELECTRON) {
         this.metaStore.importProject(this.importVideoFile.path, this.importZipFile.path)
       } else {
         this.metaStore.importProject(this.importVideoFile, this.importZipFile)

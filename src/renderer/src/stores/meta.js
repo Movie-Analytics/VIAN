@@ -23,6 +23,9 @@ export const useMetaStore = defineStore('meta', {
     deleteProject(projectId) {
       this.projects = this.projects.filter((project) => project.id !== projectId)
     },
+    importMediaPkg(videoFile, mediaPkgFile) {
+      api.importMediaPkg(videoFile, mediaPkgFile)
+    },
     importProject(videoFile, zipFile) {
       api.importProject(videoFile, zipFile)
     },

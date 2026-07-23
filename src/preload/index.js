@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  exportMediaPkg: (p) => ipcRenderer.send('export-mediapkg', p),
   exportProject: (p) => ipcRenderer.send('export-project', p),
   exportScreenshot: (p, s, a) => ipcRenderer.send('export-screenshot', p, s, a),
   exportScreenshots: (p, f) => ipcRenderer.send('export-screenshots', p, f),
   getVideoInfo: (arg, projectId) => ipcRenderer.send('get-video-info', arg, projectId),
+  importMediaPkg: (v, m) => ipcRenderer.send('import-mediapkg', v, m),
   importProject: (arg, v, z) => ipcRenderer.send('import-project', arg, v, z),
   loadStore: (arg1, arg2) => ipcRenderer.invoke('load-store', arg1, arg2),
   loadSubtitles: (p) => ipcRenderer.invoke('load-subtitles', p),

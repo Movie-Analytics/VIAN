@@ -385,6 +385,15 @@ async def export_screenshots(
     return {'message': 'job submitted'}
 
 
+@app.post(API_PREFIX + 'export-mediapkg')
+async def export_mediapkg(
+    export: ProjectExport,
+    session: db.SessionDep,
+    current_account: auth.AccountDep
+) -> dict:
+    raise HTTPException(status_code=501, detail='Not implemented')
+
+
 @app.post(API_PREFIX + 'export-project')
 async def export_project(
     export: ProjectExport,

@@ -53,7 +53,12 @@
       "importDialog": {
         "title": "Import Project",
         "video": "Video",
-        "projectFile": "Project file"
+        "projectFile": "Project file",
+        "mediaPkgFile": "MAVA .mediapkg file",
+        "tabs": {
+          "vian": "VIAN Format",
+          "mediapkg": "MAVA .mediapkg"
+        }
       },
       "uploading": "Video uploading",
       "tooltips": {
@@ -90,6 +95,7 @@
         "exportCsv": "Export Annotations as .csv",
         "exportScreenshots": "Export Screenshots",
         "exportProjectZip": "Export Project as .zip",
+        "exportMediapkg": "Export as .mediapkg",
         "switchToLightMode": "Switch to Light Mode",
         "switchToDarkMode": "Switch to Dark Mode",
         "switchToGerman": "Switch to German",

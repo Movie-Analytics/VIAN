@@ -5,10 +5,12 @@ import { join } from 'path'
 
 import {
   cleanUp,
+  exportMediaPkg,
   exportProject,
   exportScreenshot,
   exportScreenshots,
   getVideoInfo,
+  importMediaPkg,
   importProject,
   jobManager,
   loadStore,
@@ -164,8 +166,12 @@ ipcMain.on('export-screenshots', (channel, projectId, frames) =>
   exportScreenshots(channel, projectId, frames)
 )
 ipcMain.on('export-project', (channel, projectId) => exportProject(channel, projectId))
+ipcMain.on('export-mediapkg', (channel, projectId) => exportMediaPkg(channel, projectId))
 ipcMain.on('import-project', (channel, videoFile, zipFile) =>
   importProject(channel, videoFile, zipFile)
+)
+ipcMain.on('import-mediapkg', (channel, videoFile, mediaPkgFile) =>
+  importMediaPkg(channel, videoFile, mediaPkgFile)
 )
 ipcMain.on('log-error', (_, msg) => {
   logError(`Renderer Process Error: ${msg}`)

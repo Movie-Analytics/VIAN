@@ -5,9 +5,11 @@ import fs from 'fs'
 import path from 'path'
 
 import cleanUpWorker from './workers/cleanup_worker?nodeWorker'
+import exportMediaPkgWorker from './workers/export_mediapkg_worker?nodeWorker'
 import exportProjectWorker from './workers/export_project_worker?nodeWorker'
 import exportScreenshotWorker from './workers/export_screenshot_worker?nodeWorker'
 import exportScreenshotsWorker from './workers/export_screenshots_worker?nodeWorker'
+import importMediaPkgWorker from './workers/import_mediapkg_worker?nodeWorker'
 import importProjectWorker from './workers/import_project_worker?nodeWorker'
 import screenshotGenerationWorker from './workers/screenshot_generation_worker?nodeWorker'
 import screenshotsGenerationWorker from './workers/screenshots_generation_worker?nodeWorker'
@@ -244,6 +246,23 @@ export const exportScreenshots = (channel, projectId, frames) => {
   })
 }
 
+export const exportMediaPkg = (channel, projectId) => {
+  const location = dialog.showSaveDialogSync(null, {
+    defaultPath: 'corpus.mediapkg',
+    title: 'Select export location'
+  })
+  if (location === '' || location === 'undefined') return
+
+  const worker = exportMediaPkgWorker({
+    workerData: { location, storePath: getDataPath(projectId), videoId: projectId }
+  })
+  const job = jobManager.createWorkerJob(channel, 'export-mediapkg', worker, projectId)
+
+  worker.on('message', () => {
+    jobManager.updateJobStatus(channel, job.id, 'DONE')
+  })
+}
+
 export const exportProject = (channel, projectId) => {
   const location = dialog.showSaveDialogSync(null, {
     defaultPath: 'vian_project.zip',
@@ -268,6 +287,62 @@ export const importProject = (channel, videoFile, zipFile) => {
   worker.on('message', (data) => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
     channel.sender.send('imported-project', data)
+  })
+}
+
+// The mediapkg import worker reports screenshots timelines with placeholder
+// (frame-only) entries — it can't generate the actual images itself, since
+// combining parquet-wasm and the native video-reader addon in one worker
+// thread segfaults Electron. Generate them here instead, via the same
+// dedicated worker runScreenshotsGeneration() uses, then patch the
+// already-written undoable.json with the real image/thumbnail paths.
+const generateImportedScreenshots = (projectId, videoFile, screenshotJobs) => {
+  if (screenshotJobs.length === 0) return Promise.resolve()
+
+  const screenshotsDir = path.join(getDataPath(projectId), 'screenshots')
+  fs.mkdirSync(screenshotsDir, { recursive: true })
+
+  const jobs = screenshotJobs.map(
+    ({ timelineId, frames }) =>
+      new Promise((resolve, reject) => {
+        const worker = screenshotsGenerationWorker({
+          workerData: { directory: screenshotsDir, frames, videoPath: videoFile }
+        })
+        worker.on('message', (data) => {
+          if (data.status === 'DONE') resolve({ screenshots: data.data, timelineId })
+          else reject(new Error(`Screenshot generation ${data.status} for imported project`))
+        })
+      })
+  )
+
+  return Promise.all(jobs).then((results) => {
+    const storePath = getStorePath(projectId, 'undoable')
+    const undoableStore = JSON.parse(fs.readFileSync(storePath, 'utf8'))
+    for (const { timelineId, screenshots } of results) {
+      const timeline = undoableStore.timelines.find((t) => t.id === timelineId)
+      const byFrame = new Map(screenshots.map((s) => [s.frame, s]))
+      timeline.data.forEach((entry) => {
+        const generated = byFrame.get(entry.frame)
+        if (generated) {
+          entry.image = generated.image
+          entry.thumbnail = generated.thumbnail
+        }
+      })
+    }
+    fs.writeFileSync(storePath, JSON.stringify(undoableStore), 'utf8')
+  })
+}
+
+export const importMediaPkg = (channel, videoFile, mediaPkgFile) => {
+  const dataPath = path.join(app.getPath('userData'), DATA_DIR)
+  const worker = importMediaPkgWorker({ workerData: { dataPath, mediaPkgFile, videoFile } })
+  const job = jobManager.createWorkerJob(channel, 'import-mediapkg', worker)
+
+  worker.on('message', ({ id, name, screenshotJobs }) => {
+    generateImportedScreenshots(id, videoFile, screenshotJobs).then(() => {
+      jobManager.updateJobStatus(channel, job.id, 'DONE')
+      channel.sender.send('imported-project', { id, name })
+    })
   })
 }
 

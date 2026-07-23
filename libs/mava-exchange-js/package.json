@@ -1,0 +1,14 @@
+{
+  "name": "mava-exchange-js",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Partial JavaScript port of the mava-exchange .mediapkg interchange format (https://github.com/sdsc-ordes/mava-exchange), used by VIAN to export annotation packages without a Python dependency.",
+  "main": "src/index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "apache-arrow": "^18.0.0",
+    "archiver": "^7.0.1",
+    "parquet-wasm": "^0.7.0",
+    "yauzl": "^3.2.0"
+  }
+}

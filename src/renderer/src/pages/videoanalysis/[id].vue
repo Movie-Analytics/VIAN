@@ -159,6 +159,12 @@
           :title="$t('pages.video.drawer.exportProjectZip')"
           @click="exportProject"
         />
+
+        <v-list-item
+          prepend-icon="mdi-package-variant-closed"
+          :title="$t('pages.video.drawer.exportMediapkg')"
+          @click="exportMediaPkg"
+        />
       </v-list-group>
 
       <v-divider class="my-5"></v-divider>
@@ -540,6 +546,10 @@ export default {
   methods: {
     exportAnnotations(csv) {
       exportAnnotations(csv)
+    },
+
+    exportMediaPkg() {
+      api.exportMediaPkg(this.mainStore.id)
     },
 
     exportProject() {
