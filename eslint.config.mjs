@@ -152,7 +152,7 @@ export default [
       'electron.vite.config*',
       'out',
       'vite_web.config.mjs',
-      // port of the mava-exchange format. Keep separate for now till extracted and contributed back to MAVA project.
+      // Port of the mava-exchange format. Keep separate for now till extracted and contributed back to MAVA project.
       'libs/mava-exchange-js/**'
     ]
   }

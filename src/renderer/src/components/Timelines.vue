@@ -192,7 +192,11 @@
         <div id="timelineAxesContainer"></div>
 
         <div id="timelineSplitter" class="flex-1-1 overflow-y-auto">
-          <SplitterContainer :inital-panel1-percent="30" class="overflow-y-auto">
+          <SplitterContainer
+            :inital-panel1-percent="30"
+            storage-key="timelines-track-list"
+            class="overflow-y-auto"
+          >
             <template #panel1>
               <v-list
                 id="timeline-list"

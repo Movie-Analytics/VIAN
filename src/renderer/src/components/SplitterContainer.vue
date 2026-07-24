@@ -40,18 +40,33 @@ export default {
       default: 'horizontal',
       required: false,
       type: String
+    },
+
+    storageKey: {
+      default: null,
+      required: false,
+      type: String
     }
   },
 
   data() {
+    const savedPanel1Percent = this.storageKey
+      ? Number.parseFloat(localStorage.getItem(`splitter:${this.storageKey}`))
+      : Number.NaN
+
+    const panel1Percent =
+      Number.isFinite(savedPanel1Percent) && savedPanel1Percent > 0 && savedPanel1Percent < 100
+        ? savedPanel1Percent
+        : this.initalPanel1Percent
+
     return {
       currentLayout: this.layout,
       gutterColor: 'bg-grey-lighten-3',
       isDragging: false,
       mouseMoveListener: null,
       mouseUpListener: null,
-      panel1Percent: this.initalPanel1Percent,
-      panel2Percent: 100 - this.initalPanel1Percent,
+      panel1Percent,
+      panel2Percent: 100 - panel1Percent,
       resizeObserver: null
     }
   },
@@ -113,6 +128,10 @@ export default {
     mouseUp() {
       document.removeEventListener('mousemove', this.mouseMove)
       document.removeEventListener('mouseup', this.mouseUp)
+
+      if (this.storageKey) {
+        localStorage.setItem(`splitter:${this.storageKey}`, String(this.panel1Percent))
+      }
     },
 
     onGutterMouseDown(e) {
@@ -134,8 +153,11 @@ export default {
           ? this.$refs.parent.offsetWidth
           : this.$refs.parent.offsetHeight
 
-      this.panel1Percent = (mousePos / parentSize) * 100
-      this.panel2Percent = ((parentSize - mousePos) / parentSize) * 100
+      const requestedPercent = (mousePos / parentSize) * 100
+      const panel1Percent = Math.min(95, Math.max(5, requestedPercent))
+
+      this.panel1Percent = panel1Percent
+      this.panel2Percent = 100 - panel1Percent
     },
 
     resizeStart(e) {
