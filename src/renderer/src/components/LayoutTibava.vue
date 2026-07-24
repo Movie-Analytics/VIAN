@@ -1,8 +1,8 @@
 <!-- eslint-disable vue/enforce-style-attribute -->
 <template>
-  <SplitterContainer id="toplevel-splitter" layout="vertical">
+  <SplitterContainer id="toplevel-splitter" layout="vertical" storage-key="layout-tibava-top-level">
     <template #panel1>
-      <SplitterContainer :horizontal-breakpoint="700">
+      <SplitterContainer :horizontal-breakpoint="700" storage-key="layout-tibava-video-info">
         <template #panel1>
           <v-card class="h-100 w-100">
             <VideoPlayer></VideoPlayer>
