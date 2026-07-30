@@ -92,6 +92,7 @@
         "importData": "Daten importieren",
         "importElan": "ELAN-Annotationen importieren (.eaf)",
         "importTibavaWip": "Daten importieren (.tsv)",
+        "importMediapkg": ".mediapkg importieren",
         "exportData": "Daten exportieren",
         "exportElan": "Als ELAN-Annotationen exportieren (.eaf)",
         "exportCsv": "Annotationen als .csv exportieren",
@@ -146,6 +147,15 @@
           "description": "Du kannst entweder alle Screenshots auf einmal exportieren oder sie in einer Timeline einzeln auswählen und nur diese exportieren.",
           "exportAll": "Alle exportieren",
           "exportIndividually": "Einzeln exportieren"
+        },
+        "exportMediapkg": {
+          "title": "Als .mediapkg exportieren",
+          "description": "Wähle aus, welche Spuren im exportierten Paket enthalten sein sollen."
+        },
+        "importMediapkg": {
+          "title": ".mediapkg importieren",
+          "description": "Wähle eine .mediapkg-Datei und dann die Spuren aus, die in dieses Projekt importiert werden sollen. Importierte Spuren, deren Name mit einer bestehenden Spur übereinstimmt, werden mit dem Zusatz \"(Imported)\" umbenannt.",
+          "fileLabel": "Mediapkg-Datei"
         },
         "shortcuts": {
           "title": "Tastenkürzel"

@@ -124,6 +124,13 @@
           :title="$t('pages.video.drawer.importTibavaWip')"
           @click="importTibava"
         />
+
+        <v-list-item
+          v-if="electron"
+          prepend-icon="mdi-package-variant-closed"
+          :title="$t('pages.video.drawer.importMediapkg')"
+          @click="importMediaPkgDialog = true"
+        />
       </v-list-group>
 
       <v-list-group>
@@ -163,7 +170,7 @@
         <v-list-item
           prepend-icon="mdi-package-variant-closed"
           :title="$t('pages.video.drawer.exportMediapkg')"
-          @click="exportMediaPkg"
+          @click="openExportMediaPkgDialog"
         />
       </v-list-group>
 
@@ -383,6 +390,81 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="exportMediaPkgDialog" persistent max-width="500" scrollable>
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.exportMediapkg.title') }}</v-card-title>
+
+        <v-card-text>
+          {{ $t('pages.video.dialogs.exportMediapkg.description') }}
+
+          <v-checkbox
+            v-for="timeline in mediaPkgExportableTimelines"
+            :key="timeline.id"
+            v-model="exportMediaPkgSelectedIds"
+            :label="timeline.name"
+            :value="timeline.id"
+            density="compact"
+            hide-details
+          ></v-checkbox>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="exportMediaPkgDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            :disabled="exportMediaPkgSelectedIds.length === 0"
+            @click="exportMediaPkg"
+          >
+            {{ $t('common.export') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="importMediaPkgDialog" persistent max-width="500" scrollable>
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.importMediapkg.title') }}</v-card-title>
+
+        <v-card-text>
+          {{ $t('pages.video.dialogs.importMediapkg.description') }}
+
+          <v-file-input
+            v-model="importMediaPkgFile"
+            :label="$t('pages.video.dialogs.importMediapkg.fileLabel')"
+            accept=".mediapkg"
+            @update:model-value="loadImportMediaPkgTracks"
+          ></v-file-input>
+
+          <v-checkbox
+            v-for="track in importMediaPkgTracks"
+            :key="track.trackName"
+            v-model="importMediaPkgSelectedTracks"
+            :label="track.name"
+            :value="track.trackName"
+            density="compact"
+            hide-details
+          ></v-checkbox>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="importMediaPkgDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            :disabled="importMediaPkgSelectedTracks.length === 0"
+            @click="importMediaPkgIntoProjectClicked"
+          >
+            {{ $t('common.import') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="shortcutsDialog" max-width="600" scrollable>
       <v-card>
         <v-card-title>{{ $t('pages.video.dialogs.shortcuts.title') }}</v-card-title>
@@ -425,10 +507,17 @@ export default {
     drawerRail: true,
     exportCsvDialog: false,
     exportCsvIncludeScreenshots: false,
+    exportMediaPkgDialog: false,
+    exportMediaPkgSelectedIds: [],
     exportScreenshotsDialog: false,
     genScreenshotDialog: false,
+    importMediaPkgDialog: false,
+    importMediaPkgFile: null,
+    importMediaPkgSelectedTracks: [],
+    importMediaPkgTracks: [],
     jobMenuHideTimeout: null,
     jobMenuVisible: false,
+    lastImportedMediaPkgTracksJobId: null,
     layout: 'tibava',
     leaveProjectDialog: false,
     screenshotInterval: 10,
@@ -443,6 +532,10 @@ export default {
 
     darkMode() {
       return this.$vuetify.theme.global.name === 'dark'
+    },
+
+    electron() {
+      return IS_ELECTRON
     },
 
     exportScreenshotsIndividualDisabled() {
@@ -470,6 +563,12 @@ export default {
 
     isUndoable() {
       return this.undoStore.isUndoable('undoable')
+    },
+
+    mediaPkgExportableTimelines() {
+      return this.undoableStore.timelines.filter(
+        (t) => t.type === 'shots' || t.type === 'scalar' || t.type.startsWith('screenshots')
+      )
     },
 
     // The web backend already scopes jobs to the open project server-side;
@@ -514,6 +613,17 @@ export default {
       const numOldRunning = oldProjectJobs.filter((j) => j.status === 'RUNNING').length
       if (numNewErrors !== numOldErrors || numNewRunning !== numOldRunning) {
         this.jobMenuVisible = true
+      }
+
+      const importDone = newVal.find(
+        (j) =>
+          j.type === 'import-mediapkg-tracks' &&
+          j.projectId === this.mainStore.id &&
+          j.status === 'DONE'
+      )
+      if (importDone && importDone.id !== this.lastImportedMediaPkgTracksJobId) {
+        this.lastImportedMediaPkgTracksJobId = importDone.id
+        this.undoableStore.loadStore(this.mainStore.id)
       }
     }
   },
@@ -585,7 +695,8 @@ export default {
     },
 
     exportMediaPkg() {
-      api.exportMediaPkg(this.mainStore.id)
+      api.exportMediaPkg(this.mainStore.id, Array.from(this.exportMediaPkgSelectedIds))
+      this.exportMediaPkgDialog = false
     },
 
     exportProject() {
@@ -649,6 +760,18 @@ export default {
       this.undoableStore.importAnnotations()
     },
 
+    importMediaPkgIntoProjectClicked() {
+      api.importMediaPkgIntoProject(
+        this.mainStore.id,
+        this.importMediaPkgFile.path,
+        Array.from(this.importMediaPkgSelectedTracks)
+      )
+      this.importMediaPkgDialog = false
+      this.importMediaPkgFile = null
+      this.importMediaPkgTracks = []
+      this.importMediaPkgSelectedTracks = []
+    },
+
     importTibava() {
       this.undoableStore.importTibava()
     },
@@ -665,12 +788,27 @@ export default {
       this.undoStore.reset()
     },
 
+    loadImportMediaPkgTracks(file) {
+      this.importMediaPkgTracks = []
+      this.importMediaPkgSelectedTracks = []
+      if (!file) return
+      api.listMediaPkgTracks(file.path).then((tracks) => {
+        this.importMediaPkgTracks = tracks
+        this.importMediaPkgSelectedTracks = tracks.map((t) => t.trackName)
+      })
+    },
+
     loadSubtitles() {
       this.undoableStore.loadSubtitles()
     },
 
     manageVocabulary() {
       this.$refs.vocabularyDialog.show()
+    },
+
+    openExportMediaPkgDialog() {
+      this.exportMediaPkgSelectedIds = this.mediaPkgExportableTimelines.map((t) => t.id)
+      this.exportMediaPkgDialog = true
     },
 
     redo() {

@@ -72,4 +72,10 @@ async function readMediaPackage(path) {
   return { manifest, videos }
 }
 
-module.exports = { readMediaPackage }
+/** Track metadata only, without decoding the Parquet payloads — for previewing a package's contents. */
+async function readManifest(path) {
+  const entriesByName = await readZip(path)
+  return JSON.parse(entriesByName.get('manifest.json').toString('utf8'))
+}
+
+module.exports = { readManifest, readMediaPackage }

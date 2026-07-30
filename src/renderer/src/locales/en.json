@@ -90,6 +90,7 @@
         "importData": "Import Data",
         "importElan": "Import ELAN Annotations (.eaf)",
         "importTibavaWip": "Import Data (.tsv)",
+        "importMediapkg": "Import .mediapkg",
         "exportData": "Export Data",
         "exportElan": "Export as ELAN Annotations (.eaf)",
         "exportCsv": "Export Annotations as .csv",
@@ -144,6 +145,15 @@
           "description": "You can either export all screenshots at once or select individual screenshots from the timeline and export only those.",
           "exportAll": "Export all",
           "exportIndividually": "Export individually"
+        },
+        "exportMediapkg": {
+          "title": "Export as .mediapkg",
+          "description": "Choose which tracks to include in the exported package."
+        },
+        "importMediapkg": {
+          "title": "Import .mediapkg",
+          "description": "Choose a .mediapkg file, then select which tracks to import into this project. Imported tracks whose name matches an existing track are renamed with \"(Imported)\" appended.",
+          "fileLabel": "Mediapkg file"
         },
         "shortcuts": {
           "title": "Shortcuts"

@@ -10,8 +10,10 @@ import exportMediaPkgWorker from './workers/export_mediapkg_worker?nodeWorker'
 import exportProjectWorker from './workers/export_project_worker?nodeWorker'
 import exportScreenshotWorker from './workers/export_screenshot_worker?nodeWorker'
 import exportScreenshotsWorker from './workers/export_screenshots_worker?nodeWorker'
+import importMediaPkgTracksWorker from './workers/import_mediapkg_tracks_worker?nodeWorker'
 import importMediaPkgWorker from './workers/import_mediapkg_worker?nodeWorker'
 import importProjectWorker from './workers/import_project_worker?nodeWorker'
+import listMediaPkgTracksWorker from './workers/list_mediapkg_tracks_worker?nodeWorker'
 import screenshotGenerationWorker from './workers/screenshot_generation_worker?nodeWorker'
 import screenshotsGenerationWorker from './workers/screenshots_generation_worker?nodeWorker'
 import shotBoundaryWorker from './workers/shotboundary_worker?nodeWorker'
@@ -264,15 +266,19 @@ export const exportAnnotations = (channel, projectId, includeScreenshots) => {
   })
 }
 
-export const exportMediaPkg = (channel, projectId) => {
+export const exportMediaPkg = (channel, projectId, timelineIds) => {
+  const meta = loadStore('meta')
+  const projectName = meta?.projects?.find((p) => p.id === projectId)?.name
+  const defaultName = projectName ? path.parse(projectName).name : 'corpus'
+
   const location = dialog.showSaveDialogSync(null, {
-    defaultPath: 'corpus.mediapkg',
+    defaultPath: `${defaultName}.mediapkg`,
     title: 'Select export location'
   })
   if (!location) return
 
   const worker = exportMediaPkgWorker({
-    workerData: { location, storePath: getDataPath(projectId), videoId: projectId }
+    workerData: { location, storePath: getDataPath(projectId), timelineIds, videoId: projectId }
   })
   const job = jobManager.createWorkerJob(channel, 'export-mediapkg', worker, projectId)
 
@@ -360,6 +366,44 @@ export const importMediaPkg = (channel, videoFile, mediaPkgFile) => {
     generateImportedScreenshots(id, videoFile, screenshotJobs).then(() => {
       jobManager.updateJobStatus(channel, job.id, 'DONE')
       channel.sender.send('imported-project', { id, name })
+    })
+  })
+}
+
+export const listMediaPkgTracks = (mediaPkgFile) =>
+  new Promise((resolve, reject) => {
+    const worker = listMediaPkgTracksWorker({ workerData: { mediaPkgFile } })
+    worker.on('message', resolve)
+    worker.on('error', reject)
+  })
+
+export const importMediaPkgIntoProject = (channel, projectId, mediaPkgFile, trackNames) => {
+  const mainStore = loadStore('main', projectId)
+  const worker = importMediaPkgTracksWorker({
+    workerData: { fps: mainStore.fps, mediaPkgFile, trackNames }
+  })
+  const job = jobManager.createWorkerJob(channel, 'import-mediapkg-tracks', worker, projectId)
+
+  worker.on('message', ({ timelines, vocabularies, screenshotJobs }) => {
+    const storePath = getStorePath(projectId, 'undoable')
+    const undoableStore = JSON.parse(fs.readFileSync(storePath, 'utf8'))
+
+    const existingNames = new Set(undoableStore.timelines.map((t) => t.name))
+    timelines.forEach((timeline) => {
+      if (existingNames.has(timeline.name)) timeline.name += ' (Imported)'
+      existingNames.add(timeline.name)
+    })
+
+    undoableStore.timelines.push(...timelines)
+    undoableStore.vocabularies.push(...vocabularies)
+    fs.writeFileSync(storePath, JSON.stringify(undoableStore), 'utf8')
+
+    generateImportedScreenshots(
+      projectId,
+      mainStore.video.replace('app://', ''),
+      screenshotJobs
+    ).then(() => {
+      jobManager.updateJobStatus(channel, job.id, 'DONE')
     })
   })
 }

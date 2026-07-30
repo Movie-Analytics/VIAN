@@ -6,7 +6,7 @@ const {
   observationSeries
 } = require('./tracks')
 const { MediaPackageWriter } = require('./writer')
-const { readMediaPackage } = require('./reader')
+const { readManifest, readMediaPackage } = require('./reader')
 
 module.exports = {
   MAVA_TYPES,
@@ -15,5 +15,6 @@ module.exports = {
   annotationSeries,
   dimensionSpec,
   observationSeries,
+  readManifest,
   readMediaPackage
 }

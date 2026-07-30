@@ -12,8 +12,10 @@ import {
   exportScreenshots,
   getVideoInfo,
   importMediaPkg,
+  importMediaPkgIntoProject,
   importProject,
   jobManager,
+  listMediaPkgTracks,
   loadStore,
   loadSubtitles,
   logError,
@@ -170,12 +172,18 @@ ipcMain.on('export-annotations', (channel, projectId, includeScreenshots) =>
   exportAnnotations(channel, projectId, includeScreenshots)
 )
 ipcMain.on('export-project', (channel, projectId) => exportProject(channel, projectId))
-ipcMain.on('export-mediapkg', (channel, projectId) => exportMediaPkg(channel, projectId))
+ipcMain.on('export-mediapkg', (channel, projectId, timelineIds) =>
+  exportMediaPkg(channel, projectId, timelineIds)
+)
 ipcMain.on('import-project', (channel, videoFile, zipFile) =>
   importProject(channel, videoFile, zipFile)
 )
 ipcMain.on('import-mediapkg', (channel, videoFile, mediaPkgFile) =>
   importMediaPkg(channel, videoFile, mediaPkgFile)
+)
+ipcMain.handle('list-mediapkg-tracks', (_event, mediaPkgFile) => listMediaPkgTracks(mediaPkgFile))
+ipcMain.on('import-mediapkg-into-project', (channel, projectId, mediaPkgFile, trackNames) =>
+  importMediaPkgIntoProject(channel, projectId, mediaPkgFile, trackNames)
 )
 ipcMain.on('log-error', (_, msg) => {
   logError(`Renderer Process Error: ${msg}`)

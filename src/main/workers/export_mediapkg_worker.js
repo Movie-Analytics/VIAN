@@ -98,7 +98,7 @@ const addScreenshotsTimeline = (writer, videoId, timeline, fps, trackName) => {
   )
 }
 
-const exportMediaPkg = async (storePath, location, videoId) => {
+const exportMediaPkg = async (storePath, location, videoId, timelineIds) => {
   const { mainStore, undoableStore } = readVianStore(storePath)
   const { fps } = mainStore
 
@@ -117,7 +117,11 @@ const exportMediaPkg = async (storePath, location, videoId) => {
   const vocabIndex = buildVocabIndex(undoableStore.vocabularies)
   const trackName = makeUniqueNamer()
 
-  for (const timeline of undoableStore.timelines || []) {
+  const timelines = timelineIds
+    ? (undoableStore.timelines || []).filter((t) => timelineIds.includes(t.id))
+    : undoableStore.timelines || []
+
+  for (const timeline of timelines) {
     if (timeline.type === 'shots') {
       addShotsTimeline(writer, videoId, timeline, fps, vocabIndex, trackName)
     } else if (timeline.type === 'scalar') {
@@ -132,7 +136,12 @@ const exportMediaPkg = async (storePath, location, videoId) => {
 
 console.log('Started mediapkg export worker')
 
-exportMediaPkg(workerData.storePath, workerData.location, workerData.videoId)
+exportMediaPkg(
+  workerData.storePath,
+  workerData.location,
+  workerData.videoId,
+  workerData.timelineIds
+)
   .then(() => {
     parentPort.postMessage(true)
   })
