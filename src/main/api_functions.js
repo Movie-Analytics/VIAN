@@ -269,7 +269,7 @@ export const exportMediaPkg = (channel, projectId) => {
     defaultPath: 'corpus.mediapkg',
     title: 'Select export location'
   })
-  if (location === '' || location === 'undefined') return
+  if (!location) return
 
   const worker = exportMediaPkgWorker({
     workerData: { location, storePath: getDataPath(projectId), videoId: projectId }
