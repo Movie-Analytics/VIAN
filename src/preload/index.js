@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  exportAnnotations: (p) => ipcRenderer.send('export-annotations', p),
+  exportAnnotations: (p, s) => ipcRenderer.send('export-annotations', p, s),
   exportMediaPkg: (p) => ipcRenderer.send('export-mediapkg', p),
   exportProject: (p) => ipcRenderer.send('export-project', p),
   exportScreenshot: (p, s, a) => ipcRenderer.send('export-screenshot', p, s, a),

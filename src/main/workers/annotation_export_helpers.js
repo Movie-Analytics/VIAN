@@ -85,6 +85,8 @@ export const screenshotFileName = (frame, fps) => {
   )
 }
 
+export const screenshotTimelineFolder = (timeline) => timeline.name
+
 // Human-readable SMPTE-style timecode "HH:MM:SS:FF", matching the renderer's
 // useMainStore().timeReadableFrame(frame, true).
 export const timeReadable = (frame, fps) => {

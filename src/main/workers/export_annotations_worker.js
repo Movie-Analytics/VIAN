@@ -32,7 +32,7 @@ const vocabColumnHeader = (vocabColumns) =>
 
 const buildSegmentRow = ({
   fps,
-  projectName,
+  includeScreenshots,
   screenshots,
   segment,
   segNo,
@@ -49,9 +49,9 @@ const buildSegmentRow = ({
 
   const matching = screenshots.filter((s) => s.frame >= segment.start && s.frame < segment.end)
   const screenshotRefs = matching.map((s) => {
-    const filename = `${projectName}_${screenshotFileName(s.frame, fps)}`
-    usedScreenshots.set(s.image, filename)
-    return filename
+    const relativePath = `screenshots/${screenshotFileName(s.frame, fps)}`
+    if (includeScreenshots) usedScreenshots.set(s.image, relativePath)
+    return relativePath
   })
 
   const row = [
@@ -68,7 +68,7 @@ const buildSegmentRow = ({
   return row
 }
 
-const buildCsv = (undoableStore, fps, projectName, usedScreenshots) => {
+const buildCsv = (undoableStore, fps, includeScreenshots, usedScreenshots) => {
   const shotTimelines = (undoableStore.timelines || []).filter((t) => t.type === 'shots')
   const { tagInfo, vocabColumns } = buildVocabIndex(undoableStore.vocabularies)
   const screenshots = collectScreenshots(undoableStore)
@@ -89,7 +89,7 @@ const buildCsv = (undoableStore, fps, projectName, usedScreenshots) => {
     sortedByStart(timeline).map((segment, i) =>
       buildSegmentRow({
         fps,
-        projectName,
+        includeScreenshots,
         screenshots,
         segNo: i + 1,
         segment,
@@ -104,23 +104,27 @@ const buildCsv = (undoableStore, fps, projectName, usedScreenshots) => {
   return [header, ...rows].map(csvRow).join('')
 }
 
-const exportAnnotations = async (storePath, location, projectName) => {
+const exportAnnotations = async (storePath, location, includeScreenshots) => {
   const { mainStore, undoableStore } = readVianStore(storePath)
   const { fps } = mainStore
 
-  // Path separators would corrupt the zip's flat file layout.
-  const safeProjectName = projectName.replaceAll(/[/\\]/gu, '_')
-
-  // Image path -> filename inside the zip (screenshots sit alongside the CSV)
   const usedScreenshots = new Map()
-  const csv = buildCsv(undoableStore, fps, safeProjectName, usedScreenshots)
+  const csv = buildCsv(undoableStore, fps, includeScreenshots, usedScreenshots)
+
+  if (!includeScreenshots) {
+    const finalLocation = location.endsWith('.csv') ? location : `${location}.csv`
+    fs.writeFileSync(finalLocation, csv)
+    return
+  }
 
   const tmpPath = fs.mkdtempSync(path.join(os.tmpdir(), 'vian-annotations-'))
   fs.writeFileSync(path.join(tmpPath, 'annotations.csv'), csv)
 
-  for (const [imagePath, filename] of usedScreenshots) {
+  for (const [imagePath, relativePath] of usedScreenshots) {
     try {
-      fs.copyFileSync(imagePath.replace('app://', ''), path.join(tmpPath, filename))
+      const destination = path.join(tmpPath, relativePath)
+      fs.mkdirSync(path.dirname(destination), { recursive: true })
+      fs.copyFileSync(imagePath.replace('app://', ''), destination)
     } catch (err) {
       console.error('Failed to copy screenshot:', imagePath, err)
     }
@@ -138,7 +142,7 @@ const exportAnnotations = async (storePath, location, projectName) => {
 
 console.log('Started annotations export worker')
 
-exportAnnotations(workerData.storePath, workerData.location, workerData.projectName)
+exportAnnotations(workerData.storePath, workerData.location, workerData.includeScreenshots)
   .then(() => {
     parentPort.postMessage(true)
   })

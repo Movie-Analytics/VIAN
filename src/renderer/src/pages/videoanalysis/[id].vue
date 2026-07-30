@@ -145,7 +145,7 @@
         <v-list-item
           prepend-icon="mdi-file-delimited"
           :title="$t('pages.video.drawer.exportCsv')"
-          @click="exportAnnotationsCsv"
+          @click="exportCsvDialog = true"
         />
 
         <v-list-item
@@ -326,6 +326,35 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="exportCsvDialog" persistent max-width="500" scrollable>
+      <v-card>
+        <v-card-title>{{ $t('pages.video.dialogs.exportCsv.title') }}</v-card-title>
+
+        <v-card-text>
+          {{ $t('pages.video.dialogs.exportCsv.description') }}
+
+          <v-checkbox
+            v-model="exportCsvIncludeScreenshots"
+            :label="$t('pages.video.dialogs.exportCsv.includeScreenshotsLabel')"
+          ></v-checkbox>
+
+          <span v-if="exportCsvIncludeScreenshots" class="text-body-2 text-medium-emphasis">
+            {{ $t('pages.video.dialogs.exportCsv.includeScreenshotsWarning') }}
+          </span>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="exportCsvDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn color="primary" @click="exportAnnotationsCsv">
+            {{ $t('common.export') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="exportScreenshotsDialog" persistent max-width="500" scrollable>
       <v-card>
         <v-card-title>{{ $t('pages.video.dialogs.exportScreenshots.title') }}</v-card-title>
@@ -394,6 +423,8 @@ export default {
   data: () => ({
     drawerGroupsOpen: [],
     drawerRail: true,
+    exportCsvDialog: false,
+    exportCsvIncludeScreenshots: false,
     exportScreenshotsDialog: false,
     genScreenshotDialog: false,
     jobMenuHideTimeout: null,
@@ -545,7 +576,8 @@ export default {
 
   methods: {
     exportAnnotationsCsv() {
-      api.exportAnnotations(this.mainStore.id)
+      api.exportAnnotations(this.mainStore.id, this.exportCsvIncludeScreenshots)
+      this.exportCsvDialog = false
     },
 
     exportElan() {

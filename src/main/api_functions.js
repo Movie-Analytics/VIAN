@@ -247,18 +247,15 @@ export const exportScreenshots = (channel, projectId, frames) => {
   })
 }
 
-export const exportAnnotations = (channel, projectId) => {
+export const exportAnnotations = (channel, projectId, includeScreenshots) => {
   const location = dialog.showSaveDialogSync(null, {
-    defaultPath: 'annotations.zip',
+    defaultPath: includeScreenshots ? 'annotations.zip' : 'annotations.csv',
     title: 'Select export location'
   })
   if (!location) return
 
-  const meta = loadStore('meta')
-  const projectName = meta?.projects?.find((p) => p.id === projectId)?.name || projectId
-
   const worker = exportAnnotationsWorker({
-    workerData: { location, projectName, storePath: getDataPath(projectId) }
+    workerData: { includeScreenshots, location, storePath: getDataPath(projectId) }
   })
   const job = jobManager.createWorkerJob(channel, 'export-annotations', worker, projectId)
 

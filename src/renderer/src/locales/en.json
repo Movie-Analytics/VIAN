@@ -92,7 +92,7 @@
         "importTibavaWip": "Import Data (.tsv)",
         "exportData": "Export Data",
         "exportElan": "Export as ELAN Annotations (.eaf)",
-        "exportCsv": "Export Annotations as .csv (.zip)",
+        "exportCsv": "Export Annotations as .csv",
         "exportScreenshots": "Export Screenshots",
         "exportProjectZip": "Export Project as .zip",
         "exportMediapkg": "Export as .mediapkg",
@@ -132,6 +132,12 @@
           "intervalLabel": "N",
           "perShotLabel": "Ensure at least one screenshot per shot",
           "shotTimelineLabel": "Shot Timeline"
+        },
+        "exportCsv": {
+          "title": "Export Annotations as CSV",
+          "description": "Export all annotations as a CSV file.",
+          "includeScreenshotsLabel": "Include screenshots",
+          "includeScreenshotsWarning": "Since screenshots can't be bundled into a .csv file, you'll get a .zip file containing the CSV and the screenshots instead."
         },
         "exportScreenshots": {
           "title": "Export Screenshots",

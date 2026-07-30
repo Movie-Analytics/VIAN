@@ -3,7 +3,11 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 const archiver = require('archiver')
-import { readVianStore, screenshotFileName } from './annotation_export_helpers'
+import {
+  readVianStore,
+  screenshotFileName,
+  screenshotTimelineFolder
+} from './annotation_export_helpers'
 
 const exportScreenshots = async (storePath, location, frames) => {
   const tmpPath = fs.mkdtempSync(path.join(os.tmpdir(), 'vian-screenshots-'))
@@ -13,7 +17,7 @@ const exportScreenshots = async (storePath, location, frames) => {
   let copied = 0
   undoableStore.timelines.forEach((t) => {
     if (!t.type.startsWith('screenshots')) return
-    const timelinePath = path.join(tmpPath, `${t.name}-${t.id}`)
+    const timelinePath = path.join(tmpPath, screenshotTimelineFolder(t))
     fs.mkdirSync(timelinePath)
     t.data.forEach((s) => {
       if (frames && !frames.includes(s.frame)) return

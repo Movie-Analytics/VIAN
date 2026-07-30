@@ -94,7 +94,7 @@
         "importTibavaWip": "Daten importieren (.tsv)",
         "exportData": "Daten exportieren",
         "exportElan": "Als ELAN-Annotationen exportieren (.eaf)",
-        "exportCsv": "Annotationen als .csv exportieren (.zip)",
+        "exportCsv": "Annotationen als .csv exportieren",
         "exportScreenshots": "Screenshots exportieren",
         "exportProjectZip": "Projekt als .zip exportieren",
         "exportMediapkg": "Als .mediapkg exportieren",
@@ -134,6 +134,12 @@
           "intervalLabel": "N",
           "perShotLabel": "Mindestens einen Screenshot pro Shot sicherstellen",
           "shotTimelineLabel": "Shot-Timeline"
+        },
+        "exportCsv": {
+          "title": "Annotationen als CSV exportieren",
+          "description": "Exportiere alle Annotationen als CSV-Datei.",
+          "includeScreenshotsLabel": "Screenshots einschließen",
+          "includeScreenshotsWarning": "Da Screenshots nicht in eine .csv-Datei eingebettet werden können, erhältst du stattdessen eine .zip-Datei mit der CSV-Datei und den Screenshots."
         },
         "exportScreenshots": {
           "title": "Screenshots exportieren",
