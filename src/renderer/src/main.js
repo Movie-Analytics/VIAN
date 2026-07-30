@@ -13,7 +13,14 @@ import router from './router'
 
 setupCsp()
 
-const vuetify = createVuetify({ theme: { themes: { dark: false } } })
+const savedTheme = localStorage.getItem('theme')
+const defaultTheme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light'
+
+const vuetify = createVuetify({
+  theme: {
+    defaultTheme
+  }
+})
 const pinia = createPinia()
 
 const app = createApp(App)

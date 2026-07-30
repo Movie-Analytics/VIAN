@@ -665,12 +665,11 @@ export default {
     },
 
     switchLightMode() {
-      const theme = this.$vuetify.theme.global.name
-      if (theme === 'dark') {
-        this.$vuetify.theme.global.name = 'light'
-      } else {
-        this.$vuetify.theme.global.name = 'dark'
-      }
+      const currentTheme = this.$vuetify.theme.global.name
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark'
+
+      this.$vuetify.theme.global.name = nextTheme
+      localStorage.setItem('theme', nextTheme)
     },
 
     undo() {
