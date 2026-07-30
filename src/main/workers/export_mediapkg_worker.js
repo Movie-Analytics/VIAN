@@ -65,7 +65,11 @@ const addScalarTimeline = (writer, videoId, timeline, fps, trackName) => {
   // from the video's fps.
   const sampleFps = timeline.fps || fps
   const name = trackName(timeline.name, timeline.id)
-  const rows = timeline.data.map((value, i) => ({ start_seconds: i / sampleFps, value }))
+  // TSV-imported scalar timelines can have gaps, stored as null slots; skip
+  // them rather than writing a row with no value.
+  const rows = timeline.data
+    .map((value, i) => ({ start_seconds: i / sampleFps, value }))
+    .filter((r) => r.value !== null)
   writer.addTrack(
     videoId,
     mava.observationSeries({

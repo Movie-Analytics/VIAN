@@ -204,9 +204,19 @@ const drawSegment = (
     ctx.beginPath()
     ctx.lineWidth = '1'
     ctx.strokeStyle = 'DimGray'
-    ctx.moveTo(rescale(0), d.data[0])
+    let penDown = false
     d.data.forEach((p, i) => {
-      ctx.lineTo(rescale((i / d.fps) * fps), p)
+      if (p === null) {
+        penDown = false
+        return
+      }
+      const px = rescale((i / d.fps) * fps)
+      if (penDown) {
+        ctx.lineTo(px, p)
+      } else {
+        ctx.moveTo(px, p)
+        penDown = true
+      }
     })
     ctx.stroke()
   }
@@ -691,7 +701,9 @@ export default {
         }
         if (timeline.type === 'scalar') {
           data.push({
-            data: timeline.data.map((t) => mainRowY + trackHeight - t * segmentHeight - 5),
+            data: timeline.data.map((t) =>
+              t === null ? null : mainRowY + trackHeight - t * segmentHeight - 5
+            ),
             fps: timeline.fps,
             height: segmentHeight,
             id: timeline.id,

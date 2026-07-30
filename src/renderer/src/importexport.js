@@ -120,12 +120,40 @@ export const parseTsvAnnotations = (content) => {
       type: 'shots'
     }
   }
+  // Scalar timeline. Rows carry their own "start in seconds" timestamp,
+  // which may have gaps (e.g. tibava's per-sample export just omits rows
+  // for time ranges with no data). Place each value at its real timestamp
+  // rather than assuming rows are contiguous, filling skipped slots with
+  // null so gaps survive instead of silently compressing the timeline.
+  const samples = lines
+    .slice(1)
+    .map((l) => ({ time: parseFloat(l[secondsIndex]), value: parseFloat(l[annotationsIndex]) }))
+    .filter((s) => !Number.isNaN(s.time) && !Number.isNaN(s.value))
+
+  if (samples.length === 0) {
+    return { data: [], fps: 1, type: 'scalar' }
+  }
+
+  // Sampling interval: the smallest gap between consecutive timestamps.
+  // Using the smallest gap (rather than just the first two rows) keeps a
+  // missing sample early in the file from being mistaken for the native
+  // sampling rate.
+  let delta = Infinity
+  for (let i = 1; i < samples.length; i += 1) {
+    const gap = samples[i].time - samples[i - 1].time
+    if (gap > 0 && gap < delta) delta = gap
+  }
+  if (!Number.isFinite(delta)) delta = 1
+
+  const lastIndex = Math.round(samples[samples.length - 1].time / delta)
+  const data = new Array(lastIndex + 1).fill(null)
+  for (const s of samples) {
+    data[Math.round(s.time / delta)] = s.value
+  }
+
   return {
-    data: lines
-      .slice(1)
-      .map((l) => parseFloat(l[annotationsIndex]))
-      .filter((d) => !Number.isNaN(d)),
-    fps: 1 / (parseFloat(lines[2][secondsIndex]) - parseFloat(lines[1][secondsIndex])),
+    data,
+    fps: 1 / delta,
     type: 'scalar'
   }
 }
