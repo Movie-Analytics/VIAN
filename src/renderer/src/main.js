@@ -17,6 +17,12 @@ const savedTheme = localStorage.getItem('theme')
 const defaultTheme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : 'light'
 
 const vuetify = createVuetify({
+  defaults: {
+    VTooltip: {
+      openDelay: 300,
+      transition: false
+    }
+  },
   theme: {
     defaultTheme
   }
