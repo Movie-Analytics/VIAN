@@ -259,7 +259,7 @@ export default {
           throw new Error(`HTTP ${r.status} ${r.statusText}`)
         }
         const data = await r.json()
-        this.vianLatestVersion = data.tag_name
+        this.vianLatestVersion = data.tag_name.replace(/^v/u, '')
       } catch (e) {
         console.warn('Could not fetch latest version', e)
       }
