@@ -790,12 +790,12 @@ export default {
     segmentSplit() {
       if (!this.segmentSplitable) return
       const [shotid, timelineid] = this.tempStore.selectedSegments.entries().next().value
-      this.undoableStore.splitSegment(
+      const newSegmentId = this.undoableStore.splitSegment(
         timelineid,
         shotid,
         Math.round(this.tempStore.playPosition * this.mainStore.fps)
       )
-      this.tempStore.selectedSegments = new Map()
+      this.tempStore.selectedSegments = new Map([[newSegmentId, timelineid]])
     },
 
     selectTimeline(id) {

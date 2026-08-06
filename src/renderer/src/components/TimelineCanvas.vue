@@ -526,12 +526,12 @@ export default {
     contextMenuSplit() {
       if (!this.contextMenuSplitable) return
       const [shotId, timelineId] = this.tempStore.selectedSegments.entries().next().value
-      this.undoableStore.splitSegment(
+      const newSegmentId = this.undoableStore.splitSegment(
         timelineId,
         shotId,
         Math.round(this.tempStore.playPosition * this.mainStore.fps)
       )
-      this.tempStore.selectedSegments = new Map()
+      this.tempStore.selectedSegments = new Map([[newSegmentId, timelineId]])
     },
 
     doubleClickPopup(entry) {

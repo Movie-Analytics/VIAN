@@ -299,14 +299,16 @@ export const useUndoableStore = defineStore('undoable', {
       const timeline = this.getTimelineById(timelineId)
       const index = timeline.data.findIndex((s) => s.id === segmentId)
       const segment = timeline.data[index]
+      const newSegmentId = crypto.randomUUID()
       timeline.data.splice(index + 1, 0, {
         annotation: '',
         end: segment.end,
-        id: crypto.randomUUID(),
+        id: newSegmentId,
         start: position,
         vocabAnnotation: []
       })
       segment.end = position - 1
+      return newSegmentId
     },
     undo() {
       this.$patch(useUndoStore().undo('undoable'))
