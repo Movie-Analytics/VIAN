@@ -713,7 +713,7 @@ export default {
         }
         offset += trackHeight
 
-        if (timeline.vocabulary && this.tempStore.timelinesFold[timeline.id].visible) {
+        if (timeline.vocabulary && this.tempStore.timelinesFold[timeline.id]?.visible) {
           for (const category of this.tempStore.timelinesFold[timeline.id].categories) {
             timelineRowRects.push({ height: CATEGORY_HEADER_HEIGHT, y: offset })
             offset += CATEGORY_HEADER_HEIGHT
@@ -973,7 +973,7 @@ export default {
         if (offset > y) break
 
         const fold = this.tempStore.timelinesFold[timeline.id]
-        if (fold.visible) {
+        if (fold?.visible) {
           for (const category of fold.categories) {
             offset += CATEGORY_HEADER_HEIGHT
             if (offset > y) break

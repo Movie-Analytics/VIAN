@@ -615,12 +615,13 @@ export default {
         this.jobMenuVisible = true
       }
 
-      const importDone = newVal.find(
+      const importDoneJobs = newVal.filter(
         (j) =>
           j.type === 'import-mediapkg-tracks' &&
           j.projectId === this.mainStore.id &&
           j.status === 'DONE'
       )
+      const importDone = importDoneJobs[importDoneJobs.length - 1]
       if (importDone && importDone.id !== this.lastImportedMediaPkgTracksJobId) {
         this.lastImportedMediaPkgTracksJobId = importDone.id
         this.undoableStore.loadStore(this.mainStore.id)
