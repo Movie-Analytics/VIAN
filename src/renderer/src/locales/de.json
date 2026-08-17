@@ -296,6 +296,7 @@
     "timelineCanvas": {
       "annotations": "Annotation",
       "moveWarning": "Segment kann hier nicht verschoben werden, da es sich mit einem anderen Segment überschneiden würde.",
+      "zoomHandle": "Klicken und ziehen zum Zoomen",
       "contextMenu": {
         "addTextAnnotation": "Textannotation hinzufügen",
         "toggleAnnotation": "Annotation umschalten",
@@ -332,7 +333,9 @@
         "splitSegment": "Ausgewähltes Segment an der Abspielposition teilen",
         "rangeSelect": "Bereichsauswahl zwischen Anker und Klick",
         "toggleSelect": "Segment zur Mehrfachauswahl hinzufügen oder entfernen",
-        "zoomTimeline": "Timeline zoomen"
+        "zoomTimeline": "Timeline zoomen",
+        "zoomIn": "In die Timeline hineinzoomen",
+        "zoomOut": "Aus der Timeline herauszoomen"
       },
       "shotMarking": {
         "setInPoint": "Startpunkt eines neuen Segments an der Abspielposition setzen",

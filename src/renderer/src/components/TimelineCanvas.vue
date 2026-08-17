@@ -99,16 +99,25 @@
     </v-snackbar>
 
     <teleport defer to="#timelineScrollbarContainer">
-      <input
-        ref="hScrollbar"
-        type="range"
-        class="timeline-scrollbar"
-        min="0"
-        :max="scrollMax"
-        :value="scrollBarValue"
-        :style="{ '--thumb-width': scrollThumbWidth + 'px' }"
-        @input="onScroll(Number($event.target.value))"
-      />
+      <div ref="hScrollbar" class="timeline-scrollbar" @mousedown="onTrackMouseDown">
+        <div
+          class="timeline-scrollbar-thumb"
+          :style="{ left: thumbLeft + 'px', width: scrollThumbWidth + 'px' }"
+          @mousedown.stop="onThumbMouseDown"
+        >
+          <div
+            v-tooltip="{ text: $t('components.timelineCanvas.zoomHandle'), location: 'top' }"
+            class="timeline-scrollbar-handle timeline-scrollbar-handle-left"
+            @mousedown.stop="onHandleMouseDown($event, 'left')"
+          ></div>
+
+          <div
+            v-tooltip="{ text: $t('components.timelineCanvas.zoomHandle'), location: 'top' }"
+            class="timeline-scrollbar-handle timeline-scrollbar-handle-right"
+            @mousedown.stop="onHandleMouseDown($event, 'right')"
+          ></div>
+        </div>
+      </div>
     </teleport>
   </div>
 </template>
@@ -125,8 +134,10 @@ import { useUndoableStore } from '@renderer/stores/undoable'
 
 const BASE_TRACK_HEIGHT = 49
 const CATEGORY_HEADER_HEIGHT = 27
+const MIN_SCROLLBAR_THUMB_WIDTH = 20
 const PLAYHEAD_COLOR = '#ff0000'
 const SELECTION_COLOR = '#fff59d'
+const ZOOM_STEP_FACTOR = 1.2
 
 const truncateText = (ctx, text, maxWidth) => {
   if (ctx.measureText(text).width <= maxWidth) return text
@@ -241,6 +252,9 @@ export default {
       dragStartX: 0,
       dragStartY: 0,
       hCtx: null,
+      hScrollbarDrag: null,
+      hScrollbarDragStartClientX: 0,
+      hScrollbarDragStartTransform: null,
       isDragging: false,
       isDrawingScheduled: false,
       lastClick: Date.now(),
@@ -253,7 +267,6 @@ export default {
       overlayPosY: 0,
       resizeoberserver: null,
       scale: null,
-      scrollBarValue: 0,
       tCtx: null,
       transform: d3.zoomIdentity,
       unloadedImages: 0,
@@ -291,12 +304,8 @@ export default {
       return segment.start < playFps && segment.end > playFps
     },
 
-    scrollMax() {
-      return Math.max(0, Math.round(this.canvasWidth * (this.transform.k - 1)))
-    },
-
     scrollThumbWidth() {
-      return Math.max(20, Math.round(this.canvasWidth / this.transform.k))
+      return Math.max(MIN_SCROLLBAR_THUMB_WIDTH, Math.round(this.canvasWidth / this.transform.k))
     },
 
     scrollValue() {
@@ -309,6 +318,10 @@ export default {
 
     selectedTimelineId() {
       return this.tempStore.selectedTimelineId
+    },
+
+    thumbLeft() {
+      return this.scrollValue / this.transform.k
     },
 
     trackHeight() {
@@ -337,10 +350,6 @@ export default {
         this.drawSetup()
         this.requestDraw()
       }
-    },
-
-    scrollValue(val) {
-      this.scrollBarValue = val
     },
 
     'tempStore.playPosition'() {
@@ -416,6 +425,12 @@ export default {
 
     shortcuts.register('i', this.setInPoint)
     shortcuts.register('o', this.setOutPoint)
+    shortcuts.register('=', this.zoomIn, false, true)
+    shortcuts.register('=', this.zoomIn, false, false, true)
+    shortcuts.register('+', this.zoomIn, false, true)
+    shortcuts.register('+', this.zoomIn, false, false, true)
+    shortcuts.register('-', this.zoomOut, false, true)
+    shortcuts.register('-', this.zoomOut, false, false, true)
 
     this.drawSetup()
     this.requestDraw()
@@ -425,9 +440,20 @@ export default {
     this.resizeoberserver.unobserve(this.$refs.canvas)
     shortcuts.clear('i')
     shortcuts.clear('o')
+    shortcuts.clear('=', false, true)
+    shortcuts.clear('=', false, false, true)
+    shortcuts.clear('+', false, true)
+    shortcuts.clear('+', false, false, true)
+    shortcuts.clear('-', false, true)
+    shortcuts.clear('-', false, false, true)
   },
 
   methods: {
+    applyScrollTransform(scrollValue, k) {
+      const target = d3.zoomIdentity.translate(-scrollValue, 0).scale(k)
+      d3.select(this.$refs.canvas).call(this.zoom.transform, target)
+    },
+
     clickHandler(event) {
       const rect = this.$refs.canvas.getBoundingClientRect()
       const x = (event.clientX - rect.left) * this.dpr
@@ -1221,9 +1247,69 @@ export default {
       this.overlayPosY = e.clientY - this.dragStartY
     },
 
-    onScroll(value) {
-      const target = d3.zoomIdentity.translate(-value, 0).scale(this.transform.k)
-      d3.select(this.$refs.canvas).call(this.zoom.transform, target)
+    onHandleMouseDown(e, side) {
+      this.hScrollbarDrag = side
+      this.hScrollbarDragStartClientX = e.clientX
+      this.hScrollbarDragStartTransform = this.transform
+      window.addEventListener('mousemove', this.onScrollbarDrag)
+      window.addEventListener('mouseup', this.onScrollbarDragEnd)
+    },
+
+    onScrollbarDrag(e) {
+      if (!this.hScrollbarDrag) return
+
+      const deltaPx = e.clientX - this.hScrollbarDragStartClientX
+      const startK = this.hScrollbarDragStartTransform.k
+      const startLeft = -this.hScrollbarDragStartTransform.x / startK
+      const startWidth = this.canvasWidth / startK
+      const startRight = startLeft + startWidth
+
+      if (this.hScrollbarDrag === 'pan') {
+        const newLeft = Math.max(0, Math.min(this.canvasWidth - startWidth, startLeft + deltaPx))
+        this.applyScrollTransform(newLeft * startK, startK)
+        return
+      }
+
+      if (this.hScrollbarDrag === 'left') {
+        const newLeft = Math.min(
+          startRight - MIN_SCROLLBAR_THUMB_WIDTH,
+          Math.max(0, startLeft + deltaPx)
+        )
+        const newK = this.canvasWidth / (startRight - newLeft)
+        this.applyScrollTransform(newLeft * newK, newK)
+      } else if (this.hScrollbarDrag === 'right') {
+        const newRight = Math.max(
+          startLeft + MIN_SCROLLBAR_THUMB_WIDTH,
+          Math.min(this.canvasWidth, startRight + deltaPx)
+        )
+        const newK = this.canvasWidth / (newRight - startLeft)
+        this.applyScrollTransform(startLeft * newK, newK)
+      }
+    },
+
+    onScrollbarDragEnd() {
+      this.hScrollbarDrag = null
+      window.removeEventListener('mousemove', this.onScrollbarDrag)
+      window.removeEventListener('mouseup', this.onScrollbarDragEnd)
+    },
+
+    onThumbMouseDown(e) {
+      this.hScrollbarDrag = 'pan'
+      this.hScrollbarDragStartClientX = e.clientX
+      this.hScrollbarDragStartTransform = this.transform
+      window.addEventListener('mousemove', this.onScrollbarDrag)
+      window.addEventListener('mouseup', this.onScrollbarDragEnd)
+    },
+
+    onTrackMouseDown(e) {
+      const trackLeft = this.$refs.hScrollbar.getBoundingClientRect().left
+      const k = this.transform.k
+      const width = this.canvasWidth / k
+      const newLeft = Math.max(
+        0,
+        Math.min(this.canvasWidth - width, e.clientX - trackLeft - width / 2)
+      )
+      this.applyScrollTransform(newLeft * k, k)
     },
 
     overlayInputChange() {
@@ -1366,6 +1452,14 @@ export default {
       const x = d3.pointer(e, this.$refs.timeCanvas)[0]
       const timePosition = this.transform.rescaleX(this.scale).invert(x) / this.mainStore.fps
       this.tempStore.playJumpPosition = timePosition
+    },
+
+    zoomIn() {
+      this.zoom.scaleBy(d3.select(this.$refs.canvas), ZOOM_STEP_FACTOR)
+    },
+
+    zoomOut() {
+      this.zoom.scaleBy(d3.select(this.$refs.canvas), 1 / ZOOM_STEP_FACTOR)
     }
   }
 }
@@ -1377,30 +1471,45 @@ canvas {
 }
 
 .timeline-scrollbar {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
+  background: rgba(33, 150, 243, 0.08);
+  border-radius: 4px;
   cursor: pointer;
   height: 8px;
   margin: 4px 0 0;
+  position: relative;
   width: 100%;
 }
 
-.timeline-scrollbar::-webkit-slider-runnable-track {
-  background: rgba(33, 150, 243, 0.08);
-  border-radius: 4px;
-  height: 8px;
-}
-
-.timeline-scrollbar::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
+.timeline-scrollbar-thumb {
   background: #90caf9;
   border-radius: 4px;
-  cursor: pointer;
+  cursor: grab;
   height: 8px;
-  margin-top: 0;
-  width: var(--thumb-width, 40px);
+  position: absolute;
+  top: 0;
+}
+
+.timeline-scrollbar-thumb:active {
+  cursor: grabbing;
+}
+
+.timeline-scrollbar-handle {
+  background: #1976d2;
+  border-radius: 50%;
+  cursor: ew-resize;
+  height: 10px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+}
+
+.timeline-scrollbar-handle-left {
+  left: -5px;
+}
+
+.timeline-scrollbar-handle-right {
+  right: -5px;
 }
 
 .overlay-card {

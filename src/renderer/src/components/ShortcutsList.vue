@@ -68,6 +68,14 @@ export default {
             {
               action: this.$t('components.shortcutsList.segmentation.zoomTimeline'),
               key: 'Ctrl + Scroll'
+            },
+            {
+              action: this.$t('components.shortcutsList.segmentation.zoomIn'),
+              key: 'Ctrl/Cmd + +'
+            },
+            {
+              action: this.$t('components.shortcutsList.segmentation.zoomOut'),
+              key: 'Ctrl/Cmd + -'
             }
           ],
 

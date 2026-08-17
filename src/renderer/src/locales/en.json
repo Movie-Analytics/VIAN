@@ -294,6 +294,7 @@
     "timelineCanvas": {
       "annotations": "Annotation",
       "moveWarning": "Segment cannot be moved here as it would overlap with another segment.",
+      "zoomHandle": "Click and drag to zoom",
       "contextMenu": {
         "addTextAnnotation": "Add text annotation",
         "toggleAnnotation": "Toggle annotation",
@@ -330,7 +331,9 @@
         "splitSegment": "Split selected segment at playhead",
         "rangeSelect": "Range select segments between anchor and click",
         "toggleSelect": "Toggle segment in/out of multi-selection",
-        "zoomTimeline": "Zoom the timeline"
+        "zoomTimeline": "Zoom the timeline",
+        "zoomIn": "Zoom in on the timeline",
+        "zoomOut": "Zoom out on the timeline"
       },
       "shotMarking": {
         "setInPoint": "Set in-point of a new segment at the playhead",
