@@ -180,6 +180,8 @@
       "timelines": {
         "addTrack": "Add new track",
         "duplicate": "Duplicate",
+        "duplicateShotsOnly": "Duplicate (shots only)",
+        "duplicateWithAnnotations": "Duplicate (with annotations)",
         "delete": "Delete",
         "rename": "Rename",
         "linkVocabulary": "Link to Vocabulary",
@@ -282,6 +284,8 @@
         "lockTrack": "Lock/unlock track",
         "timelineOptions": "Options",
         "duplicateTrack": "Create a copy of this track",
+        "duplicateTrackShotsOnly": "Create a copy of this track with the shot boundaries but no annotations",
+        "duplicateTrackWithAnnotations": "Create a copy of this track including its annotations",
         "deleteTrack": "Permanently remove this track and all its segments",
         "renameTrack": "Change the name of this track",
         "linkVocabularyToTrack": "Associate this track with a vocabulary for annotation",

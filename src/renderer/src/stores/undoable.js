@@ -123,11 +123,15 @@ export const useUndoableStore = defineStore('undoable', {
       const vocab = this.vocabularies.find((v) => v.id === vocabId)
       vocab.tags = vocab.tags.filter((t) => t.id !== tagId)
     },
-    duplicateTimeline(id) {
+    duplicateTimeline(id, withAnnotations = true) {
       const timeline = this.getTimelineById(id)
       const newTimeline = JSON.parse(JSON.stringify(timeline))
       newTimeline.data.forEach((d) => {
         d.id = crypto.randomUUID()
+        if (!withAnnotations) {
+          d.annotation = ''
+          d.vocabAnnotation = []
+        }
       })
       newTimeline.id = crypto.randomUUID()
       newTimeline.name += ' (copy)'

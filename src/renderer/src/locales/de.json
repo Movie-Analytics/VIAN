@@ -182,6 +182,8 @@
       "timelines": {
         "addTrack": "Neue Spur hinzufügen",
         "duplicate": "Duplizieren",
+        "duplicateShotsOnly": "Duplizieren (nur Shots)",
+        "duplicateWithAnnotations": "Duplizieren (mit Annotationen)",
         "delete": "Löschen",
         "rename": "Umbenennen",
         "linkVocabulary": "Mit Vokabular verknüpfen",
@@ -284,6 +286,8 @@
         "lockTrack": "Track sperren/entsperren",
         "timelineOptions": "Optionen",
         "duplicateTrack": "Eine Kopie dieser Spur erstellen",
+        "duplicateTrackShotsOnly": "Eine Kopie dieser Spur mit den Shot-Grenzen, aber ohne Annotationen erstellen",
+        "duplicateTrackWithAnnotations": "Eine Kopie dieser Spur einschließlich ihrer Annotationen erstellen",
         "deleteTrack": "Diese Spur und alle Segmente dauerhaft entfernen",
         "renameTrack": "Den Namen dieser Spur ändern",
         "linkVocabularyToTrack": "Diese Spur mit einem Vokabular für Annotationen verknüpfen",

@@ -303,7 +303,32 @@
                             </template>
 
                             <v-list class="pb-0 pt-0">
+                              <template v-if="undoableStore.getTimelineById(id).type === 'shots'">
+                                <v-list-item
+                                  v-tooltip="{
+                                    text: $t(
+                                      'components.timelines.tooltips.duplicateTrackShotsOnly'
+                                    ),
+                                    location: 'right'
+                                  }"
+                                  :title="$t('pages.video.timelines.duplicateShotsOnly')"
+                                  @click="duplicateTimeline(id, false)"
+                                ></v-list-item>
+
+                                <v-list-item
+                                  v-tooltip="{
+                                    text: $t(
+                                      'components.timelines.tooltips.duplicateTrackWithAnnotations'
+                                    ),
+                                    location: 'right'
+                                  }"
+                                  :title="$t('pages.video.timelines.duplicateWithAnnotations')"
+                                  @click="duplicateTimeline(id, true)"
+                                ></v-list-item>
+                              </template>
+
                               <v-list-item
+                                v-else
                                 v-tooltip="{
                                   text: $t('components.timelines.tooltips.duplicateTrack'),
                                   location: 'right'
@@ -723,8 +748,8 @@ export default {
       e.target.style.opacity = '0.5'
     },
 
-    duplicateTimeline(id) {
-      this.undoableStore.duplicateTimeline(id)
+    duplicateTimeline(id, withAnnotations = true) {
+      this.undoableStore.duplicateTimeline(id, withAnnotations)
     },
 
     linkVocab() {
