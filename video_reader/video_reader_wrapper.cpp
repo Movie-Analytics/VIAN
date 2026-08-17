@@ -192,11 +192,12 @@ Napi::Value VideoReaderWrapper::QueueWorker(
 
     Napi::Function callback = info[info.Length() - 1].As<Napi::Function>();
 
-    currentWorker = std::make_unique<Worker>(
+    currentWorker = new Worker(
         callback,
         videoReader.get(),
         std::move(execFunc),
-        std::move(resultFunc)
+        std::move(resultFunc),
+        &currentWorker
     );
 
     currentWorker->Queue();

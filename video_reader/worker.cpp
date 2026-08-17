@@ -1,16 +1,22 @@
 #include "worker.h"
 
 
-Worker::Worker(Napi::Function& callback, 
+Worker::Worker(Napi::Function& callback,
                VideoReader* videoReader,
                WorkerFunction execFunc,
-               ResultHandler resultFunc)
+               ResultHandler resultFunc,
+               Worker** ownerSlot)
     : Napi::AsyncWorker(callback),
       videoReader(videoReader),
       execFunction(std::move(execFunc)),
-      resultHandler(std::move(resultFunc)) {}
+      resultHandler(std::move(resultFunc)),
+      ownerSlot(ownerSlot) {}
 
-Worker::~Worker() {}
+Worker::~Worker() {
+    if (ownerSlot && *ownerSlot == this) {
+        *ownerSlot = nullptr;
+    }
+}
 
 void Worker::Cancel() {
     if (videoReader) {

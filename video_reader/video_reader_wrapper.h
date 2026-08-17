@@ -13,7 +13,9 @@ public:
 private:
     static Napi::FunctionReference* constructor;
     bool finished = false;
-    std::unique_ptr<Worker> currentWorker;
+    // Non-owning: Napi::AsyncWorker deletes itself once the job completes,
+    // and Worker's destructor clears this pointer when that happens.
+    Worker* currentWorker = nullptr;
     std::unique_ptr<VideoReader> videoReader;
 
     Napi::Value Open(const Napi::CallbackInfo& info);

@@ -19,6 +19,8 @@ import screenshotsGenerationWorker from './workers/screenshots_generation_worker
 import shotBoundaryWorker from './workers/shotboundary_worker?nodeWorker'
 import videoInfoWorker from './workers/videoinfo_worker?nodeWorker'
 
+const CANCEL_TIMEOUT_MS = 10000
+const COOPERATIVE_JOB_TYPES = ['shotboundary-detection', 'screenshots-generation']
 const DATA_DIR = 'vian'
 
 const getDataPath = (projectId = '') => path.join(app.getPath('userData'), DATA_DIR, projectId)
@@ -63,13 +65,31 @@ class JobManager {
     const job = this.jobs.get(jobId)
     if (!job) return false
 
-    if (['shotboundary-detection', 'screenshots-generation'].includes(job.type)) {
+    if (COOPERATIVE_JOB_TYPES.includes(job.type)) {
       job.worker.postMessage({ type: 'TERMINATE' })
     } else {
       job.worker.terminate()
       job.status = 'CANCELED'
     }
     return true
+  }
+
+  // Cancellation of native ffmpeg/ONNX work is cooperative: TERMINATE only
+  // flips a flag the decode loop polls between frames, and the worker
+  // reports back with a final status message once it has actually unwound.
+  // Waiting for that message (instead of a fixed delay) avoids force-exiting
+  // the app while that native thread is still running.
+  waitForJobToFinish(job) {
+    if (!COOPERATIVE_JOB_TYPES.includes(job.type)) return Promise.resolve()
+
+    return new Promise((resolve) => {
+      const timer = setTimeout(resolve, CANCEL_TIMEOUT_MS)
+      job.worker.once('message', () => {
+        clearTimeout(timer)
+        job.worker.terminate().catch((error) => console.error('Failed to terminate worker:', error))
+        resolve()
+      })
+    })
   }
 
   sendJobsUpdate(channel) {
@@ -93,15 +113,13 @@ class JobManager {
     const jobs = Array.from(this.jobs.values())
     const runningJobs = jobs.filter((job) => job.status === 'RUNNING')
 
-    if (runningJobs.length > 0) {
-      runningJobs.forEach((job) => {
+    await Promise.all(
+      runningJobs.map((job) => {
+        const finished = this.waitForJobToFinish(job)
         this.terminateJob(job.id)
+        return finished
       })
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1500)
-      })
-    }
+    )
     return true
   }
 }
