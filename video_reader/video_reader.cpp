@@ -111,28 +111,34 @@ bool VideoReader::Open() {
   }
 
 double VideoReader::getFrameRate() {
+    if (video_stream_index == -1) return 0;
     return av_q2d(format_ctx->streams[video_stream_index]->r_frame_rate);
 }
 
 double VideoReader::getHeight() {
+    if (video_stream_index == -1) return 0;
     return format_ctx->streams[video_stream_index]->codecpar->height;
 }
 
 double VideoReader::getWidth() {
+    if (video_stream_index == -1) return 0;
     return format_ctx->streams[video_stream_index]->codecpar->width;
 }
 
 double VideoReader::getNumFrames() {
+    if (video_stream_index == -1) return 0;
     return format_ctx->streams[video_stream_index]->nb_frames;
 }
 
 std::string VideoReader::getCodecName() {
+    if (video_stream_index == -1) return "unknown";
     const AVCodec* codec = avcodec_find_decoder(
         format_ctx->streams[video_stream_index]->codecpar->codec_id);
     return codec ? codec->name : "unknown";
 }
 
 std::string VideoReader::getPixelFormat() {
+    if (!codec_ctx) return "unknown";
     const char* name = av_get_pix_fmt_name(codec_ctx->pix_fmt);
     return name ? name : "unknown";
 }
