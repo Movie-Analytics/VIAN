@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { toRaw } from 'vue'
 
 import { parseEafAnnotations, parseTsvAnnotations } from '@renderer/importexport'
 import api from '@renderer/api'
@@ -286,6 +287,17 @@ export const useUndoableStore = defineStore('undoable', {
           }
         }
       }
+    },
+    reorderTags(categoryId, id, index) {
+      const category = this.vocabById.get(categoryId)
+      const rawTags = toRaw(category.tags)
+      const initialIndex = rawTags.findIndex((t) => t.id === id)
+
+      const tags = [...rawTags]
+      const [removed] = tags.splice(initialIndex, 1)
+      tags.splice(index, 0, removed)
+
+      category.tags = tags
     },
     reorderTimelines(id, index) {
       const initialIndex = this.timelines.findIndex((t) => t.id === id)

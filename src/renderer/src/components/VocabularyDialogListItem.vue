@@ -84,10 +84,15 @@
         :key="tag.id"
         :item="tag"
         :is-editing="tag.id === editTagId"
+        :draggable="tag.id !== editTagId"
         @edit="startEdit(tag.id)"
         @save="saveEdit"
         @delete="deleteTag(tag.id)"
         @cancel="cancelEdit"
+        @dragstart="dragStart($event, tag.id)"
+        @dragend="dragEnd"
+        @dragover="dragOver"
+        @drop="dragDrop($event, tag.id)"
       ></VocabularyDialogTag>
 
       <v-chip variant="outlined" prepend-icon="mdi-plus" class="ma-1" @click="addTag">
@@ -182,6 +187,29 @@ export default {
 
     deleteTag(id) {
       this.undoableStore.vocabularyDelete(id)
+    },
+
+    dragDrop(e, id) {
+      e.preventDefault()
+      const draggedId = e.dataTransfer.getData('text/plain')
+      if (draggedId !== id) {
+        const index = this.item.tags.findIndex((t) => t.id === id)
+        this.undoableStore.reorderTags(this.item.id, draggedId, index)
+      }
+    },
+
+    dragEnd(e) {
+      e.target.style.opacity = '1'
+    },
+
+    dragOver(e) {
+      e.preventDefault()
+    },
+
+    dragStart(e, id) {
+      e.dataTransfer.setData('text/plain', id)
+      e.dataTransfer.effectAllowed = 'move'
+      e.target.style.opacity = '0.5'
     },
 
     saveEdit(newName) {
