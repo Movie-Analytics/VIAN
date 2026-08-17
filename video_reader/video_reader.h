@@ -27,6 +27,10 @@ public:
     double getHeight();
     double getNumFrames();
     double getWidth();
+    std::string getCodecName();
+    std::string getPixelFormat();
+    std::string getFormatName();
+    double getBitRate();
     bool Open();
     static void setCancelled(bool value);
     static bool isCancelled();

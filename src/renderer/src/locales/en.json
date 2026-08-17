@@ -77,10 +77,15 @@
       },
 
       "info": {
+        "path": "Path",
+        "format": "Format",
+        "codec": "Codec",
+        "pixelFormat": "Pixel format",
         "fps": "FPS",
         "resolution": "Resolution",
         "duration": "Duration",
-        "totalFrames": "Total number of frames"
+        "totalFrames": "Total number of frames",
+        "bitRate": "Bit rate"
       },
       "drawer": {
         "shotBoundaryDetection": "Shot Boundary Detection",

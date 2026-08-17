@@ -12,13 +12,13 @@
         <template #panel2>
           <v-card class="d-flex flex-column h-100 w-100">
             <v-tabs v-model="tab" show-arrows class="flex-0-0">
-              <v-tab value="info">{{ $t('pages.video.tabs.info') }}</v-tab>
-
               <v-tab :disabled="undoableStore.shotTimelines.length == 0" value="shots">
                 {{ $t('pages.video.tabs.segmentation') }}
               </v-tab>
 
               <v-tab value="selection">{{ $t('pages.video.tabs.annotation') }}</v-tab>
+
+              <v-tab value="info">{{ $t('pages.video.tabs.info') }}</v-tab>
             </v-tabs>
 
             <v-card-text class="d-flex flex-1-1 flex-column height-min-0">
@@ -27,7 +27,29 @@
                 v-model="tab"
                 class="d-flex flex-1-1 flex-column height-min-0"
               >
+                <v-tabs-window-item value="shots" class="h-100">
+                  <ShotList></ShotList>
+                </v-tabs-window-item>
+
+                <v-tabs-window-item value="selection" class="h-100 overflow-y-auto">
+                  <ShotDetail></ShotDetail>
+                </v-tabs-window-item>
+
                 <v-tabs-window-item value="info">
+                  <p v-if="videoPath">{{ $t('pages.video.info.path') }}: {{ videoPath }}</p>
+
+                  <p v-if="mainStore.formatName">
+                    {{ $t('pages.video.info.format') }}: {{ mainStore.formatName }}
+                  </p>
+
+                  <p v-if="mainStore.codecName">
+                    {{ $t('pages.video.info.codec') }}: {{ mainStore.codecName }}
+                  </p>
+
+                  <p v-if="mainStore.pixelFormat">
+                    {{ $t('pages.video.info.pixelFormat') }}: {{ mainStore.pixelFormat }}
+                  </p>
+
                   <p v-if="mainStore.fps">{{ $t('pages.video.info.fps') }}: {{ mainStore.fps }}</p>
 
                   <p v-if="mainStore.height && mainStore.width">
@@ -40,14 +62,10 @@
                   <p v-if="mainStore.numFrames">
                     {{ $t('pages.video.info.totalFrames') }}: {{ mainStore.numFrames }}
                   </p>
-                </v-tabs-window-item>
 
-                <v-tabs-window-item value="shots" class="h-100">
-                  <ShotList></ShotList>
-                </v-tabs-window-item>
-
-                <v-tabs-window-item value="selection" class="h-100 overflow-y-auto">
-                  <ShotDetail></ShotDetail>
+                  <p v-if="mainStore.bitRate">
+                    {{ $t('pages.video.info.bitRate') }}: {{ bitRateReadable }}
+                  </p>
                 </v-tabs-window-item>
               </v-tabs-window>
             </v-card-text>
@@ -90,9 +108,19 @@ export default {
   computed: {
     ...mapStores(useMainStore, useUndoableStore),
 
+    bitRateReadable() {
+      if (!this.mainStore.bitRate) return null
+      return `${(this.mainStore.bitRate / 1000).toFixed(0)} kbps`
+    },
+
     duration() {
       if (this.mainStore.numFrames === null) return null
       return this.mainStore.timeReadableFrame(this.mainStore.numFrames)
+    },
+
+    videoPath() {
+      if (!this.mainStore.video) return null
+      return this.mainStore.video.replace(/^app:\/\//u, '')
     }
   }
 }

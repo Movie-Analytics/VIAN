@@ -5,10 +5,14 @@ import { useUndoableStore } from './undoable'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
+    bitRate: null,
+    codecName: null,
+    formatName: null,
     fps: null,
     height: null,
     id: null,
     numFrames: null,
+    pixelFormat: null,
     video: null,
     videoDuration: null,
     width: null
@@ -23,9 +27,13 @@ export const useMainStore = defineStore('main', {
       })
       // Set up listener
       api.onVideoInfo((data) => {
+        this.bitRate = data.bitRate
+        this.codecName = data.codecName
         this.fps = data.fps
+        this.formatName = data.formatName
         this.height = data.height
         this.numFrames = data.numFrames
+        this.pixelFormat = data.pixelFormat
         this.width = data.width
       })
     },

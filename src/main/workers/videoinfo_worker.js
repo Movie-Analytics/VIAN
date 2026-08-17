@@ -11,4 +11,17 @@ const fps = reader.getFrameRate()
 const width = reader.getWidth()
 const height = reader.getHeight()
 const numFrames = reader.getNumFrames()
-parentPort.postMessage({ fps, height, numFrames, width })
+const codecName = reader.getCodecName()
+const pixelFormat = reader.getPixelFormat()
+const formatName = reader.getFormatName()
+const bitRate = reader.getBitRate()
+parentPort.postMessage({
+  bitRate,
+  codecName,
+  formatName,
+  fps,
+  height,
+  numFrames,
+  pixelFormat,
+  width
+})

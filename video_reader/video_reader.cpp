@@ -126,6 +126,25 @@ double VideoReader::getNumFrames() {
     return format_ctx->streams[video_stream_index]->nb_frames;
 }
 
+std::string VideoReader::getCodecName() {
+    const AVCodec* codec = avcodec_find_decoder(
+        format_ctx->streams[video_stream_index]->codecpar->codec_id);
+    return codec ? codec->name : "unknown";
+}
+
+std::string VideoReader::getPixelFormat() {
+    const char* name = av_get_pix_fmt_name(codec_ctx->pix_fmt);
+    return name ? name : "unknown";
+}
+
+std::string VideoReader::getFormatName() {
+    return format_ctx->iformat->name;
+}
+
+double VideoReader::getBitRate() {
+    return format_ctx->bit_rate;
+}
+
 std::vector<uint8_t>& VideoReader::ReadNextFrame(std::vector<uint8_t>& out_frame_data) {
     AVPacket packet;
     int response;

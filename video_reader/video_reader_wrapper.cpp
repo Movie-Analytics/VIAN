@@ -96,6 +96,10 @@ Napi::Object VideoReaderWrapper::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod<&VideoReaderWrapper::GetHeight>("getHeight"),
         InstanceMethod<&VideoReaderWrapper::GetNumFrames>("getNumFrames"),
         InstanceMethod<&VideoReaderWrapper::GetWidth>("getWidth"),
+        InstanceMethod<&VideoReaderWrapper::GetCodecName>("getCodecName"),
+        InstanceMethod<&VideoReaderWrapper::GetPixelFormat>("getPixelFormat"),
+        InstanceMethod<&VideoReaderWrapper::GetFormatName>("getFormatName"),
+        InstanceMethod<&VideoReaderWrapper::GetBitRate>("getBitRate"),
         InstanceMethod<&VideoReaderWrapper::DetectShots>("detectShots"),
         InstanceMethod<&VideoReaderWrapper::GenerateScreenshots>("generateScreenshots"),
         InstanceMethod<&VideoReaderWrapper::GenerateScreenshot>("generateScreenshot"),
@@ -147,6 +151,27 @@ Napi::Value VideoReaderWrapper::GetWidth(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     double width = videoReader->getWidth();
     return Napi::Number::New(env, width);
+}
+
+Napi::Value VideoReaderWrapper::GetCodecName(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, videoReader->getCodecName());
+}
+
+Napi::Value VideoReaderWrapper::GetPixelFormat(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, videoReader->getPixelFormat());
+}
+
+Napi::Value VideoReaderWrapper::GetFormatName(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, videoReader->getFormatName());
+}
+
+Napi::Value VideoReaderWrapper::GetBitRate(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    double bitRate = videoReader->getBitRate();
+    return Napi::Number::New(env, bitRate);
 }
 
 Napi::Value VideoReaderWrapper::Done(const Napi::CallbackInfo& info) {
