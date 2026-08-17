@@ -109,7 +109,7 @@ const exportAnnotations = async (storePath, location, includeScreenshots) => {
   const { fps } = mainStore
 
   const usedScreenshots = new Map()
-  const csv = buildCsv(undoableStore, fps, includeScreenshots, usedScreenshots)
+  const csv = '﻿' + buildCsv(undoableStore, fps, includeScreenshots, usedScreenshots)
 
   if (!includeScreenshots) {
     const finalLocation = location.endsWith('.csv') ? location : `${location}.csv`
