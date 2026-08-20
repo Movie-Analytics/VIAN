@@ -180,7 +180,7 @@
       "timelines": {
         "addTrack": "Add new track",
         "duplicate": "Duplicate",
-        "duplicateShotsOnly": "Duplicate (shots only)",
+        "duplicateShotsOnly": "Duplicate (segments only)",
         "duplicateWithAnnotations": "Duplicate (with annotations)",
         "delete": "Delete",
         "rename": "Rename",
