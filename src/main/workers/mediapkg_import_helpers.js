@@ -1,3 +1,5 @@
+import { buildScalarDataFromSamples } from '../../shared/scalar_timeline'
+
 export const buildShotsTimeline = (name, track, fps) => ({
   data: track.rows.map((r) => ({
     annotation: r.annotations || '',
@@ -16,12 +18,11 @@ export const buildShotsTimeline = (name, track, fps) => ({
 
 export const buildScalarTimeline = (name, track, fps) => {
   const valueColumn = Object.keys(track.dimensions || {})[0]
-  const sampleFps = track.sampling_interval_seconds ? 1 / track.sampling_interval_seconds : fps
+  const samples = track.rows.map((r) => ({ time: r.start_seconds, value: r[valueColumn] }))
+  const knownInterval = track.sampling_interval_seconds || (fps ? 1 / fps : null)
+  const { data, fps: sampleFps } = buildScalarDataFromSamples(samples, knownInterval)
   return {
-    data: track.rows
-      .slice()
-      .sort((a, b) => a.start_seconds - b.start_seconds)
-      .map((r) => r[valueColumn]),
+    data,
     fps: sampleFps,
     id: crypto.randomUUID(),
     name,

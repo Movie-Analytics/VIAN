@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio'
+import { buildScalarDataFromSamples } from '../../shared/scalar_timeline'
 import { useMainStore } from '@renderer/stores/main'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
@@ -130,32 +131,8 @@ export const parseTsvAnnotations = (content) => {
     .map((l) => ({ time: parseFloat(l[secondsIndex]), value: parseFloat(l[annotationsIndex]) }))
     .filter((s) => !Number.isNaN(s.time) && !Number.isNaN(s.value))
 
-  if (samples.length === 0) {
-    return { data: [], fps: 1, type: 'scalar' }
-  }
-
-  // Sampling interval: the smallest gap between consecutive timestamps.
-  // Using the smallest gap (rather than just the first two rows) keeps a
-  // missing sample early in the file from being mistaken for the native
-  // sampling rate.
-  let delta = Infinity
-  for (let i = 1; i < samples.length; i += 1) {
-    const gap = samples[i].time - samples[i - 1].time
-    if (gap > 0 && gap < delta) delta = gap
-  }
-  if (!Number.isFinite(delta)) delta = 1
-
-  const lastIndex = Math.round(samples[samples.length - 1].time / delta)
-  const data = new Array(lastIndex + 1).fill(null)
-  for (const s of samples) {
-    data[Math.round(s.time / delta)] = s.value
-  }
-
-  return {
-    data,
-    fps: 1 / delta,
-    type: 'scalar'
-  }
+  const { data, fps } = buildScalarDataFromSamples(samples)
+  return { data, fps, type: 'scalar' }
 }
 
 export const exportElanAnnotations = () => {
