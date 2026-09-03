@@ -50,7 +50,9 @@
                     {{ $t('pages.video.info.pixelFormat') }}: {{ mainStore.pixelFormat }}
                   </p>
 
-                  <p v-if="mainStore.fps">{{ $t('pages.video.info.fps') }}: {{ mainStore.fps }}</p>
+                  <p v-if="mainStore.fps">
+                    {{ $t('pages.video.info.fps') }}: {{ mainStore.fps.toFixed(2) }}
+                  </p>
 
                   <p v-if="mainStore.height && mainStore.width">
                     {{ $t('pages.video.info.resolution') }}: {{ mainStore.width }} x
