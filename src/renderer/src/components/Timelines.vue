@@ -533,7 +533,6 @@ import SplitterContainer from '@renderer/components/SplitterContainer.vue'
 import TimelineCanvas from '@renderer/components/TimelineCanvas.vue'
 import api from '@renderer/api'
 import shortcuts from '@renderer/shortcuts'
-import { toRaw } from 'vue'
 import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
 import { useUndoableStore } from '@renderer/stores/undoable'
@@ -742,8 +741,10 @@ export default {
           if (typeof t.vocabulary !== 'string') {
             return [t.id, { name: t.name, visible: false }]
           }
-          const categories = structuredClone(
-            toRaw(this.undoableStore.vocabularies.find((v) => v.id === t.vocabulary).categories)
+          const categories = JSON.parse(
+            JSON.stringify(
+              this.undoableStore.vocabularies.find((v) => v.id === t.vocabulary).categories
+            )
           )
           categories.forEach((c) => {
             c.visible = false

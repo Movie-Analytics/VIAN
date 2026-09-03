@@ -14,7 +14,7 @@
             @save="saveEdit"
             @cancel="cancelEdit"
             @export="exportToFile"
-            @delete="deleteVocabulary(item.id)"
+            @delete="confirmDelete('vocabulary', item.id)"
             @select="select('vocabulary', item)"
           />
 
@@ -43,7 +43,7 @@
             @edit="startEdit('category', item.id)"
             @save="saveEdit"
             @cancel="cancelEdit"
-            @delete="deleteCategory(item.id)"
+            @delete="confirmDelete('category', item.id)"
             @select="select('category', item)"
           />
 
@@ -62,6 +62,8 @@
       <v-spacer v-else></v-spacer>
     </template>
   </SplitterContainer>
+
+  <ConfirmDialog ref="confirmDialog" />
 </template>
 
 <script>
@@ -69,12 +71,13 @@ import { exportVocabJson } from '@renderer/importexport'
 import { mapStores } from 'pinia'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
+import ConfirmDialog from '@renderer/components/ConfirmDialog.vue'
 import SplitterContainer from '@renderer/components/SplitterContainer.vue'
 import VocabularyDialogListItem from '@renderer/components/VocabularyDialogListItem.vue'
 
 export default {
   name: 'VocabularyDialogList',
-  components: { SplitterContainer, VocabularyDialogListItem },
+  components: { ConfirmDialog, SplitterContainer, VocabularyDialogListItem },
 
   props: {
     id: { type: [String, null], required: true },
@@ -125,6 +128,22 @@ export default {
       this.editVocabularyId = null
       this.editCategoryId = null
       this.editAfterCreation = false
+    },
+
+    async confirmDelete(itemType, id) {
+      if (this.undoableStore.hasVocabularyAnnotations(id)) {
+        const confirmed = await this.$refs.confirmDialog.show({
+          text: this.$t('components.vocabularyDialogList.deleteWarningText'),
+          title: this.$t('components.vocabularyDialogList.deleteWarningTitle')
+        })
+        if (!confirmed) return
+      }
+
+      if (itemType === 'vocabulary') {
+        this.deleteVocabulary(id)
+      } else {
+        this.deleteCategory(id)
+      }
     },
 
     deleteCategory(id) {

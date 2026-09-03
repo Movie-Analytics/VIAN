@@ -237,7 +237,9 @@
         "vocabulary": "Vokabular",
         "category": "Kategorie",
         "tag": "Tag"
-      }
+      },
+      "deleteWarningTitle": "Diesen Eintrag löschen?",
+      "deleteWarningText": "Dieser Eintrag wird in bestehenden Annotationen verwendet. Beim Löschen gehen diese Annotationen verloren. Dies kann nicht rückgängig gemacht werden."
     },
 
     "vocabularyDialogListItem": {
@@ -247,7 +249,9 @@
         "editItem": "Eintrag umbenennen",
         "exportItem": "Eintrag exportieren",
         "deleteItem": "Eintrag löschen"
-      }
+      },
+      "deleteWarningTitle": "Diesen Tag löschen?",
+      "deleteWarningText": "Dieser Tag wird in bestehenden Annotationen verwendet. Beim Löschen gehen diese Annotationen verloren. Dies kann nicht rückgängig gemacht werden."
     },
 
     "shotDetail": {

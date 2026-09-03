@@ -87,7 +87,7 @@
         :draggable="tag.id !== editTagId"
         @edit="startEdit(tag.id)"
         @save="saveEdit"
-        @delete="deleteTag(tag.id)"
+        @delete="confirmDeleteTag(tag.id)"
         @cancel="cancelEdit"
         @dragstart="dragStart($event, tag.id)"
         @dragend="dragEnd"
@@ -104,16 +104,19 @@
       </v-chip>
     </v-list>
   </v-list-item>
+
+  <ConfirmDialog ref="confirmDialog" />
 </template>
 
 <script>
+import ConfirmDialog from '@renderer/components/ConfirmDialog.vue'
 import VocabularyDialogTag from '@renderer/components/VocabularyDialogTag.vue'
 import { mapStores } from 'pinia'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
 export default {
   name: 'VocabularyDialogListItem',
-  components: { VocabularyDialogTag },
+  components: { ConfirmDialog, VocabularyDialogTag },
 
   props: {
     isEditing: {
@@ -183,6 +186,17 @@ export default {
       }
       this.editTagId = null
       this.editAfterCreation = false
+    },
+
+    async confirmDeleteTag(id) {
+      if (this.undoableStore.hasVocabularyAnnotations(id)) {
+        const confirmed = await this.$refs.confirmDialog.show({
+          text: this.$t('components.vocabularyDialogListItem.deleteWarningText'),
+          title: this.$t('components.vocabularyDialogListItem.deleteWarningTitle')
+        })
+        if (!confirmed) return
+      }
+      this.deleteTag(id)
     },
 
     deleteTag(id) {

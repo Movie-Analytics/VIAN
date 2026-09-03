@@ -24,6 +24,23 @@ export const useUndoableStore = defineStore('undoable', {
     getTimelineById: (state) => (id) => {
       return state.timelines.find((t) => t.id === id)
     },
+    hasVocabularyAnnotations: (state) => (id) => {
+      const node = state.vocabById.get(id)
+      if (!node) return false
+
+      const tagIds = new Set()
+      if ('categories' in node) {
+        node.categories.forEach((c) => c.tags.forEach((t) => tagIds.add(t.id)))
+      } else if ('tags' in node) {
+        node.tags.forEach((t) => tagIds.add(t.id))
+      } else {
+        tagIds.add(id)
+      }
+
+      return state.timelines.some((t) =>
+        t.data.some((s) => s?.vocabAnnotation?.some((tagId) => tagIds.has(tagId)))
+      )
+    },
     screenshotTimelines: (state) => state.timelines.filter((t) => t.type.startsWith('screenshot')),
     shotTimelines: (state) => state.timelines.filter((t) => t.type === 'shots'),
     vocabById: (state) =>

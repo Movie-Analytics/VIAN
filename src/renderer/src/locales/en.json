@@ -235,7 +235,9 @@
         "vocabulary": "Vocabulary",
         "category": "Category",
         "tag": "Tag"
-      }
+      },
+      "deleteWarningTitle": "Delete this item?",
+      "deleteWarningText": "This item is used in existing annotations. Deleting it will remove those annotations. This cannot be undone."
     },
 
     "vocabularyDialogListItem": {
@@ -245,7 +247,9 @@
         "editItem": "Rename",
         "exportItem": "Export",
         "deleteItem": "Delete"
-      }
+      },
+      "deleteWarningTitle": "Delete this tag?",
+      "deleteWarningText": "This tag is used in existing annotations. Deleting it will remove those annotations. This cannot be undone."
     },
 
     "shotDetail": {
