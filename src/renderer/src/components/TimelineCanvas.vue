@@ -65,6 +65,8 @@
 
     <canvas ref="hiddenCanvas" height="0" class="d-none"></canvas>
 
+    <MergeAnnotationsDialog ref="mergeAnnotationsDialog" />
+
     <div class="position-fixed" :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }">
       <v-menu v-model="contextMenuVisible" activator="parent">
         <v-list density="compact" class="pb-0 pt-0">
@@ -127,6 +129,7 @@ import * as d3 from 'd3'
 import { mapStores } from 'pinia'
 import { markRaw } from 'vue'
 
+import MergeAnnotationsDialog from '@renderer/components/MergeAnnotationsDialog.vue'
 import shortcuts from '@renderer/shortcuts'
 import { useMainStore } from '@renderer/stores/main'
 import { useTempStore } from '@renderer/stores/temp'
@@ -235,6 +238,7 @@ const drawSegment = (
 
 export default {
   name: 'TimelineCanvas',
+  components: { MergeAnnotationsDialog },
 
   data() {
     return {
@@ -544,9 +548,7 @@ export default {
 
     contextMenuMerge() {
       if (!this.contextMenuMergable) return
-      const segments = this.tempStore.selectedSegments
-      this.undoableStore.mergeSegments(segments.values().next().value, Array.from(segments.keys()))
-      this.tempStore.selectedSegments = new Map()
+      this.mergeSelectedSegments()
     },
 
     contextMenuSplit() {
@@ -1030,6 +1032,24 @@ export default {
       }
 
       return null
+    },
+
+    async mergeSelectedSegments() {
+      const segments = this.tempStore.selectedSegments
+      const timelineId = segments.values().next().value
+      const segmentIds = Array.from(segments.keys())
+      const annotations = segmentIds
+        .map((id) => this.undoableStore.getSegmentForId(timelineId, id).annotation)
+        .filter((annotation) => annotation)
+
+      let annotation = annotations[0]
+      if (annotations.length > 1) {
+        annotation = await this.$refs.mergeAnnotationsDialog.show(annotations)
+        if (annotation === null) return
+      }
+
+      this.undoableStore.mergeSegments(timelineId, segmentIds, annotation)
+      this.tempStore.selectedSegments = new Map()
     },
 
     mousedown(e) {

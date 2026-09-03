@@ -14,7 +14,8 @@
     "export": "Export",
     "generate": "Generate",
     "close": "Close",
-    "ignore": "Ignore"
+    "ignore": "Ignore",
+    "merge": "Merge"
   },
 
   "pages": {
@@ -264,6 +265,9 @@
 
     "imageDialog": {
       "screenshotAt": "Screenshot at"
+    },
+    "mergeAnnotationsDialog": {
+      "title": "Choose annotations to keep"
     },
 
     "layout": {

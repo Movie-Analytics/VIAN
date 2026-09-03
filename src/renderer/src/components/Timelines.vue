@@ -807,9 +807,7 @@ export default {
 
     segmentMerge() {
       if (!this.segmentMergable) return
-      const segments = this.tempStore.selectedSegments
-      this.undoableStore.mergeSegments(segments.values().next().value, Array.from(segments.keys()))
-      this.tempStore.selectedSegments = new Map()
+      this.$refs.timelineCanvas.mergeSelectedSegments()
     },
 
     segmentSplit() {

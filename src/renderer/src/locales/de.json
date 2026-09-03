@@ -14,7 +14,8 @@
     "close": "Schließen",
     "rename": "Umbenennen",
     "delete": "Löschen",
-    "ignore": "Ignorieren"
+    "ignore": "Ignorieren",
+    "merge": "Zusammenführen"
   },
 
   "pages": {
@@ -266,6 +267,9 @@
 
     "imageDialog": {
       "screenshotAt": "Screenshot bei"
+    },
+    "mergeAnnotationsDialog": {
+      "title": "Zu behaltende Annotationen auswählen"
     },
 
     "layout": {

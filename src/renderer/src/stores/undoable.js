@@ -218,7 +218,7 @@ export const useUndoableStore = defineStore('undoable', {
       this.subtitles = await api.loadSubtitles(this.id)
       return this.subtitles
     },
-    mergeSegments(timelineId, segmentIds) {
+    mergeSegments(timelineId, segmentIds, annotation = null) {
       const timeline = this.getTimelineById(timelineId)
       const segment = timeline.data.find((s) => s.id === segmentIds[0])
       segmentIds.slice(1).forEach((segmentId) => {
@@ -227,6 +227,9 @@ export const useUndoableStore = defineStore('undoable', {
         segment.end = Math.max(segment.end, timeline.data[index].end)
         timeline.data.splice(index, 1)
       })
+      if (annotation !== null) {
+        segment.annotation = annotation
+      }
       useTempStore().validateSelectedSegments()
     },
     onScreenshotGeneration(data) {
