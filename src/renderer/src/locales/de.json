@@ -248,6 +248,7 @@
         "cancel": "Abbrechen",
         "editItem": "Eintrag umbenennen",
         "exportItem": "Eintrag exportieren",
+        "duplicateItem": "Duplizieren",
         "deleteItem": "Eintrag löschen"
       },
       "deleteWarningTitle": "Diesen Tag löschen?",

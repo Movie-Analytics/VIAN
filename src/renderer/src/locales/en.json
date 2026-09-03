@@ -246,6 +246,7 @@
         "cancel": "Cancel",
         "editItem": "Rename",
         "exportItem": "Export",
+        "duplicateItem": "Duplicate",
         "deleteItem": "Delete"
       },
       "deleteWarningTitle": "Delete this tag?",

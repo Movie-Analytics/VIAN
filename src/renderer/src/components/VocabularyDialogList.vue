@@ -14,6 +14,7 @@
             @save="saveEdit"
             @cancel="cancelEdit"
             @export="exportToFile"
+            @duplicate="duplicateVocabulary"
             @delete="confirmDelete('vocabulary', item.id)"
             @select="select('vocabulary', item)"
           />
@@ -156,6 +157,10 @@ export default {
       this.undoableStore.vocabularyDelete(id)
       this.selectedVocabularyId = null
       this.selectedVocabulary = null
+    },
+
+    duplicateVocabulary(id) {
+      this.undoableStore.duplicateVocabulary(id)
     },
 
     exportToFile(id) {

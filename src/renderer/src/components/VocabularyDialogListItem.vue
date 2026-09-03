@@ -68,6 +68,12 @@
             ></v-list-item>
 
             <v-list-item
+              v-if="showExport"
+              :title="$t('components.vocabularyDialogListItem.tooltips.duplicateItem')"
+              @click.stop="$emit('duplicate', item.id)"
+            ></v-list-item>
+
+            <v-list-item
               :title="$t('components.vocabularyDialogListItem.tooltips.deleteItem')"
               @click.stop="$emit('delete', item.id)"
             ></v-list-item>
@@ -137,7 +143,7 @@ export default {
     }
   },
 
-  emits: ['select', 'edit', 'save', 'cancel', 'export', 'delete'],
+  emits: ['select', 'edit', 'save', 'cancel', 'export', 'duplicate', 'delete'],
 
   data() {
     return {

@@ -155,6 +155,19 @@ export const useUndoableStore = defineStore('undoable', {
       newTimeline.name += ' (copy)'
       this.timelines.push(newTimeline)
     },
+    duplicateVocabulary(id) {
+      const vocab = this.vocabularies.find((v) => v.id === id)
+      const newVocab = JSON.parse(JSON.stringify(vocab))
+      newVocab.id = crypto.randomUUID()
+      newVocab.name += ' (copy)'
+      newVocab.categories.forEach((c) => {
+        c.id = crypto.randomUUID()
+        c.tags.forEach((t) => {
+          t.id = crypto.randomUUID()
+        })
+      })
+      this.vocabularies.push(newVocab)
+    },
     generateScreenshot(frame) {
       api.runScreenshotGeneration(useMainStore().video, frame, this.id)
     },
