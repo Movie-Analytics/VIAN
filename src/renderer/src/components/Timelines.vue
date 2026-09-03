@@ -367,6 +367,20 @@
 
                               <v-list-item
                                 v-tooltip="{
+                                  text: $t(
+                                    'components.timelines.tooltips.unlinkVocabularyFromTrack'
+                                  ),
+                                  location: 'right'
+                                }"
+                                :title="$t('pages.video.timelines.unlinkVocabulary')"
+                                :disabled="
+                                  typeof undoableStore.getTimelineById(id).vocabulary !== 'string'
+                                "
+                                @click="unlinkVocabDialogOpen(id)"
+                              ></v-list-item>
+
+                              <v-list-item
+                                v-tooltip="{
                                   text: $t('components.timelines.tooltips.hideTrack'),
                                   location: 'right'
                                 }"
@@ -491,6 +505,24 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="unlinkVocabDialog" persistent max-width="400">
+      <v-card>
+        <v-card-title>{{ $t('pages.video.timelines.unlinkVocabularyTitle') }}</v-card-title>
+
+        <v-card-text>{{ $t('pages.video.timelines.unlinkVocabularyWarning') }}</v-card-text>
+
+        <v-card-actions>
+          <v-btn color="warning" @click="unlinkVocabDialog = false">
+            {{ $t('common.cancel') }}
+          </v-btn>
+
+          <v-btn color="primary" @click="unlinkVocab">{{
+            $t('pages.video.timelines.unlinkVocabulary')
+          }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-sheet>
 </template>
 
@@ -522,7 +554,8 @@ export default {
       selectedVocab: null,
       timelineName: '',
       trackListResizeObserver: null,
-      trackNameRefs: {}
+      trackNameRefs: {},
+      unlinkVocabDialog: false
     }
   },
 
@@ -834,6 +867,17 @@ export default {
     toggleTimelineLock(id) {
       const timeline = this.undoableStore.getTimelineById(id)
       timeline.locked = !timeline.locked
+    },
+
+    unlinkVocab() {
+      this.undoableStore.unlinkTimelineFromVocabulary(this.selectedTimeline)
+      this.unlinkVocabDialog = false
+      this.createTimelineFolds()
+    },
+
+    unlinkVocabDialogOpen(id) {
+      this.unlinkVocabDialog = true
+      this.selectedTimeline = id
     }
   }
 }

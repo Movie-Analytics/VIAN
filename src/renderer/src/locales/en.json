@@ -215,7 +215,10 @@
         "renameTimelineTitle": "Rename Timeline",
         "newTimelineName": "New Timeline Name",
         "linkVocabularyTitle": "Link Vocabulary to Timeline",
-        "selectVocabulary": "Select Vocabulary"
+        "selectVocabulary": "Select Vocabulary",
+        "unlinkVocabulary": "Unlink Vocabulary",
+        "unlinkVocabularyTitle": "Unlink Vocabulary",
+        "unlinkVocabularyWarning": "This track's vocabulary annotations will be lost. This cannot be undone."
       }
     }
   },
@@ -316,6 +319,7 @@
         "deleteTrack": "Permanently remove this track and all its segments",
         "renameTrack": "Change the name of this track",
         "linkVocabularyToTrack": "Associate this track with a vocabulary for annotation",
+        "unlinkVocabularyFromTrack": "Remove the vocabulary link from this track",
         "trackHeight": "Adjust the height of the tracks",
         "hideTrack": "Remove this track from the main list",
         "showTrack": "Restore this track to the main list"

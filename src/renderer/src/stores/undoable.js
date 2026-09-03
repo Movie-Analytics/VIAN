@@ -332,6 +332,13 @@ export const useUndoableStore = defineStore('undoable', {
     undo() {
       this.$patch(useUndoStore().undo('undoable'))
     },
+    unlinkTimelineFromVocabulary(timelineId) {
+      const timeline = this.getTimelineById(timelineId)
+      timeline.vocabulary = null
+      timeline.data.forEach((s) => {
+        s.vocabAnnotation = []
+      })
+    },
     vocabularyAdd(id, name) {
       const newId = crypto.randomUUID()
 

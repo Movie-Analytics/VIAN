@@ -217,7 +217,10 @@
         "renameTimelineTitle": "Timeline umbenennen",
         "newTimelineName": "Neuer Timeline-Name",
         "linkVocabularyTitle": "Vokabular mit Timeline verknüpfen",
-        "selectVocabulary": "Vokabular auswählen"
+        "selectVocabulary": "Vokabular auswählen",
+        "unlinkVocabulary": "Vokabular entfernen",
+        "unlinkVocabularyTitle": "Vokabular entfernen",
+        "unlinkVocabularyWarning": "Die Vokabular-Annotationen dieser Spur gehen verloren. Dies kann nicht rückgängig gemacht werden."
       }
     }
   },
@@ -318,6 +321,7 @@
         "deleteTrack": "Diese Spur und alle Segmente dauerhaft entfernen",
         "renameTrack": "Den Namen dieser Spur ändern",
         "linkVocabularyToTrack": "Diese Spur mit einem Vokabular für Annotationen verknüpfen",
+        "unlinkVocabularyFromTrack": "Die Vokabular-Verknüpfung dieser Spur entfernen",
         "trackHeight": "Die Höhe der Spuren anpassen",
         "hideTrack": "Diese Spur aus der Hauptliste entfernen",
         "showTrack": "Diese Spur wieder in der Hauptliste anzeigen"
