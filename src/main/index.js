@@ -161,7 +161,9 @@ ipcMain.on('run-screenshots-generation', (channel, path, frames, videoId) =>
 ipcMain.on('run-screenshot-generation', (channel, path, frame, videoId) =>
   runScreenshotGeneration(channel, path, frame, videoId)
 )
-ipcMain.on('get-video-info', (channel, path, projectId) => getVideoInfo(channel, path, projectId))
+ipcMain.handle('get-video-info', (channel, path, projectId) =>
+  getVideoInfo(channel, path, projectId)
+)
 ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnotations) =>
   exportScreenshot(channel, projectId, screenshot, associatedAnnotations)
 )

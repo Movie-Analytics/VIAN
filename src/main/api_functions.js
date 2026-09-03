@@ -227,13 +227,17 @@ export const getVideoInfo = (channel, videoPath, projectId) => {
   const worker = videoInfoWorker({ workerData: videoPath.replace('app://', '') })
   const job = jobManager.createWorkerJob(channel, 'video-info', worker, projectId)
 
-  worker.on('message', (data) => {
-    jobManager.updateJobStatus(channel, job.id, 'DONE')
-    if (data.error === 'no-video-track') {
-      dialog.showErrorBox('Unable to open video', 'This file does not contain a video track.')
-      return
-    }
-    channel.sender.send('video-info', data)
+  return new Promise((resolve) => {
+    worker.on('message', (data) => {
+      jobManager.updateJobStatus(channel, job.id, 'DONE')
+      if (data.error === 'no-video-track') {
+        dialog.showErrorBox('Unable to open video', 'This file does not contain a video track.')
+        resolve(false)
+        return
+      }
+      channel.sender.send('video-info', data)
+      resolve(true)
+    })
   })
 }
 

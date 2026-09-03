@@ -60,9 +60,10 @@ export const useMetaStore = defineStore('meta', {
         id: crypto.randomUUID(),
         name: videoInfo.name
       }
-      this.projects.push(project)
       const mainStore = useMainStore()
-      mainStore.openVideo(project.id, videoInfo.location)
+      const success = await mainStore.openVideo(project.id, videoInfo.location)
+      if (!success) return null
+      this.projects.push(project)
       return project.id
     },
     renameProject(projectId, newName) {

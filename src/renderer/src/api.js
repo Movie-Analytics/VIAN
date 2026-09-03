@@ -214,12 +214,12 @@ class RemoteApi {
     this.callbacks['jobs-update'] = cb
   }
 
-  async getVideoInfo(video) {
+  async getVideoInfo(video, projectId) {
     this.callbacks['jobs-update'](await this.getJobs())
 
     const response = await fetch(this.baseApi + 'get-video-info', {
       body: JSON.stringify({
-        id: useMainStore().id,
+        id: projectId,
         video
       }),
       headers: {

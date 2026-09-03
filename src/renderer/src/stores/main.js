@@ -43,17 +43,19 @@ export const useMainStore = defineStore('main', {
         this.$patch(state)
       }
     },
-    openVideo(id, video) {
+    async openVideo(id, video) {
       // TODO could become race condition, meta or backend should create file
       // and then just loadProject
+      if (video !== null) {
+        const success = await api.getVideoInfo(video, id)
+        if (!success) return false
+      }
+
       const undoableStore = useUndoableStore()
       this.id = id
       undoableStore.id = id
       this.video = video
-
-      if (this.video !== null) {
-        api.getVideoInfo(this.video, this.id)
-      }
+      return true
     },
     timeReadableFrame(frame, framenum = false) {
       const totalSeconds = frame / this.fps
