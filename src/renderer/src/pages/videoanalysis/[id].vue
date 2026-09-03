@@ -166,14 +166,6 @@
         @click="switchLanguage"
       ></v-list-item>
 
-      <v-list-item
-        v-else
-        v-tooltip="{ text: $t('pages.video.drawer.tooltips.switchToGerman'), location: 'left' }"
-        prepend-icon="mdi-translate"
-        :title="$t('pages.video.drawer.switchToGerman')"
-        @click="switchLanguage"
-      ></v-list-item>
-
       <v-list-group>
         <template #activator="{ props }">
           <v-list-item
