@@ -97,11 +97,6 @@
         "importTibavaWip": "Import Data (.tsv)",
         "importMediapkg": "Import .mediapkg",
         "exportData": "Export Data",
-        "exportElan": "Export as ELAN Annotations (.eaf)",
-        "exportCsv": "Export Annotations as .csv",
-        "exportScreenshots": "Export Screenshots",
-        "exportProjectZip": "Export Project as .zip",
-        "exportMediapkg": "Export as .mediapkg",
         "switchToLightMode": "Switch to Light Mode",
         "switchToDarkMode": "Switch to Dark Mode",
         "switchToGerman": "Switch to German",
@@ -116,7 +111,7 @@
           "generateScreenshots": "Capture screenshots from the video at a set interval",
           "manageVocabulary": "Create and edit vocabularies for structured annotation",
           "importData": "Import annotations from external files",
-          "exportData": "Export annotations to external formats",
+          "exportData": "Export data to external formats",
           "switchToLightMode": "Switch the interface to light mode",
           "switchToDarkMode": "Switch the interface to dark mode",
           "switchToGerman": "Switch the interface to German",
@@ -139,21 +134,49 @@
           "perShotLabel": "Ensure at least one screenshot per shot",
           "shotTimelineLabel": "Shot Timeline"
         },
-        "exportCsv": {
-          "title": "Export Annotations as CSV",
-          "description": "Export all annotations as a CSV file.",
-          "includeScreenshotsLabel": "Include screenshots",
-          "includeScreenshotsWarning": "Since screenshots can't be bundled into a .csv file, you'll get a .zip file containing the CSV and the screenshots instead."
-        },
-        "exportScreenshots": {
-          "title": "Export Screenshots",
-          "description": "You can either export all screenshots at once or select individual screenshots from the timeline and export only those.",
-          "exportAll": "Export all",
-          "exportIndividually": "Export individually"
-        },
-        "exportMediapkg": {
-          "title": "Export as .mediapkg",
-          "description": "Choose which tracks to include in the exported package."
+        "export": {
+          "title": "Export Data",
+          "tabs": {
+            "tracks": "Annotations",
+            "project": "Full Project"
+          },
+          "tracks": {
+            "description": "Choose the tracks you want to export. Formats that support your selection are enabled on the right.",
+            "selectAll": "Select all",
+            "trackTypes": {
+              "shots": "Shots",
+              "scalar": "Scalar",
+              "screenshots": "Screenshots",
+              "screenshots-manual": "Screenshots, manual"
+            },
+            "disabledReasons": {
+              "noSelection": "Select at least one track first.",
+              "shotsOnly": "Only supports shots tracks, with no other track types selected.",
+              "csvUnsupported": "Requires at least one shots track. Scalar tracks aren't supported (screenshot tracks are fine)."
+            },
+            "formats": {
+              "elan": {
+                "title": "ELAN (.eaf)",
+                "description": "Export the selected shots track(s) as an ELAN annotation file, including free-text and vocabulary tag annotations."
+              },
+              "csv": {
+                "title": "CSV",
+                "description": "Export the selected shots track(s) as a CSV file."
+              },
+              "csvScreenshots": {
+                "title": "CSV with Screenshots",
+                "description": "Export the selected shots track(s) as a CSV file, bundled with the linked screenshots into a .zip archive."
+              },
+              "mediapkg": {
+                "title": "Tracks (.mediapkg)",
+                "description": "Export the selected tracks as a MAVA .mediapkg package, documented in the",
+                "docsLinkLabel": "MAVA exchange spec"
+              }
+            }
+          },
+          "project": {
+            "description": "Export the whole project, including the video reference and all timelines, as a .zip archive that can be opened again in VIAN."
+          }
         },
         "importMediapkg": {
           "title": "Import .mediapkg",

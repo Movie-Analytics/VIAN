@@ -133,46 +133,12 @@
         />
       </v-list-group>
 
-      <v-list-group>
-        <template #activator="{ props }">
-          <v-list-item
-            v-tooltip="{ text: $t('pages.video.drawer.tooltips.exportData'), location: 'left' }"
-            v-bind="props"
-            prepend-icon="mdi-export"
-            :title="$t('pages.video.drawer.exportData')"
-          />
-        </template>
-
-        <v-list-item
-          prepend-icon="mdi-alpha-e-box"
-          :title="$t('pages.video.drawer.exportElan')"
-          @click="exportElan"
-        />
-
-        <v-list-item
-          prepend-icon="mdi-file-delimited"
-          :title="$t('pages.video.drawer.exportCsv')"
-          @click="exportCsvDialog = true"
-        />
-
-        <v-list-item
-          prepend-icon="mdi-image-move"
-          :title="$t('pages.video.drawer.exportScreenshots')"
-          @click="exportScreenshotsDialog = true"
-        />
-
-        <v-list-item
-          prepend-icon="mdi-folder-zip"
-          :title="$t('pages.video.drawer.exportProjectZip')"
-          @click="exportProject"
-        />
-
-        <v-list-item
-          prepend-icon="mdi-package-variant-closed"
-          :title="$t('pages.video.drawer.exportMediapkg')"
-          @click="openExportMediaPkgDialog"
-        />
-      </v-list-group>
+      <v-list-item
+        v-tooltip="{ text: $t('pages.video.drawer.tooltips.exportData'), location: 'left' }"
+        prepend-icon="mdi-export"
+        :title="$t('pages.video.drawer.exportData')"
+        @click="openExportDialog"
+      ></v-list-item>
 
       <v-divider class="my-5"></v-divider>
 
@@ -333,92 +299,170 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="exportCsvDialog" persistent max-width="500" scrollable>
+    <v-dialog v-model="exportDialog" persistent max-width="900" scrollable>
       <v-card>
-        <v-card-title>{{ $t('pages.video.dialogs.exportCsv.title') }}</v-card-title>
+        <v-card-title>{{ $t('pages.video.dialogs.export.title') }}</v-card-title>
 
-        <v-card-text>
-          {{ $t('pages.video.dialogs.exportCsv.description') }}
+        <v-tabs v-model="exportTab" grow>
+          <v-tab value="tracks">{{ $t('pages.video.dialogs.export.tabs.tracks') }}</v-tab>
 
-          <v-checkbox
-            v-model="exportCsvIncludeScreenshots"
-            :label="$t('pages.video.dialogs.exportCsv.includeScreenshotsLabel')"
-          ></v-checkbox>
+          <v-tab value="project">{{ $t('pages.video.dialogs.export.tabs.project') }}</v-tab>
+        </v-tabs>
 
-          <span v-if="exportCsvIncludeScreenshots" class="text-body-2 text-medium-emphasis">
-            {{ $t('pages.video.dialogs.exportCsv.includeScreenshotsWarning') }}
-          </span>
+        <v-divider></v-divider>
+
+        <v-card-text class="pt-5">
+          <v-window v-model="exportTab">
+            <v-window-item value="tracks">
+              <v-row>
+                <v-col cols="5">
+                  <p class="mb-2 text-body-2 text-medium-emphasis">
+                    {{ $t('pages.video.dialogs.export.tracks.description') }}
+                  </p>
+
+                  <v-checkbox
+                    :model-value="allTimelinesSelected"
+                    :indeterminate="someTimelinesSelected"
+                    :label="$t('pages.video.dialogs.export.tracks.selectAll')"
+                    density="compact"
+                    hide-details
+                    class="font-weight-bold"
+                    @click="toggleSelectAllTimelines"
+                  ></v-checkbox>
+
+                  <v-divider class="my-2"></v-divider>
+
+                  <v-checkbox
+                    v-for="timeline in exportableTimelines"
+                    :key="timeline.id"
+                    v-model="exportSelectedTimelineIds"
+                    :label="`${timeline.name} (${$t(
+                      'pages.video.dialogs.export.tracks.trackTypes.' + timeline.type
+                    )})`"
+                    :value="timeline.id"
+                    density="compact"
+                    hide-details
+                  ></v-checkbox>
+                </v-col>
+
+                <v-col cols="auto" class="px-0">
+                  <v-divider vertical></v-divider>
+                </v-col>
+
+                <v-col>
+                  <div class="d-flex flex-column ga-4">
+                    <div>
+                      <p class="font-weight-bold mb-1">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.elan.title') }}
+                      </p>
+
+                      <p class="mb-2 text-body-2 text-medium-emphasis">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.elan.description') }}
+                      </p>
+
+                      <span v-tooltip="elanDisabledReason || false">
+                        <v-btn color="primary" :disabled="!!elanDisabledReason" @click="exportElan">
+                          {{ $t('common.export') }}
+                        </v-btn>
+                      </span>
+                    </div>
+
+                    <div>
+                      <p class="font-weight-bold mb-1">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.csv.title') }}
+                      </p>
+
+                      <p class="mb-2 text-body-2 text-medium-emphasis">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.csv.description') }}
+                      </p>
+
+                      <span v-tooltip="csvDisabledReason || false">
+                        <v-btn
+                          color="primary"
+                          :disabled="!!csvDisabledReason"
+                          @click="exportAnnotationsCsv(false)"
+                        >
+                          {{ $t('common.export') }}
+                        </v-btn>
+                      </span>
+                    </div>
+
+                    <div>
+                      <p class="font-weight-bold mb-1">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.csvScreenshots.title') }}
+                      </p>
+
+                      <p class="mb-2 text-body-2 text-medium-emphasis">
+                        {{
+                          $t('pages.video.dialogs.export.tracks.formats.csvScreenshots.description')
+                        }}
+                      </p>
+
+                      <span v-tooltip="csvDisabledReason || false">
+                        <v-btn
+                          color="primary"
+                          :disabled="!!csvDisabledReason"
+                          @click="exportAnnotationsCsv(true)"
+                        >
+                          {{ $t('common.export') }}
+                        </v-btn>
+                      </span>
+                    </div>
+
+                    <div>
+                      <p class="font-weight-bold mb-1">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.mediapkg.title') }}
+                      </p>
+
+                      <p class="mb-2 text-body-2 text-medium-emphasis">
+                        {{ $t('pages.video.dialogs.export.tracks.formats.mediapkg.description') }}
+                        <a
+                          href="https://github.com/sdsc-ordes/mava-exchange"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {{
+                            $t('pages.video.dialogs.export.tracks.formats.mediapkg.docsLinkLabel')
+                          }}</a
+                        >.
+                      </p>
+
+                      <span v-tooltip="noSelectionDisabledReason || false">
+                        <v-btn
+                          color="primary"
+                          :disabled="!!noSelectionDisabledReason"
+                          @click="exportMediaPkg"
+                        >
+                          {{ $t('common.export') }}
+                        </v-btn>
+                      </span>
+                    </div>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-window-item>
+
+            <v-window-item value="project">
+              <p>{{ $t('pages.video.dialogs.export.project.description') }}</p>
+
+              <v-card-actions class="px-0">
+                <v-spacer></v-spacer>
+
+                <v-btn color="primary" @click="exportProject">
+                  {{ $t('common.export') }}
+                </v-btn>
+              </v-card-actions>
+            </v-window-item>
+          </v-window>
         </v-card-text>
+
+        <v-divider></v-divider>
 
         <v-card-actions>
-          <v-btn color="warning" @click="exportCsvDialog = false">
-            {{ $t('common.cancel') }}
-          </v-btn>
+          <v-spacer></v-spacer>
 
-          <v-btn color="primary" @click="exportAnnotationsCsv">
-            {{ $t('common.export') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="exportScreenshotsDialog" persistent max-width="500" scrollable>
-      <v-card>
-        <v-card-title>{{ $t('pages.video.dialogs.exportScreenshots.title') }}</v-card-title>
-
-        <v-card-text>
-          {{ $t('pages.video.dialogs.exportScreenshots.description') }}
-        </v-card-text>
-
-        <v-card-actions class="flex-wrap">
-          <v-btn color="warning" @click="exportScreenshotsDialog = false">
-            {{ $t('common.cancel') }}
-          </v-btn>
-
-          <v-btn color="primary" @click="exportScreenshots(false)">
-            {{ $t('pages.video.dialogs.exportScreenshots.exportAll') }}
-          </v-btn>
-
-          <v-btn
-            color="secondary"
-            :disabled="exportScreenshotsIndividualDisabled"
-            @click="exportScreenshots(true)"
-          >
-            {{ $t('pages.video.dialogs.exportScreenshots.exportIndividually') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="exportMediaPkgDialog" persistent max-width="500" scrollable>
-      <v-card>
-        <v-card-title>{{ $t('pages.video.dialogs.exportMediapkg.title') }}</v-card-title>
-
-        <v-card-text>
-          {{ $t('pages.video.dialogs.exportMediapkg.description') }}
-
-          <v-checkbox
-            v-for="timeline in mediaPkgExportableTimelines"
-            :key="timeline.id"
-            v-model="exportMediaPkgSelectedIds"
-            :label="timeline.name"
-            :value="timeline.id"
-            density="compact"
-            hide-details
-          ></v-checkbox>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-btn color="warning" @click="exportMediaPkgDialog = false">
-            {{ $t('common.cancel') }}
-          </v-btn>
-
-          <v-btn
-            color="primary"
-            :disabled="exportMediaPkgSelectedIds.length === 0"
-            @click="exportMediaPkg"
-          >
-            {{ $t('common.export') }}
+          <v-btn @click="exportDialog = false">
+            {{ $t('common.close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -505,11 +549,9 @@ export default {
   data: () => ({
     drawerGroupsOpen: [],
     drawerRail: true,
-    exportCsvDialog: false,
-    exportCsvIncludeScreenshots: false,
-    exportMediaPkgDialog: false,
-    exportMediaPkgSelectedIds: [],
-    exportScreenshotsDialog: false,
+    exportDialog: false,
+    exportSelectedTimelineIds: [],
+    exportTab: 'tracks',
     genScreenshotDialog: false,
     importMediaPkgDialog: false,
     importMediaPkgFile: null,
@@ -530,19 +572,51 @@ export default {
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore, useUndoStore),
 
+    allTimelinesSelected() {
+      return (
+        this.exportableTimelines.length > 0 &&
+        this.exportSelectedTimelineIds.length === this.exportableTimelines.length
+      )
+    },
+
+    csvDisabledReason() {
+      if (this.noSelectionDisabledReason) return this.noSelectionDisabledReason
+      const selectedTypes = new Set(
+        this.exportableTimelines
+          .filter((t) => this.exportSelectedTimelineIds.includes(t.id))
+          .map((t) => t.type)
+      )
+      if (!selectedTypes.has('shots') || selectedTypes.has('scalar')) {
+        return this.$t('pages.video.dialogs.export.tracks.disabledReasons.csvUnsupported')
+      }
+      return null
+    },
+
     darkMode() {
       return this.$vuetify.theme.global.name === 'dark'
+    },
+
+    elanDisabledReason() {
+      if (this.noSelectionDisabledReason) return this.noSelectionDisabledReason
+      const selectedTypes = new Set(
+        this.exportableTimelines
+          .filter((t) => this.exportSelectedTimelineIds.includes(t.id))
+          .map((t) => t.type)
+      )
+      if (selectedTypes.size !== 1 || !selectedTypes.has('shots')) {
+        return this.$t('pages.video.dialogs.export.tracks.disabledReasons.shotsOnly')
+      }
+      return null
     },
 
     electron() {
       return IS_ELECTRON
     },
 
-    exportScreenshotsIndividualDisabled() {
-      if (this.tempStore.selectedSegments.size === 0) return true
-      const [shotid, timelineid] = this.tempStore.selectedSegments.entries().next().value
-      const segment = this.undoableStore.getSegmentForId(timelineid, shotid)
-      return !('image' in segment)
+    exportableTimelines() {
+      return this.undoableStore.timelines.filter(
+        (t) => t.type === 'shots' || t.type === 'scalar' || t.type.startsWith('screenshots')
+      )
     },
 
     genScreenshotButtonDisabled() {
@@ -565,10 +639,10 @@ export default {
       return this.undoStore.isUndoable('undoable')
     },
 
-    mediaPkgExportableTimelines() {
-      return this.undoableStore.timelines.filter(
-        (t) => t.type === 'shots' || t.type === 'scalar' || t.type.startsWith('screenshots')
-      )
+    noSelectionDisabledReason() {
+      return this.exportSelectedTimelineIds.length === 0
+        ? this.$t('pages.video.dialogs.export.tracks.disabledReasons.noSelection')
+        : null
     },
 
     // The web backend already scopes jobs to the open project server-side;
@@ -580,6 +654,10 @@ export default {
 
     runningJobs() {
       return this.projectJobs.some((j) => j.status === 'RUNNING')
+    },
+
+    someTimelinesSelected() {
+      return this.exportSelectedTimelineIds.length > 0 && !this.allTimelinesSelected
     }
   },
 
@@ -686,34 +764,28 @@ export default {
   },
 
   methods: {
-    exportAnnotationsCsv() {
-      api.exportAnnotations(this.mainStore.id, this.exportCsvIncludeScreenshots)
-      this.exportCsvDialog = false
+    exportAnnotationsCsv(includeScreenshots) {
+      api.exportAnnotations(
+        this.mainStore.id,
+        includeScreenshots,
+        Array.from(this.exportSelectedTimelineIds)
+      )
+      this.exportDialog = false
     },
 
     exportElan() {
-      exportElanAnnotations()
+      exportElanAnnotations(Array.from(this.exportSelectedTimelineIds))
+      this.exportDialog = false
     },
 
     exportMediaPkg() {
-      api.exportMediaPkg(this.mainStore.id, Array.from(this.exportMediaPkgSelectedIds))
-      this.exportMediaPkgDialog = false
+      api.exportMediaPkg(this.mainStore.id, Array.from(this.exportSelectedTimelineIds))
+      this.exportDialog = false
     },
 
     exportProject() {
       api.exportProject(this.mainStore.id)
-    },
-
-    exportScreenshots(individually) {
-      if (individually) {
-        const frames = Array.from(this.tempStore.selectedSegments).map(
-          ([shotid, timelineid]) => this.undoableStore.getSegmentForId(timelineid, shotid).frame
-        )
-        api.exportScreenshots(this.mainStore.id, frames)
-      } else {
-        api.exportScreenshots(this.mainStore.id, null)
-      }
-      this.exportScreenshotsDialog = false
+      this.exportDialog = false
     },
 
     generateScreenshots() {
@@ -807,9 +879,10 @@ export default {
       this.$refs.vocabularyDialog.show()
     },
 
-    openExportMediaPkgDialog() {
-      this.exportMediaPkgSelectedIds = this.mediaPkgExportableTimelines.map((t) => t.id)
-      this.exportMediaPkgDialog = true
+    openExportDialog() {
+      this.exportSelectedTimelineIds = this.exportableTimelines.map((t) => t.id)
+      this.exportTab = 'tracks'
+      this.exportDialog = true
     },
 
     redo() {
@@ -841,6 +914,12 @@ export default {
 
       this.$vuetify.theme.global.name = nextTheme
       localStorage.setItem('theme', nextTheme)
+    },
+
+    toggleSelectAllTimelines() {
+      this.exportSelectedTimelineIds = this.allTimelinesSelected
+        ? []
+        : this.exportableTimelines.map((t) => t.id)
     },
 
     undo() {

@@ -99,11 +99,6 @@
         "importTibavaWip": "Daten importieren (.tsv)",
         "importMediapkg": ".mediapkg importieren",
         "exportData": "Daten exportieren",
-        "exportElan": "Als ELAN-Annotationen exportieren (.eaf)",
-        "exportCsv": "Annotationen als .csv exportieren",
-        "exportScreenshots": "Screenshots exportieren",
-        "exportProjectZip": "Projekt als .zip exportieren",
-        "exportMediapkg": "Als .mediapkg exportieren",
         "switchToLightMode": "Zum Hellmodus wechseln",
         "switchToDarkMode": "Zum Dunkelmodus wechseln",
         "switchToGerman": "Zu Deutsch wechseln",
@@ -118,7 +113,7 @@
           "generateScreenshots": "Screenshots aus dem Video in festgelegtem Intervall aufnehmen",
           "manageVocabulary": "Vokabulare für strukturierte Annotationen erstellen und bearbeiten",
           "importData": "Annotationen aus externen Dateien importieren",
-          "exportData": "Annotationen in externe Formate exportieren",
+          "exportData": "Daten in externe Formate exportieren",
           "switchToLightMode": "Zur hellen Benutzeroberfläche wechseln",
           "switchToDarkMode": "Zur dunklen Benutzeroberfläche wechseln",
           "switchToGerman": "Benutzeroberfläche auf Deutsch umstellen",
@@ -141,21 +136,49 @@
           "perShotLabel": "Mindestens einen Screenshot pro Shot sicherstellen",
           "shotTimelineLabel": "Shot-Timeline"
         },
-        "exportCsv": {
-          "title": "Annotationen als CSV exportieren",
-          "description": "Exportiere alle Annotationen als CSV-Datei.",
-          "includeScreenshotsLabel": "Screenshots einschließen",
-          "includeScreenshotsWarning": "Da Screenshots nicht in eine .csv-Datei eingebettet werden können, erhältst du stattdessen eine .zip-Datei mit der CSV-Datei und den Screenshots."
-        },
-        "exportScreenshots": {
-          "title": "Screenshots exportieren",
-          "description": "Du kannst entweder alle Screenshots auf einmal exportieren oder sie in einer Timeline einzeln auswählen und nur diese exportieren.",
-          "exportAll": "Alle exportieren",
-          "exportIndividually": "Einzeln exportieren"
-        },
-        "exportMediapkg": {
-          "title": "Als .mediapkg exportieren",
-          "description": "Wähle aus, welche Spuren im exportierten Paket enthalten sein sollen."
+        "export": {
+          "title": "Daten exportieren",
+          "tabs": {
+            "tracks": "Annotationen",
+            "project": "Gesamtes Projekt"
+          },
+          "tracks": {
+            "description": "Wähle die Spuren aus, die du exportieren möchtest. Formate, die deine Auswahl unterstützen, sind rechts aktiviert.",
+            "selectAll": "Alle auswählen",
+            "trackTypes": {
+              "shots": "Shots",
+              "scalar": "Skalar",
+              "screenshots": "Screenshots",
+              "screenshots-manual": "Screenshots, manuell"
+            },
+            "disabledReasons": {
+              "noSelection": "Wähle zuerst mindestens eine Spur aus.",
+              "shotsOnly": "Unterstützt nur Shots-Spuren, es dürfen keine anderen Spurtypen ausgewählt sein.",
+              "csvUnsupported": "Erfordert mindestens eine Shots-Spur. Skalar-Spuren werden nicht unterstützt (Screenshot-Spuren sind kein Problem)."
+            },
+            "formats": {
+              "elan": {
+                "title": "ELAN (.eaf)",
+                "description": "Exportiere die ausgewählte(n) Shots-Spur(en) als ELAN-Annotationsdatei, einschließlich Freitext- und Vokabular-Tag-Annotationen."
+              },
+              "csv": {
+                "title": "CSV",
+                "description": "Exportiere die ausgewählte(n) Shots-Spur(en) als CSV-Datei."
+              },
+              "csvScreenshots": {
+                "title": "CSV mit Screenshots",
+                "description": "Exportiere die ausgewählte(n) Shots-Spur(en) als CSV-Datei, zusammen mit den verknüpften Screenshots in einem .zip-Archiv."
+              },
+              "mediapkg": {
+                "title": "Spuren (.mediapkg)",
+                "description": "Exportiere die ausgewählten Spuren als MAVA-.mediapkg-Paket, dokumentiert in der",
+                "docsLinkLabel": "MAVA-Exchange-Spezifikation"
+              }
+            }
+          },
+          "project": {
+            "description": "Exportiere das gesamte Projekt, einschließlich der Videoreferenz und aller Timelines, als .zip-Archiv, das in VIAN wieder geöffnet werden kann."
+          }
         },
         "importMediapkg": {
           "title": ".mediapkg importieren",
