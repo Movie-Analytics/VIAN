@@ -13,6 +13,7 @@
       @click:outside="overlayInput = false"
     >
       <v-card
+        ref="overlayCard"
         :class="{
           'cursor-grabbing': isDragging
         }"
@@ -576,20 +577,9 @@ export default {
     doubleClickPopup(entry) {
       this.overlayInput = true
       this.$nextTick().then(() => {
-        const rect = this.$refs.canvas.getBoundingClientRect()
-        const x = Math.round(this.transform.rescaleX(this.scale)(entry.x)) + rect.left
-        const maxWidth = 500
-
-        // Stay within viewport horizontally
-        this.overlayPosX = Math.min(Math.max(x, 0), window.innerWidth - maxWidth)
-
-        // Try to position below segment
-        let topPos = entry.y + 46 + rect.top
-        // If it goes off-viewport at bottom, position above segment
-        if (topPos + 300 > window.innerHeight) {
-          topPos = Math.max(0, entry.y + rect.top - 300)
-        }
-        this.overlayPosY = topPos
+        const card = this.$refs.overlayCard.$el
+        this.overlayPosX = (window.innerWidth - card.offsetWidth) / 2
+        this.overlayPosY = (window.innerHeight - card.offsetHeight) / 2
 
         this.overlayInputEntry = this.undoableStore.getSegmentForId(entry.timeline, entry.id)
         this.overlayInputModel = this.overlayInputEntry.annotation
@@ -1559,6 +1549,7 @@ canvas {
 }
 
 .overlay-card {
+  width: 400px;
   min-width: min-content;
   resize: both;
   overflow: hidden;
