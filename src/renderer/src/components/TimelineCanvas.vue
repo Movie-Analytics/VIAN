@@ -365,6 +365,17 @@ export default {
       this.requestDraw()
     },
 
+    'tempStore.selectedSegments': {
+      deep: true,
+
+      handler() {
+        if (this.tempStore.selectedSegments.size !== 1) return
+        const [segmentId, timelineId] = this.tempStore.selectedSegments.entries().next().value
+        const segment = this.undoableStore.getSegmentForId(timelineId, segmentId)
+        if (segment) this.scrollSegmentIntoView(segment)
+      }
+    },
+
     'tempStore.selectedTimelineId'() {
       if (this.tempStore.tmpShot?.ioPending) this.tempStore.tmpShot = null
       this.requestDraw()
@@ -1401,6 +1412,21 @@ export default {
     rgbToHex(r, g, b) {
       // eslint-disable-next-line
       return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toLowerCase()
+    },
+
+    scrollSegmentIntoView(segment) {
+      if (!this.scale) return
+      const margin = 20
+      const rescale = this.transform.rescaleX(this.scale)
+      const leftFrame = rescale.invert(margin)
+      const rightFrame = rescale.invert(this.canvasWidth - margin)
+      const k = this.transform.k
+
+      if (segment.start < leftFrame) {
+        this.applyScrollTransform(this.scale(segment.start) * k - margin, k)
+      } else if (segment.end > rightFrame) {
+        this.applyScrollTransform(this.scale(segment.end) * k - (this.canvasWidth - margin), k)
+      }
     },
 
     setInPoint() {
