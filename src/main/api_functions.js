@@ -271,7 +271,7 @@ export const exportScreenshots = (channel, projectId, frames) => {
   })
 }
 
-export const exportAnnotations = (channel, projectId, includeScreenshots) => {
+export const exportAnnotations = (channel, projectId, includeScreenshots, timelineIds) => {
   const location = dialog.showSaveDialogSync(null, {
     defaultPath: includeScreenshots ? 'annotations.zip' : 'annotations.csv',
     title: 'Select export location'
@@ -279,7 +279,7 @@ export const exportAnnotations = (channel, projectId, includeScreenshots) => {
   if (!location) return
 
   const worker = exportAnnotationsWorker({
-    workerData: { includeScreenshots, location, storePath: getDataPath(projectId) }
+    workerData: { includeScreenshots, location, storePath: getDataPath(projectId), timelineIds }
   })
   const job = jobManager.createWorkerJob(channel, 'export-annotations', worker, projectId)
 

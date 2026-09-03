@@ -168,8 +168,8 @@ ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnot
 ipcMain.on('export-screenshots', (channel, projectId, frames) =>
   exportScreenshots(channel, projectId, frames)
 )
-ipcMain.on('export-annotations', (channel, projectId, includeScreenshots) =>
-  exportAnnotations(channel, projectId, includeScreenshots)
+ipcMain.on('export-annotations', (channel, projectId, includeScreenshots, timelineIds) =>
+  exportAnnotations(channel, projectId, includeScreenshots, timelineIds)
 )
 ipcMain.on('export-project', (channel, projectId) => exportProject(channel, projectId))
 ipcMain.on('export-mediapkg', (channel, projectId, timelineIds) =>

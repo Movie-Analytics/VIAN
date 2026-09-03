@@ -3,7 +3,7 @@ import { buildScalarDataFromSamples } from '../../shared/scalar_timeline'
 import { useMainStore } from '@renderer/stores/main'
 import { useUndoableStore } from '@renderer/stores/undoable'
 
-const generateEAFContent = () => {
+const generateEAFContent = (timelineIds) => {
   let timeorder = '<TIME_ORDER>\n'
   let tiers = ''
   let timeslotid = 1
@@ -11,6 +11,7 @@ const generateEAFContent = () => {
 
   useUndoableStore().timelines.forEach((t) => {
     if (t.type !== 'shots') return
+    if (timelineIds && !timelineIds.includes(t.id)) return
 
     tiers += `<TIER LINGUISTIC_TYPE_REF="default-lt" TIER_ID="${t.name}">\n`
 
@@ -135,8 +136,8 @@ export const parseTsvAnnotations = (content) => {
   return { data, fps, type: 'scalar' }
 }
 
-export const exportElanAnnotations = () => {
-  const blob = new Blob([generateEAFContent()], { type: 'text/eaf' })
+export const exportElanAnnotations = (timelineIds) => {
+  const blob = new Blob([generateEAFContent(timelineIds)], { type: 'text/eaf' })
 
   const url = URL.createObjectURL(blob)
 

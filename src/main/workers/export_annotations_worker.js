@@ -68,8 +68,10 @@ const buildSegmentRow = ({
   return row
 }
 
-const buildCsv = (undoableStore, fps, includeScreenshots, usedScreenshots) => {
-  const shotTimelines = (undoableStore.timelines || []).filter((t) => t.type === 'shots')
+const buildCsv = (undoableStore, fps, includeScreenshots, usedScreenshots, timelineIds) => {
+  const shotTimelines = (undoableStore.timelines || []).filter(
+    (t) => t.type === 'shots' && (!timelineIds || timelineIds.includes(t.id))
+  )
   const { tagInfo, vocabColumns } = buildVocabIndex(undoableStore.vocabularies)
   const screenshots = collectScreenshots(undoableStore)
 
@@ -104,12 +106,12 @@ const buildCsv = (undoableStore, fps, includeScreenshots, usedScreenshots) => {
   return [header, ...rows].map(csvRow).join('')
 }
 
-const exportAnnotations = async (storePath, location, includeScreenshots) => {
+const exportAnnotations = async (storePath, location, includeScreenshots, timelineIds) => {
   const { mainStore, undoableStore } = readVianStore(storePath)
   const { fps } = mainStore
 
   const usedScreenshots = new Map()
-  const csv = '﻿' + buildCsv(undoableStore, fps, includeScreenshots, usedScreenshots)
+  const csv = '﻿' + buildCsv(undoableStore, fps, includeScreenshots, usedScreenshots, timelineIds)
 
   if (!includeScreenshots) {
     const finalLocation = location.endsWith('.csv') ? location : `${location}.csv`
@@ -142,7 +144,12 @@ const exportAnnotations = async (storePath, location, includeScreenshots) => {
 
 console.log('Started annotations export worker')
 
-exportAnnotations(workerData.storePath, workerData.location, workerData.includeScreenshots)
+exportAnnotations(
+  workerData.storePath,
+  workerData.location,
+  workerData.includeScreenshots,
+  workerData.timelineIds
+)
   .then(() => {
     parentPort.postMessage(true)
   })
