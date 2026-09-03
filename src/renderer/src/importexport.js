@@ -8,6 +8,9 @@ const generateEAFContent = (timelineIds) => {
   let tiers = ''
   let timeslotid = 1
   let annotationid = 1
+  let hasTagTier = false
+
+  const vocabById = useUndoableStore().vocabById
 
   useUndoableStore().timelines.forEach((t) => {
     if (t.type !== 'shots') return
@@ -15,13 +18,16 @@ const generateEAFContent = (timelineIds) => {
 
     tiers += `<TIER LINGUISTIC_TYPE_REF="default-lt" TIER_ID="${t.name}">\n`
 
+    const tagAnnotations = []
+
     t.data.forEach((s) => {
       const start = Math.round((s.start / useMainStore().fps) * 1000)
       const end = Math.round((s.end / useMainStore().fps) * 1000)
+      const parentAnnotationId = `a${annotationid}`
 
       tiers += `
         <ANNOTATION>
-            <ALIGNABLE_ANNOTATION ANNOTATION_ID="a${annotationid}"
+            <ALIGNABLE_ANNOTATION ANNOTATION_ID="${parentAnnotationId}"
                 TIME_SLOT_REF1="ts${timeslotid}" TIME_SLOT_REF2="ts${timeslotid + 1}">
                 <ANNOTATION_VALUE>${s.annotation || ''}</ANNOTATION_VALUE>
             </ALIGNABLE_ANNOTATION>
@@ -29,12 +35,35 @@ const generateEAFContent = (timelineIds) => {
       `
       annotationid += 1
 
+      const tagNames = (s.vocabAnnotation || [])
+        .map((tagId) => vocabById.get(tagId)?.name)
+        .filter(Boolean)
+      if (tagNames.length > 0) {
+        tagAnnotations.push({ parentAnnotationId, value: tagNames.join(', ') })
+      }
+
       timeorder += `<TIME_SLOT TIME_SLOT_ID="ts${timeslotid}" TIME_VALUE="${start}"/>\n`
       timeorder += `<TIME_SLOT TIME_SLOT_ID="ts${timeslotid + 1}" TIME_VALUE="${end}"/>\n`
       timeslotid += 2
     })
 
     tiers += '</TIER>\n'
+
+    if (tagAnnotations.length > 0) {
+      hasTagTier = true
+      tiers += `<TIER LINGUISTIC_TYPE_REF="tags-lt" PARENT_REF="${t.name}" TIER_ID="${t.name} Tags">\n`
+      tagAnnotations.forEach(({ parentAnnotationId, value }) => {
+        tiers += `
+          <ANNOTATION>
+              <REF_ANNOTATION ANNOTATION_ID="a${annotationid}" ANNOTATION_REF="${parentAnnotationId}">
+                  <ANNOTATION_VALUE>${value}</ANNOTATION_VALUE>
+              </REF_ANNOTATION>
+          </ANNOTATION>
+        `
+        annotationid += 1
+      })
+      tiers += '</TIER>\n'
+    }
   })
   timeorder += '</TIME_ORDER>\n'
 
@@ -53,6 +82,11 @@ const generateEAFContent = (timelineIds) => {
       ${tiers}
       <LINGUISTIC_TYPE GRAPHIC_REFERENCES="false"
         LINGUISTIC_TYPE_ID="default-lt" TIME_ALIGNABLE="true"/>
+      ${
+        hasTagTier
+          ? '<LINGUISTIC_TYPE CONSTRAINTS="Symbolic_Association" GRAPHIC_REFERENCES="false"\n        LINGUISTIC_TYPE_ID="tags-lt" TIME_ALIGNABLE="false"/>'
+          : ''
+      }
       <CONSTRAINT
         DESCRIPTION="Time subdivision of parent annotation's time interval, no time gaps allowed within this interval" STEREOTYPE="Time_Subdivision"/>
       <CONSTRAINT
