@@ -872,7 +872,7 @@ export default {
     },
 
     openExportDialog() {
-      this.exportSelectedTimelineIds = this.exportableTimelines.map((t) => t.id)
+      this.exportSelectedTimelineIds = []
       this.exportTab = 'tracks'
       this.exportDialog = true
     },
