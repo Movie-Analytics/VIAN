@@ -195,13 +195,12 @@ export default {
     },
 
     async confirmDeleteTag(id) {
-      if (this.undoableStore.hasVocabularyAnnotations(id)) {
-        const confirmed = await this.$refs.confirmDialog.show({
-          text: this.$t('components.vocabularyDialogListItem.deleteWarningText'),
-          title: this.$t('components.vocabularyDialogListItem.deleteWarningTitle')
-        })
-        if (!confirmed) return
-      }
+      const confirmed = await this.$refs.confirmDialog.show({
+        text: this.$t('components.vocabularyDialogListItem.deleteWarningText'),
+        title: this.$t('components.vocabularyDialogListItem.deleteWarningTitle')
+      })
+      if (!confirmed) return
+
       this.deleteTag(id)
     },
 

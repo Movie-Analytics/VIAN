@@ -239,7 +239,7 @@
         "tag": "Tag"
       },
       "deleteWarningTitle": "Diesen Eintrag löschen?",
-      "deleteWarningText": "Dieser Eintrag wird in bestehenden Annotationen verwendet. Beim Löschen gehen diese Annotationen verloren. Dies kann nicht rückgängig gemacht werden."
+      "deleteWarningText": "Beim Löschen dieses Eintrags gehen auch alle Annotationen verloren, die ihn verwenden. Dies kann nicht rückgängig gemacht werden."
     },
 
     "vocabularyDialogListItem": {
@@ -252,7 +252,7 @@
         "deleteItem": "Eintrag löschen"
       },
       "deleteWarningTitle": "Diesen Tag löschen?",
-      "deleteWarningText": "Dieser Tag wird in bestehenden Annotationen verwendet. Beim Löschen gehen diese Annotationen verloren. Dies kann nicht rückgängig gemacht werden."
+      "deleteWarningText": "Beim Löschen dieses Tags gehen auch alle Annotationen verloren, die ihn verwenden. Dies kann nicht rückgängig gemacht werden."
     },
 
     "shotDetail": {

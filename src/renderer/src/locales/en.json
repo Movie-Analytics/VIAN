@@ -237,7 +237,7 @@
         "tag": "Tag"
       },
       "deleteWarningTitle": "Delete this item?",
-      "deleteWarningText": "This item is used in existing annotations. Deleting it will remove those annotations. This cannot be undone."
+      "deleteWarningText": "Deleting this item also removes any annotations that use it. This cannot be undone."
     },
 
     "vocabularyDialogListItem": {
@@ -250,7 +250,7 @@
         "deleteItem": "Delete"
       },
       "deleteWarningTitle": "Delete this tag?",
-      "deleteWarningText": "This tag is used in existing annotations. Deleting it will remove those annotations. This cannot be undone."
+      "deleteWarningText": "Deleting this tag also removes any annotations that use it. This cannot be undone."
     },
 
     "shotDetail": {
