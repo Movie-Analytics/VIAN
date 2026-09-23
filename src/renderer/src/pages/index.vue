@@ -32,6 +32,15 @@
               >
                 {{ $t('pages.index.updateAvailable') }}
               </v-chip>
+
+              <v-icon
+                v-if="vianUpdateCheckFailed && !vianLatestVersion"
+                v-tooltip="{ text: $t('pages.index.updateCheckFailed'), location: 'bottom' }"
+                class="ms-2"
+                size="small"
+              >
+                mdi-cloud-alert-outline
+              </v-icon>
             </div>
           </v-col>
         </v-row>
@@ -205,7 +214,8 @@ export default {
       importZipFile: null,
       projectName: '',
       renameDialog: false,
-      vianLatestVersion: null,
+      vianLatestVersion: localStorage.getItem('vianLatestVersion'),
+      vianUpdateCheckFailed: false,
       vianVersion: APP_VERSION
     }
   },
@@ -252,21 +262,36 @@ export default {
       this.renameDialog = true
     },
 
-    async checkVianUpdate() {
+    async checkVianUpdate(attempt = 1, maxAttempts = 2) {
       try {
-        const r = await fetch('https://api.github.com/repos/Movie-Analytics/VIAN/releases/latest')
-        if (!r.ok) {
-          throw new Error(`HTTP ${r.status} ${r.statusText}`)
-        }
-        const data = await r.json()
-        this.vianLatestVersion = data.tag_name.replace(/^v/u, '')
+        const latest = await this.fetchLatestVianVersion()
+        this.vianLatestVersion = latest
+        this.vianUpdateCheckFailed = false
+        localStorage.setItem('vianLatestVersion', latest)
       } catch (e) {
-        console.warn('Could not fetch latest version', e)
+        console.warn(`Could not fetch latest version (attempt ${attempt}/${maxAttempts})`, e)
+        if (attempt >= maxAttempts) {
+          this.vianUpdateCheckFailed = true
+          return
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 3000)
+        })
+        await this.checkVianUpdate(attempt + 1, maxAttempts)
       }
     },
 
     deleteProject(projectId) {
       this.metaStore.deleteProject(projectId)
+    },
+
+    async fetchLatestVianVersion() {
+      const r = await fetch('https://api.github.com/repos/Movie-Analytics/VIAN/releases/latest')
+      if (!r.ok) {
+        throw new Error(`HTTP ${r.status} ${r.statusText}`)
+      }
+      const data = await r.json()
+      return data.tag_name.replace(/^v/u, '')
     },
 
     importProject() {

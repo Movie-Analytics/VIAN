@@ -45,6 +45,7 @@
     "index": {
       "version": "Version",
       "updateAvailable": "Update verfügbar",
+      "updateCheckFailed": "Update-Prüfung fehlgeschlagen",
       "openVideo": "Video öffnen",
       "importProject": "Projekt importieren",
 

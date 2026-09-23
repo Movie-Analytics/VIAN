@@ -45,6 +45,7 @@
     "index": {
       "version": "Version",
       "updateAvailable": "Update available",
+      "updateCheckFailed": "Could not check for updates",
       "openVideo": "Open video",
       "importProject": "Import project",
       "renameProject": {
