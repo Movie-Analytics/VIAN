@@ -148,7 +148,22 @@
               </v-list>
             </v-menu>
 
-            <p>{{ readableTime }}</p>
+            <v-text-field
+              v-if="editingTime"
+              v-model="timeInput"
+              :error="timeInputInvalid"
+              autofocus
+              density="compact"
+              hide-details
+              single-line
+              variant="outlined"
+              width="150"
+              @blur="editingTime = false"
+              @keydown.enter="jumpToTimeInput"
+              @keydown.esc="editingTime = false"
+            ></v-text-field>
+
+            <p v-else class="cursor-pointer" @dblclick="startTimeEdit">{{ readableTime }}</p>
           </div>
 
           <div class="align-center d-flex">
@@ -270,11 +285,13 @@ export default {
 
   data() {
     return {
+      editingTime: false,
       lastVolume: 100,
       missingVideoDialog: false,
       playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8, 16],
       playingState: false,
-      sliderPosition: 0
+      sliderPosition: 0,
+      timeInput: ''
     }
   },
 
@@ -295,6 +312,10 @@ export default {
 
     readableTime() {
       return this.mainStore.timeReadableSec(this.tempStore.playPosition, true)
+    },
+
+    timeInputInvalid() {
+      return this.parseTimeInput(this.timeInput) === null
     },
 
     volume: {
@@ -410,6 +431,13 @@ export default {
       )
     },
 
+    jumpToTimeInput() {
+      const seconds = this.parseTimeInput(this.timeInput)
+      if (seconds === null) return
+      this.$refs.video.currentTime = Math.min(seconds, this.mainStore.videoDuration)
+      this.editingTime = false
+    },
+
     navigateToNextSegment() {
       const currentTime = Math.ceil(this.$refs.video.currentTime * this.mainStore.fps)
 
@@ -455,6 +483,16 @@ export default {
       }
     },
 
+    parseTimeInput(text) {
+      // HH:MM:SS:FF, or HH:MM:SS without frames
+      const parts = text.trim().split(':')
+      if ((parts.length !== 3 && parts.length !== 4) || !parts.every((x) => /^\d+$/u.test(x))) {
+        return null
+      }
+      const [hours, minutes, seconds, frames = 0] = parts.map(Number)
+      return hours * 3600 + minutes * 60 + seconds + frames / this.mainStore.fps
+    },
+
     pictureInPictureClicked() {
       this.$refs.video.requestPictureInPicture()
     },
@@ -496,6 +534,11 @@ export default {
 
     sliderMoved(value) {
       this.$refs.video.currentTime = value
+    },
+
+    startTimeEdit() {
+      this.timeInput = this.readableTime
+      this.editingTime = true
     },
 
     stopClicked() {
