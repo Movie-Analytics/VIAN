@@ -67,7 +67,7 @@ export const makeUniqueNamer = () => {
   }
 }
 
-// File-safe timecode used to name exported screenshot images, e.g. "00-01-23_45.jpg".
+// File-safe timecode used to name exported screenshot images, e.g. "00_01_23_45.jpg".
 export const screenshotFileName = (frame, fps) => {
   const t = frame / fps
   const hours = Math.floor(t / 3600)
@@ -80,7 +80,7 @@ export const screenshotFileName = (frame, fps) => {
 
   return (
     `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
-      .replaceAll(':', '-')
+      .replaceAll(':', '_')
       .replace(',', '_') + '.jpg'
   )
 }
