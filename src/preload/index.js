@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportMediaPkg: (p, t) => ipcRenderer.send('export-mediapkg', p, t),
   exportProject: (p) => ipcRenderer.send('export-project', p),
   exportScreenshot: (p, s, a) => ipcRenderer.send('export-screenshot', p, s, a),
-  exportScreenshots: (p, f) => ipcRenderer.send('export-screenshots', p, f),
+  exportScreenshots: (p, f, t) => ipcRenderer.send('export-screenshots', p, f, t),
   getVideoInfo: (arg, projectId) => ipcRenderer.invoke('get-video-info', arg, projectId),
   importMediaPkg: (v, m) => ipcRenderer.send('import-mediapkg', v, m),
   importMediaPkgIntoProject: (p, m, t) => ipcRenderer.send('import-mediapkg-into-project', p, m, t),

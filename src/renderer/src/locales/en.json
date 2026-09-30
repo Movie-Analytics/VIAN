@@ -140,6 +140,7 @@
           "title": "Export Data",
           "tabs": {
             "tracks": "Annotations",
+            "screenshots": "Screenshots",
             "project": "Full Project"
           },
           "tracks": {
@@ -175,6 +176,11 @@
                 "docsLinkLabel": "MAVA exchange spec"
               }
             }
+          },
+          "screenshots": {
+            "description": "Choose the screenshot tracks to export as a .zip archive of images.",
+            "none": "This project has no screenshot tracks.",
+            "noSelection": "Select at least one track first."
           },
           "project": {
             "description": "Export the whole project, including the video reference and all timelines, as a .zip archive that can be opened again in VIAN."

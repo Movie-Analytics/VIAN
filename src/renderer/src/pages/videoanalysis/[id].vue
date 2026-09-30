@@ -298,6 +298,8 @@
         <v-tabs v-model="exportTab" grow>
           <v-tab value="tracks">{{ $t('pages.video.dialogs.export.tabs.tracks') }}</v-tab>
 
+          <v-tab value="screenshots">{{ $t('pages.video.dialogs.export.tabs.screenshots') }}</v-tab>
+
           <v-tab value="project">{{ $t('pages.video.dialogs.export.tabs.project') }}</v-tab>
         </v-tabs>
 
@@ -434,6 +436,40 @@
               </v-row>
             </v-window-item>
 
+            <v-window-item value="screenshots">
+              <p class="mb-2 text-body-2 text-medium-emphasis">
+                {{ $t('pages.video.dialogs.export.screenshots.description') }}
+              </p>
+
+              <p v-if="screenshotTimelines.length === 0">
+                {{ $t('pages.video.dialogs.export.screenshots.none') }}
+              </p>
+
+              <v-checkbox
+                v-for="timeline in screenshotTimelines"
+                :key="timeline.id"
+                v-model="screenshotExportTimelineIds"
+                :label="timeline.name"
+                :value="timeline.id"
+                density="compact"
+                hide-details
+              ></v-checkbox>
+
+              <v-card-actions class="px-0">
+                <v-spacer></v-spacer>
+
+                <span v-tooltip="screenshotExportDisabledReason || false">
+                  <v-btn
+                    color="primary"
+                    :disabled="!!screenshotExportDisabledReason"
+                    @click="exportScreenshotsOnly"
+                  >
+                    {{ $t('common.export') }}
+                  </v-btn>
+                </span>
+              </v-card-actions>
+            </v-window-item>
+
             <v-window-item value="project">
               <p>{{ $t('pages.video.dialogs.export.project.description') }}</p>
 
@@ -554,6 +590,7 @@ export default {
     lastImportedMediaPkgTracksJobId: null,
     layout: 'tibava',
     leaveProjectDialog: false,
+    screenshotExportTimelineIds: [],
     screenshotInterval: 10,
     screenshotPerShot: false,
     screenshotShotTimeline: null,
@@ -646,6 +683,16 @@ export default {
 
     runningJobs() {
       return this.projectJobs.some((j) => j.status === 'RUNNING')
+    },
+
+    screenshotExportDisabledReason() {
+      return this.screenshotExportTimelineIds.length === 0
+        ? this.$t('pages.video.dialogs.export.screenshots.noSelection')
+        : null
+    },
+
+    screenshotTimelines() {
+      return this.undoableStore.timelines.filter((t) => t.type.startsWith('screenshots'))
     },
 
     someTimelinesSelected() {
@@ -780,6 +827,11 @@ export default {
       this.exportDialog = false
     },
 
+    exportScreenshotsOnly() {
+      api.exportScreenshots(this.mainStore.id, null, Array.from(this.screenshotExportTimelineIds))
+      this.exportDialog = false
+    },
+
     generateScreenshots() {
       this.genScreenshotDialog = false
       const frames = []
@@ -873,6 +925,7 @@ export default {
 
     openExportDialog() {
       this.exportSelectedTimelineIds = []
+      this.screenshotExportTimelineIds = []
       this.exportTab = 'tracks'
       this.exportDialog = true
     },

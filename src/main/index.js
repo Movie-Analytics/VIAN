@@ -167,8 +167,8 @@ ipcMain.handle('get-video-info', (channel, path, projectId) =>
 ipcMain.on('export-screenshot', (channel, projectId, screenshot, associatedAnnotations) =>
   exportScreenshot(channel, projectId, screenshot, associatedAnnotations)
 )
-ipcMain.on('export-screenshots', (channel, projectId, frames) =>
-  exportScreenshots(channel, projectId, frames)
+ipcMain.on('export-screenshots', (channel, projectId, frames, timelineIds) =>
+  exportScreenshots(channel, projectId, frames, timelineIds)
 )
 ipcMain.on('export-annotations', (channel, projectId, includeScreenshots, timelineIds) =>
   exportAnnotations(channel, projectId, includeScreenshots, timelineIds)

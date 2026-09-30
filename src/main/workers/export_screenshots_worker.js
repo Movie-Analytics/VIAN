@@ -9,7 +9,7 @@ import {
   screenshotTimelineFolder
 } from './annotation_export_helpers'
 
-const exportScreenshots = async (storePath, location, frames) => {
+const exportScreenshots = async (storePath, location, frames, timelineIds) => {
   const tmpPath = fs.mkdtempSync(path.join(os.tmpdir(), 'vian-screenshots-'))
 
   const { mainStore, undoableStore } = readVianStore(storePath)
@@ -17,6 +17,7 @@ const exportScreenshots = async (storePath, location, frames) => {
   let copied = 0
   undoableStore.timelines.forEach((t) => {
     if (!t.type.startsWith('screenshots')) return
+    if (timelineIds && !timelineIds.includes(t.id)) return
     const timelinePath = path.join(tmpPath, screenshotTimelineFolder(t))
     fs.mkdirSync(timelinePath)
     t.data.forEach((s) => {
@@ -48,7 +49,12 @@ const exportScreenshots = async (storePath, location, frames) => {
 
 console.log('Started screenshot export worker')
 
-exportScreenshots(workerData.storePath, workerData.location, workerData.frames)
+exportScreenshots(
+  workerData.storePath,
+  workerData.location,
+  workerData.frames,
+  workerData.timelineIds
+)
   .then(() => {
     parentPort.postMessage(true)
   })

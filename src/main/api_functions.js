@@ -258,7 +258,7 @@ export const exportScreenshot = (channel, projectId, screenshot, associatedAnnot
   })
 }
 
-export const exportScreenshots = (channel, projectId, frames) => {
+export const exportScreenshots = (channel, projectId, frames, timelineIds) => {
   const location = dialog.showSaveDialogSync(null, {
     defaultPath: 'screenshots.zip',
     title: 'Select export location'
@@ -266,7 +266,7 @@ export const exportScreenshots = (channel, projectId, frames) => {
   if (location === '') return
 
   const worker = exportScreenshotsWorker({
-    workerData: { frames, location, storePath: getDataPath(projectId) }
+    workerData: { frames, location, storePath: getDataPath(projectId), timelineIds }
   })
   const job = jobManager.createWorkerJob(channel, 'export-screenshots', worker, projectId)
 

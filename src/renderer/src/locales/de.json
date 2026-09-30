@@ -142,6 +142,7 @@
           "title": "Daten exportieren",
           "tabs": {
             "tracks": "Annotationen",
+            "screenshots": "Screenshots",
             "project": "Gesamtes Projekt"
           },
           "tracks": {
@@ -177,6 +178,11 @@
                 "docsLinkLabel": "MAVA-Exchange-Spezifikation"
               }
             }
+          },
+          "screenshots": {
+            "description": "Wähle die Screenshot-Spuren, die als .zip-Archiv mit Bildern exportiert werden sollen.",
+            "none": "Dieses Projekt hat keine Screenshot-Spuren.",
+            "noSelection": "Wähle zuerst mindestens eine Spur aus."
           },
           "project": {
             "description": "Exportiere das gesamte Projekt, einschließlich der Videoreferenz und aller Timelines, als .zip-Archiv, das in VIAN wieder geöffnet werden kann."
