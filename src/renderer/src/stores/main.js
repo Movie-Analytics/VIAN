@@ -11,10 +11,14 @@ export const useMainStore = defineStore('main', {
     fps: null,
     height: null,
     id: null,
+    inspectorTab: null,
     numFrames: null,
     pixelFormat: null,
+    playbackRate: 1,
     video: null,
     videoDuration: null,
+    videoPosition: 0,
+    volume: 100,
     width: null
   }),
   /* eslint-disable-next-line vue/sort-keys */

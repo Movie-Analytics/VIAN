@@ -272,11 +272,9 @@ export default {
     return {
       lastVolume: 100,
       missingVideoDialog: false,
-      playbackRate: 1,
       playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4, 8, 16],
       playingState: false,
-      sliderPosition: 0,
-      volume: 100
+      sliderPosition: 0
     }
   },
 
@@ -285,8 +283,28 @@ export default {
       return document.pictureInPictureEnabled
     },
 
+    playbackRate: {
+      get() {
+        return this.mainStore.playbackRate
+      },
+
+      set(value) {
+        this.mainStore.playbackRate = value
+      }
+    },
+
     readableTime() {
       return this.mainStore.timeReadableSec(this.tempStore.playPosition, true)
+    },
+
+    volume: {
+      get() {
+        return this.mainStore.volume
+      },
+
+      set(value) {
+        this.mainStore.volume = value
+      }
     },
 
     ...mapStores(useMainStore, useMetaStore, useTempStore, useUndoableStore)
@@ -369,6 +387,12 @@ export default {
 
     durationChange(event) {
       this.mainStore.videoDuration = event.target.duration
+      event.target.playbackRate = this.playbackRate
+      event.target.volume = this.volume / 100
+
+      if (event.target.currentTime === 0 && this.mainStore.videoPosition > 0) {
+        event.target.currentTime = Math.min(this.mainStore.videoPosition, event.target.duration)
+      }
     },
 
     forwardClicked() {
@@ -512,6 +536,15 @@ export default {
     videoTimeUpdate(event) {
       this.tempStore.playPosition = event.target.currentTime
       this.sliderPosition = event.target.currentTime
+
+      // Skip the reset to 0 that happens while a video is (re)loading, and avoid
+      // writing the project store on every tick
+      if (
+        event.target.readyState > 0 &&
+        Math.floor(event.target.currentTime) !== Math.floor(this.mainStore.videoPosition)
+      ) {
+        this.mainStore.videoPosition = event.target.currentTime
+      }
     }
   }
 }

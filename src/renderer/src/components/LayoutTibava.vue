@@ -103,10 +103,6 @@ export default {
   name: 'LayoutTibava',
   components: { ShotDetail, ShotList, SplitterContainer, Timelines, VideoPlayer },
 
-  data: () => ({
-    tab: null
-  }),
-
   computed: {
     ...mapStores(useMainStore, useUndoableStore),
 
@@ -118,6 +114,16 @@ export default {
     duration() {
       if (this.mainStore.numFrames === null) return null
       return this.mainStore.timeReadableFrame(this.mainStore.numFrames)
+    },
+
+    tab: {
+      get() {
+        return this.mainStore.inspectorTab
+      },
+
+      set(value) {
+        this.mainStore.inspectorTab = value
+      }
     },
 
     videoPath() {
