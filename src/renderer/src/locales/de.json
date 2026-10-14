@@ -148,6 +148,12 @@
           "tracks": {
             "description": "Wähle die Spuren aus, die du exportieren möchtest. Formate, die deine Auswahl unterstützen, sind rechts aktiviert.",
             "selectAll": "Alle auswählen",
+            "groups": {
+              "screenshots": "Screenshots",
+              "freeText": "Freitext",
+              "vocabulary": "Vokabular-verknüpft",
+              "scalar": "Skalar"
+            },
             "trackTypes": {
               "shots": "Shots",
               "scalar": "Skalar",

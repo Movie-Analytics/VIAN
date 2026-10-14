@@ -146,6 +146,12 @@
           "tracks": {
             "description": "Choose the tracks you want to export. Formats that support your selection are enabled on the right.",
             "selectAll": "Select all",
+            "groups": {
+              "screenshots": "Screenshots",
+              "freeText": "Free text",
+              "vocabulary": "Vocabulary-linked",
+              "scalar": "Scalar"
+            },
             "trackTypes": {
               "shots": "Shots",
               "scalar": "Scalar",

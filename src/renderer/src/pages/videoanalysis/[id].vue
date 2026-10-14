@@ -326,17 +326,48 @@
 
                   <v-divider class="my-2"></v-divider>
 
-                  <v-checkbox
-                    v-for="timeline in exportableTimelines"
-                    :key="timeline.id"
-                    v-model="exportSelectedTimelineIds"
-                    :label="`${timeline.name} (${$t(
-                      'pages.video.dialogs.export.tracks.trackTypes.' + timeline.type
-                    )})`"
-                    :value="timeline.id"
-                    density="compact"
-                    hide-details
-                  ></v-checkbox>
+                  <div v-for="group in exportTimelineGroups" :key="group.key" class="mb-2">
+                    <div class="align-center d-flex">
+                      <v-btn
+                        :icon="
+                          exportGroupsExpanded[group.key] ? 'mdi-chevron-down' : 'mdi-chevron-right'
+                        "
+                        variant="text"
+                        density="compact"
+                        size="small"
+                        @click="toggleExportGroup(group.key)"
+                      ></v-btn>
+
+                      <span class="font-weight-medium">
+                        {{ $t('pages.video.dialogs.export.tracks.groups.' + group.key) }}
+                      </span>
+
+                      <v-spacer></v-spacer>
+
+                      <v-checkbox
+                        :model-value="isGroupSelected(group)"
+                        :indeterminate="isGroupPartiallySelected(group)"
+                        density="compact"
+                        hide-details
+                        class="flex-0-0"
+                        @click="toggleSelectGroup(group)"
+                      ></v-checkbox>
+                    </div>
+
+                    <div v-show="exportGroupsExpanded[group.key]">
+                      <v-checkbox
+                        v-for="timeline in group.timelines"
+                        :key="timeline.id"
+                        v-model="exportSelectedTimelineIds"
+                        :label="`${timeline.name} (${$t(
+                          'pages.video.dialogs.export.tracks.trackTypes.' + timeline.type
+                        )})`"
+                        :value="timeline.id"
+                        density="compact"
+                        hide-details
+                      ></v-checkbox>
+                    </div>
+                  </div>
                 </v-col>
 
                 <v-col cols="auto" class="px-0">
@@ -578,6 +609,7 @@ export default {
     drawerGroupsOpen: [],
     drawerRail: true,
     exportDialog: false,
+    exportGroupsExpanded: {},
     exportSelectedTimelineIds: [],
     exportTab: 'tracks',
     genScreenshotDialog: false,
@@ -640,6 +672,21 @@ export default {
 
     electron() {
       return IS_ELECTRON
+    },
+
+    exportTimelineGroups() {
+      const isScreenshots = (t) => t.type.startsWith('screenshots')
+      const isVocabulary = (t) => t.type === 'shots' && typeof t.vocabulary === 'string'
+      const groups = [
+        { key: 'screenshots', timelines: this.exportableTimelines.filter(isScreenshots) },
+        {
+          key: 'freeText',
+          timelines: this.exportableTimelines.filter((t) => t.type === 'shots' && !isVocabulary(t))
+        },
+        { key: 'vocabulary', timelines: this.exportableTimelines.filter(isVocabulary) },
+        { key: 'scalar', timelines: this.exportableTimelines.filter((t) => t.type === 'scalar') }
+      ]
+      return groups.filter((g) => g.timelines.length > 0)
     },
 
     exportableTimelines() {
@@ -893,6 +940,15 @@ export default {
       this.undoableStore.importTibava()
     },
 
+    isGroupPartiallySelected(group) {
+      const selected = group.timelines.filter((t) => this.exportSelectedTimelineIds.includes(t.id))
+      return selected.length > 0 && selected.length < group.timelines.length
+    },
+
+    isGroupSelected(group) {
+      return group.timelines.every((t) => this.exportSelectedTimelineIds.includes(t.id))
+    },
+
     leaveProject() {
       this.leaveProjectDialog = false
       this.projectJobs
@@ -961,10 +1017,24 @@ export default {
       localStorage.setItem('theme', nextTheme)
     },
 
+    toggleExportGroup(key) {
+      this.exportGroupsExpanded = {
+        ...this.exportGroupsExpanded,
+        [key]: !this.exportGroupsExpanded[key]
+      }
+    },
+
     toggleSelectAllTimelines() {
       this.exportSelectedTimelineIds = this.allTimelinesSelected
         ? []
         : this.exportableTimelines.map((t) => t.id)
+    },
+
+    toggleSelectGroup(group) {
+      const groupIds = group.timelines.map((t) => t.id)
+      this.exportSelectedTimelineIds = this.isGroupSelected(group)
+        ? this.exportSelectedTimelineIds.filter((id) => !groupIds.includes(id))
+        : [...new Set([...this.exportSelectedTimelineIds, ...groupIds])]
     },
 
     undo() {
