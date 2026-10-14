@@ -48,6 +48,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_report_time;  // Time of last FPS report
 
     std::vector<uint8_t>& ReadNextFrame(std::vector<uint8_t>& out_frame_data);
+    AVFrame* makeSquarePixelFrame(const AVFrame* src);
     int saveFrameAsJpeg(AVPixelFormat pix_fmt, AVFrame* pFrame, const std::string& path);
     int saveFrame(const std::string& directory, int frame);
     static void signalHandler(int signum);

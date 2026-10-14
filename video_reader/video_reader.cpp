@@ -16,6 +16,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+#include <libavutil/mathematics.h>
 }
 
 #include <onnxruntime_cxx_api.h>
@@ -410,23 +411,73 @@ int VideoReader::generateScreenshot(const std::string& directory, int frame_num)
     return -1;
 }
 
+// Container metadata can carry a wrong aspect ratio, so the display aspect is
+// taken from the sample aspect ratio of the decoded frame. Returns a copy of
+// src scaled to square pixels, or nullptr if the frame needs no correction.
+AVFrame* VideoReader::makeSquarePixelFrame(const AVFrame* src) {
+    AVRational sar = src->sample_aspect_ratio;
+    if (sar.num <= 0 || sar.den <= 0 || sar.num == sar.den) {
+        return nullptr;
+    }
+
+    int width = src->width;
+    int height = src->height;
+    if (sar.num > sar.den) {
+        width = static_cast<int>(av_rescale(src->width, sar.num, sar.den));
+    } else {
+        height = static_cast<int>(av_rescale(src->height, sar.den, sar.num));
+    }
+    // Chroma subsampled formats need even dimensions
+    width += width % 2;
+    height += height % 2;
+
+    SwsContext* sws_ctx = sws_getContext(
+        src->width, src->height, static_cast<AVPixelFormat>(src->format),
+        width, height, static_cast<AVPixelFormat>(src->format),
+        SWS_BICUBIC, nullptr, nullptr, nullptr
+    );
+    if (!sws_ctx) {
+        return nullptr;
+    }
+
+    AVFrame* out = av_frame_alloc();
+    out->width = width;
+    out->height = height;
+    out->format = src->format;
+    out->color_range = src->color_range;
+    if (av_frame_get_buffer(out, 0) < 0) {
+        av_frame_free(&out);
+        sws_freeContext(sws_ctx);
+        return nullptr;
+    }
+
+    sws_scale(sws_ctx, src->data, src->linesize, 0, src->height, out->data, out->linesize);
+    sws_freeContext(sws_ctx);
+    return out;
+}
+
 int VideoReader::saveFrame(const std::string& directory, int frame_num) {
     std::ostringstream path;
     path << directory << '/' << std::setw(8) << std::setfill('0') << frame_num << ".jpg";
 
-    if (saveFrameAsJpeg(codec_ctx->pix_fmt, frame, path.str()) < 0) {
+    AVFrame* squared = makeSquarePixelFrame(frame);
+    AVFrame* source = squared ? squared : frame;
+
+    if (saveFrameAsJpeg(codec_ctx->pix_fmt, source, path.str()) < 0) {
+        av_frame_free(&squared);
         return -1;
     }
 
     // Generate a mini thumbnail
     AVPixelFormat scaled_pix_fmt = AV_PIX_FMT_YUV420P;
     SwsContext* sws_ctx = sws_getContext(
-        frame->width, frame->height, static_cast<AVPixelFormat>(frame->format),
+        source->width, source->height, static_cast<AVPixelFormat>(source->format),
         48, 27, scaled_pix_fmt,
         SWS_BICUBIC, nullptr, nullptr, nullptr
     );
 
     if (!sws_ctx) {
+        av_frame_free(&squared);
         return -1;
     }
 
@@ -440,12 +491,13 @@ int VideoReader::saveFrame(const std::string& directory, int frame_num) {
     if (!frame2 || !frame2_buffer) {
         av_free(frame2_buffer);
         av_frame_free(&frame2);
+        av_frame_free(&squared);
         sws_freeContext(sws_ctx);
         return -1;
     }
 
     av_image_fill_arrays(frame2->data, frame2->linesize, frame2_buffer, scaled_pix_fmt, 48, 27, 1);
-    sws_scale(sws_ctx, frame->data, frame->linesize, 0, frame->height, frame2->data, frame2->linesize);
+    sws_scale(sws_ctx, source->data, source->linesize, 0, source->height, frame2->data, frame2->linesize);
     frame2->color_range = AVCOL_RANGE_JPEG;
 
     std::ostringstream path_mini;
@@ -454,6 +506,7 @@ int VideoReader::saveFrame(const std::string& directory, int frame_num) {
 
     av_free(frame2_buffer);
     av_frame_free(&frame2);
+    av_frame_free(&squared);
     sws_freeContext(sws_ctx);
     return 0;
 }
