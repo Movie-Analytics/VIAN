@@ -15,7 +15,8 @@
     "generate": "Generate",
     "close": "Close",
     "ignore": "Ignore",
-    "merge": "Merge"
+    "merge": "Merge",
+    "reportBug": "Report a bug"
   },
 
   "pages": {

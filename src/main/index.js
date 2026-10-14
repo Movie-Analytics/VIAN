@@ -20,6 +20,7 @@ import {
   loadSubtitles,
   logError,
   openVideoDialog,
+  reportBug,
   runScreenshotGeneration,
   runScreenshotsGeneration,
   runShotBoundaryDetection,
@@ -187,6 +188,7 @@ ipcMain.handle('list-mediapkg-tracks', (_event, mediaPkgFile) => listMediaPkgTra
 ipcMain.on('import-mediapkg-into-project', (channel, projectId, mediaPkgFile, trackNames) =>
   importMediaPkgIntoProject(channel, projectId, mediaPkgFile, trackNames)
 )
+ipcMain.on('report-bug', (_event, jobId) => reportBug(jobId))
 ipcMain.on('log-error', (_, msg) => {
   logError(`Renderer Process Error: ${msg}`)
 })

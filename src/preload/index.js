@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUndoAction: (cb) => ipcRenderer.on('undo-action', (c, ...args) => cb(...args)),
   onVideoInfo: (cb) => ipcRenderer.on('video-info', (c, ...args) => cb(...args)),
   openVideo: () => ipcRenderer.invoke('open-video'),
+  reportBug: (jobId) => ipcRenderer.send('report-bug', jobId),
   runScreenshotGeneration: (v, f, i) => ipcRenderer.send('run-screenshot-generation', v, f, i),
   runScreenshotsGeneration: (v, f, i) => ipcRenderer.send('run-screenshots-generation', v, f, i),
   runShotBoundaryDetection: (arg, projectId) =>

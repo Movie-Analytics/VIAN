@@ -36,6 +36,16 @@
           <v-list-item-title>{{ job.type }}</v-list-item-title>
 
           <template #append>
+            <v-btn
+              v-if="electron && job.status === 'ERROR'"
+              v-tooltip="$t('common.reportBug')"
+              icon="mdi-bug-outline"
+              size="small"
+              variant="text"
+              class="me-2"
+              @click="reportBug(job.id)"
+            ></v-btn>
+
             <v-badge :color="statusToColor(job.status)" :content="job.status" inline></v-badge>
           </template>
 
@@ -990,6 +1000,10 @@ export default {
 
     redo() {
       this.undoableStore.redo('undoable')
+    },
+
+    reportBug(jobId) {
+      api.reportBug(jobId)
     },
 
     shotBoundaryDetectionClicked() {

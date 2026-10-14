@@ -1,6 +1,6 @@
 import { parse, stringify } from 'subtitle'
 const { dialog } = require('electron')
-import { app } from 'electron'
+import { app, shell } from 'electron'
 import fs from 'fs'
 import path from 'path'
 
@@ -19,6 +19,8 @@ import screenshotsGenerationWorker from './workers/screenshots_generation_worker
 import shotBoundaryWorker from './workers/shotboundary_worker?nodeWorker'
 import videoInfoWorker from './workers/videoinfo_worker?nodeWorker'
 
+const BUG_REPORT_MAX_ERROR_LENGTH = 3000
+const BUG_REPORT_URL = 'https://github.com/Movie-Analytics/VIAN/issues/new'
 const CANCEL_TIMEOUT_MS = 10000
 const COOPERATIVE_JOB_TYPES = ['shotboundary-detection', 'screenshots-generation']
 const DATA_DIR = 'vian'
@@ -102,6 +104,7 @@ class JobManager {
     worker.on('error', (error) => {
       console.error(`Worker error in ${type}:`, error)
       logError(`Error in worker: ${error.stack || error.message}`)
+      job.error = error.stack || error.message
       this.updateJobStatus(channel, job.id, 'ERROR')
     })
 
@@ -126,6 +129,49 @@ class JobManager {
 
 // exported functions ↓
 export const jobManager = new JobManager()
+
+// Opens a prefilled GitHub issue; the user reviews it before submitting
+const openBugReport = (jobType, videoInfo, error) => {
+  const body = [
+    'Thanks for reporting this. If you can, tell us what you were doing when it happened:',
+    '',
+    '',
+    `Version: ${app.getVersion()}`,
+    `System: ${process.platform} ${process.getSystemVersion()} (${process.arch})`,
+    `Job: ${jobType}`,
+    ...(videoInfo.length ? ['', 'Video:', ...videoInfo] : []),
+    '',
+    'Error:',
+    '```',
+    error.slice(0, BUG_REPORT_MAX_ERROR_LENGTH),
+    '```'
+  ].join('\n')
+  shell.openExternal(`${BUG_REPORT_URL}?body=${encodeURIComponent(body)}`)
+}
+
+const describeVideo = (entries) =>
+  entries.filter(([, value]) => value).map(([name, value]) => `${name}: ${value}`)
+
+export const reportBug = (jobId) => {
+  const job = jobManager.jobs.get(jobId)
+  if (!job) return
+
+  const mainStorePath = getStorePath(job.projectId, 'main')
+  const mainStore = fs.existsSync(mainStorePath)
+    ? JSON.parse(fs.readFileSync(mainStorePath, 'utf8'))
+    : {}
+  const videoInfo = describeVideo([
+    ['container', mainStore.formatName],
+    ['extension', mainStore.video && path.extname(mainStore.video)],
+    ['codec', mainStore.codecName],
+    ['pixel format', mainStore.pixelFormat],
+    ['size', mainStore.width && `${mainStore.width}x${mainStore.height}`],
+    ['fps', mainStore.fps],
+    ['frames', mainStore.numFrames],
+    ['bit rate', mainStore.bitRate]
+  ])
+  openBugReport(job.type, videoInfo, job.error || '')
+}
 
 export const selectFile = (filters) => {
   const result = dialog.showOpenDialogSync({
@@ -231,7 +277,25 @@ export const getVideoInfo = (channel, videoPath, projectId) => {
     worker.on('message', (data) => {
       jobManager.updateJobStatus(channel, job.id, 'DONE')
       if (data.error === 'no-video-track') {
-        dialog.showErrorBox('Unable to open video', 'This file could not be read as a video.')
+        const filePath = videoPath.replace('app://', '')
+        const choice = dialog.showMessageBoxSync({
+          buttons: ['OK', 'Report a bug'],
+          cancelId: 0,
+          defaultId: 0,
+          message: 'This file could not be read as a video.',
+          title: 'Unable to open video',
+          type: 'error'
+        })
+        if (choice === 1) {
+          openBugReport(
+            job.type,
+            describeVideo([
+              ['extension', path.extname(filePath)],
+              ['file size', `${Math.round(fs.statSync(filePath).size / 1e6)} MB`]
+            ]),
+            'The video reader could not open the file as a video.'
+          )
+        }
         resolve(false)
         return
       }

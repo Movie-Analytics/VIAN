@@ -15,7 +15,8 @@
     "rename": "Umbenennen",
     "delete": "Löschen",
     "ignore": "Ignorieren",
-    "merge": "Zusammenführen"
+    "merge": "Zusammenführen",
+    "reportBug": "Fehler melden"
   },
 
   "pages": {
