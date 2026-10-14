@@ -247,7 +247,7 @@ export default {
 .container {
   max-height: calc(90vh - 148px);
   overflow-y: auto;
-  padding: 4px;
+  padding: 0;
 }
 .item {
   margin-top: 8px;
@@ -256,8 +256,8 @@ export default {
 }
 .image {
   object-fit: contain;
-  max-height: 100%;
-  max-width: 100%;
+  width: 100%;
+  max-height: calc(90vh - 148px);
   transition: transform 0.1s ease;
   cursor: zoom-in;
   touch-action: none;
@@ -272,10 +272,8 @@ export default {
 }
 .image-container {
   position: relative;
-  height: 60vh;
-  max-height: 60vh;
-  max-width: 90%;
-  margin: auto;
+  max-width: 100%;
+  margin: 0 auto;
   overflow: hidden;
   display: flex;
   justify-content: center;

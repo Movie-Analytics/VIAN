@@ -6,7 +6,7 @@
 
     <v-sheet v-else-if="selectedTimelineSegment !== null">
       <div v-if="selectedTimelineSegment.image">
-        <v-img :src="selectedTimelineSegment.image" @click="imageClicked" />
+        <v-img :src="selectedTimelineSegment.image" @dblclick="imageClicked" />
       </div>
 
       <div v-else>

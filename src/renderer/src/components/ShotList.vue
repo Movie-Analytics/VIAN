@@ -59,7 +59,7 @@
                 :src="img.image"
                 :style="thumbZoomStyle"
                 loading="lazy"
-                @click="imageClicked(img)"
+                @dblclick="imageClicked(img)"
               />
             </v-row>
           </div>
