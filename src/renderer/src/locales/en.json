@@ -275,7 +275,8 @@
       "selectTrack": "Select Track",
       "screenshotTimeline": "Screenshot Timeline",
       "id": "ID",
-      "annotation": "Annotation"
+      "annotation": "Annotation",
+      "exportScreenshots": "Export selected screenshots"
     },
 
     "imageDialog": {
@@ -343,6 +344,7 @@
       "moveWarning": "Segment cannot be moved here as it would overlap with another segment.",
       "zoomHandle": "Click and drag to zoom",
       "contextMenu": {
+        "exportScreenshots": "Export selected screenshots",
         "addTextAnnotation": "Add text annotation",
         "toggleAnnotation": "Toggle annotation",
         "merge": "Merge selected segments",

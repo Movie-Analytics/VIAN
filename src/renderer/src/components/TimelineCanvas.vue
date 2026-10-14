@@ -73,6 +73,12 @@
         <v-list density="compact" class="pb-0 pt-0">
           <v-list-item :title="contextMenuAnnotateLabel" @click="contextMenuAnnotate" />
 
+          <v-list-item
+            v-if="contextMenuEntry && contextMenuEntry.type === 'screenshot'"
+            :title="$t('components.timelineCanvas.contextMenu.exportScreenshots')"
+            @click="contextMenuExportScreenshots"
+          />
+
           <template v-if="contextMenuEntry && contextMenuEntry.type === 'shot'">
             <v-list-item
               :disabled="!contextMenuMergable"
@@ -537,6 +543,10 @@ export default {
       const segmentIds = Array.from(this.tempStore.selectedSegments.keys())
       this.undoableStore.deleteSegments(timelineId, segmentIds)
       this.tempStore.selectedSegments = new Map()
+    },
+
+    contextMenuExportScreenshots() {
+      this.tempStore.exportSelectedScreenshots(this.mainStore.id)
     },
 
     contextMenuHandler(event) {

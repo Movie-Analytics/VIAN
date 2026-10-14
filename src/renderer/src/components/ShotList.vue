@@ -53,19 +53,35 @@
             </div>
 
             <v-row v-if="screenshotTimeline" justify="start" class="ga-3 mx-3 py-3">
-              <img
+              <div
                 v-for="img in getShotImages(item)"
                 :key="img.id"
-                :src="img.image"
-                :style="thumbZoomStyle"
-                loading="lazy"
-                @dblclick="imageClicked(img)"
-              />
+                class="screenshot"
+                :class="{ 'screenshot-selected': tempStore.selectedSegments.has(img.id) }"
+              >
+                <img
+                  :src="img.image"
+                  :style="thumbZoomStyle"
+                  loading="lazy"
+                  @click="imageClicked($event, img)"
+                  @contextmenu.prevent="imageContextMenu($event, img)"
+                  @dblclick="imageDoubleClicked(img)"
+                />
+              </div>
             </v-row>
           </div>
         </template>
       </v-virtual-scroll>
     </div>
+
+    <v-menu v-model="contextMenuVisible" :target="[contextMenuX, contextMenuY]">
+      <v-list density="compact">
+        <v-list-item
+          :title="$t('components.shotList.exportScreenshots')"
+          @click="tempStore.exportSelectedScreenshots(mainStore.id)"
+        />
+      </v-list>
+    </v-menu>
 
     <ImageDialog ref="imageDialog"></ImageDialog>
   </v-sheet>
@@ -83,6 +99,9 @@ export default {
   components: { ImageDialog },
 
   data: () => ({
+    contextMenuVisible: false,
+    contextMenuX: 0,
+    contextMenuY: 0,
     screenshotTimeline: null,
     shotTimeline: null,
     thumbZoom: 50
@@ -90,6 +109,13 @@ export default {
 
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
+
+    screenshotTimelineData() {
+      const timeline = this.undoableStore.screenshotTimelines.find(
+        (s) => s.id === this.screenshotTimeline
+      )
+      return timeline ? [...timeline.data].sort((a, b) => a.frame - b.frame) : []
+    },
 
     shots() {
       const timeline = this.undoableStore.shotTimelines.find((s) => s.id === this.shotTimeline)
@@ -129,7 +155,42 @@ export default {
         : []
     },
 
-    imageClicked(shot) {
+    imageClicked(event, img) {
+      const selected = this.tempStore.selectedSegments
+      // Only allow selection from the same timeline
+      const sameTimeline =
+        selected.size > 0 && selected.values().next().value === this.screenshotTimeline
+
+      if (event.shiftKey && sameTimeline) {
+        const images = this.screenshotTimelineData
+        const anchorIdx = images.findIndex((i) => i.id === [...selected.keys()].pop())
+        const targetIdx = images.findIndex((i) => i.id === img.id)
+        const from = Math.min(anchorIdx, targetIdx)
+        const to = Math.max(anchorIdx, targetIdx)
+        this.tempStore.selectedSegments = new Map(
+          images.slice(from, to + 1).map((i) => [i.id, this.screenshotTimeline])
+        )
+      } else if ((event.metaKey || event.ctrlKey) && sameTimeline) {
+        if (selected.has(img.id)) {
+          selected.delete(img.id)
+        } else {
+          selected.set(img.id, this.screenshotTimeline)
+        }
+      } else {
+        this.tempStore.selectedSegments = new Map([[img.id, this.screenshotTimeline]])
+      }
+    },
+
+    imageContextMenu(event, img) {
+      if (!this.tempStore.selectedSegments.has(img.id)) {
+        this.tempStore.selectedSegments = new Map([[img.id, this.screenshotTimeline]])
+      }
+      this.contextMenuX = event.clientX
+      this.contextMenuY = event.clientY
+      this.contextMenuVisible = true
+    },
+
+    imageDoubleClicked(shot) {
       this.$refs.imageDialog.show(shot)
     },
 
@@ -147,6 +208,15 @@ export default {
 </script>
 
 <style scoped>
+.screenshot {
+  line-height: 0;
+}
+.screenshot-selected {
+  background-color: #fff59d;
+}
+.screenshot-selected img {
+  opacity: 0.5;
+}
 .shotlist-header-element {
   min-width: 120px;
 }

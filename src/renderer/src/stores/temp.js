@@ -26,6 +26,14 @@ export const useTempStore = defineStore('temp', {
   }),
   /* eslint-disable-next-line vue/sort-keys */
   actions: {
+    exportSelectedScreenshots(projectId) {
+      const undoableStore = useUndoableStore()
+      const timelineId = this.selectedTimelineId
+      const frames = Array.from(this.selectedSegments.keys()).map(
+        (id) => undoableStore.getSegmentForId(timelineId, id).frame
+      )
+      api.exportScreenshots(projectId, frames, [timelineId])
+    },
     initialize() {
       api.onJobsUpdate((data) => {
         this.jobs = data

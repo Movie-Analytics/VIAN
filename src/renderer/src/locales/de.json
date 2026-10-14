@@ -277,7 +277,8 @@
       "selectTrack": "Spur auswählen",
       "screenshotTimeline": "Screenshot-Timeline",
       "id": "ID",
-      "annotation": "Annotation"
+      "annotation": "Annotation",
+      "exportScreenshots": "Ausgewählte Screenshots exportieren"
     },
 
     "imageDialog": {
@@ -345,6 +346,7 @@
       "moveWarning": "Segment kann hier nicht verschoben werden, da es sich mit einem anderen Segment überschneiden würde.",
       "zoomHandle": "Klicken und ziehen zum Zoomen",
       "contextMenu": {
+        "exportScreenshots": "Ausgewählte Screenshots exportieren",
         "addTextAnnotation": "Textannotation hinzufügen",
         "toggleAnnotation": "Annotation umschalten",
         "merge": "Ausgewählte Segmente zusammenführen",
