@@ -40,12 +40,6 @@ VideoReader::~VideoReader() {
     if (frame) {
         av_frame_free(&frame);
     }
-    if (file) {
-      fclose(file);
-    }
-    if (parser) {
-      av_parser_close(parser);
-    }
 }
 
 void VideoReader::signalHandler(int signum) {
@@ -93,19 +87,9 @@ bool VideoReader::Open() {
         return false;
     }
 
-    parser = av_parser_init(codec->id);
-    if (!parser) {
-        return false;
-    }
-
     frame = av_frame_alloc();
     if (!frame) {
       return false;
-    }
-
-    file = fopen(file_path.c_str(), "rb");
-    if (!file) {
-        return false;
     }
     return true;
   }

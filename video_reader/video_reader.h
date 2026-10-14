@@ -39,11 +39,9 @@ private:
     std::string file_path;
     AVFormatContext* format_ctx = nullptr;
     AVCodecContext* codec_ctx = nullptr;
-    AVCodecParserContext *parser = nullptr;
     AVFrame* frame = nullptr;
     int video_stream_index = -1;
     bool finished = false;
-    FILE *file = nullptr;
     static std::atomic<bool> cancelled;
     int64_t frame_counter = 0;  // Counter for processed frames
     const int FPS_REPORT_INTERVAL = 150;  // Report FPS every 150 frames
