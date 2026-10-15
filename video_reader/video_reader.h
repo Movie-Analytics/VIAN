@@ -30,6 +30,7 @@ public:
     std::string getCodecName();
     std::string getPixelFormat();
     std::string getFormatName();
+    std::string getFailureReason() const;
     double getBitRate();
     bool Open();
     static void setCancelled(bool value);
@@ -37,6 +38,7 @@ public:
 
 private:
     std::string file_path;
+    std::string failure_reason;
     AVFormatContext* format_ctx = nullptr;
     AVCodecContext* codec_ctx = nullptr;
     AVFrame* frame = nullptr;
@@ -48,6 +50,8 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_report_time;  // Time of last FPS report
 
     std::vector<uint8_t>& ReadNextFrame(std::vector<uint8_t>& out_frame_data);
+    std::string describeStreams() const;
+    bool fail(const std::string& step, int err = 0);
     AVFrame* makeSquarePixelFrame(const AVFrame* src);
     int saveFrameAsJpeg(AVPixelFormat pix_fmt, AVFrame* pFrame, const std::string& path);
     int saveFrame(const std::string& directory, int frame);

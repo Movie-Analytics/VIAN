@@ -25,6 +25,7 @@ private:
     Napi::Value GetWidth(const Napi::CallbackInfo& info);
     Napi::Value GetCodecName(const Napi::CallbackInfo& info);
     Napi::Value GetPixelFormat(const Napi::CallbackInfo& info);
+    Napi::Value GetFailureReason(const Napi::CallbackInfo& info);
     Napi::Value GetFormatName(const Napi::CallbackInfo& info);
     Napi::Value GetBitRate(const Napi::CallbackInfo& info);
     Napi::Value ReadNextFrame(const Napi::CallbackInfo& info);

@@ -49,13 +49,53 @@ void VideoReader::signalHandler(int signum) {
 }
 
 
+// Lists the streams of the opened file, e.g. "video h264 640x480, audio aac"
+std::string VideoReader::describeStreams() const {
+    std::string out;
+    for (uint32_t i = 0; i < format_ctx->nb_streams; i++) {
+        const AVCodecParameters* par = format_ctx->streams[i]->codecpar;
+        const char* type = av_get_media_type_string(par->codec_type);
+        if (i > 0) {
+            out += ", ";
+        }
+        out += type ? type : "unknown";
+        out += std::string(" ") + avcodec_get_name(par->codec_id);
+        if (par->codec_type == AVMEDIA_TYPE_VIDEO) {
+            out += " " + std::to_string(par->width) + "x" + std::to_string(par->height);
+        }
+    }
+    return out.empty() ? "none" : out;
+}
+
+// Records why Open() failed so the app can show it in a bug report
+bool VideoReader::fail(const std::string& step, int err) {
+    failure_reason = step;
+    if (err < 0) {
+        char buf[AV_ERROR_MAX_STRING_SIZE] = {0};
+        av_strerror(err, buf, sizeof(buf));
+        failure_reason += std::string(": ") + buf;
+    }
+    if (format_ctx) {
+        failure_reason += std::string(" (container: ") +
+            (format_ctx->iformat ? format_ctx->iformat->name : "unknown") +
+            "; streams: " + describeStreams() + ")";
+    }
+    return false;
+}
+
+std::string VideoReader::getFailureReason() const {
+    return failure_reason;
+}
+
 bool VideoReader::Open() {
-    if (avformat_open_input(&format_ctx, file_path.c_str(), nullptr, nullptr) < 0) {
-        return false;
+    int ret = avformat_open_input(&format_ctx, file_path.c_str(), nullptr, nullptr);
+    if (ret < 0) {
+        return fail("could not open the file", ret);
     }
 
-    if (avformat_find_stream_info(format_ctx, nullptr) < 0) {
-        return false;
+    ret = avformat_find_stream_info(format_ctx, nullptr);
+    if (ret < 0) {
+        return fail("could not read the stream information", ret);
     }
 
     for (uint32_t i = 0; i < format_ctx->nb_streams; i++) {
@@ -66,31 +106,33 @@ bool VideoReader::Open() {
     }
 
     if (video_stream_index == -1) {
-        return false;
+        return fail("no video stream found");
     }
 
     AVCodecParameters* codec_params = format_ctx->streams[video_stream_index]->codecpar;
     const AVCodec* codec = avcodec_find_decoder(codec_params->codec_id);
     if (!codec) {
-        return false;
+        return fail(std::string("no decoder available for ") + avcodec_get_name(codec_params->codec_id));
     }
 
     codec_ctx = avcodec_alloc_context3(codec);
     if (!codec_ctx) {
-        return false;
+        return fail("could not allocate the decoder");
     }
 
-    if (avcodec_parameters_to_context(codec_ctx, codec_params) < 0) {
-        return false;
+    ret = avcodec_parameters_to_context(codec_ctx, codec_params);
+    if (ret < 0) {
+        return fail("could not copy the codec parameters", ret);
     }
 
-    if (avcodec_open2(codec_ctx, codec, nullptr) < 0) {
-        return false;
+    ret = avcodec_open2(codec_ctx, codec, nullptr);
+    if (ret < 0) {
+        return fail("could not open the decoder", ret);
     }
 
     frame = av_frame_alloc();
     if (!frame) {
-      return false;
+        return fail("could not allocate a frame");
     }
     return true;
   }

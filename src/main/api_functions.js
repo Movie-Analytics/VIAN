@@ -293,7 +293,7 @@ export const getVideoInfo = (channel, videoPath, projectId) => {
               ['extension', path.extname(filePath)],
               ['file size', `${Math.round(fs.statSync(filePath).size / 1e6)} MB`]
             ]),
-            'The video reader could not open the file as a video.'
+            data.reason || 'The video reader could not open the file as a video.'
           )
         }
         resolve(false)

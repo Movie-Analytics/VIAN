@@ -26,5 +26,5 @@ if (reader.open()) {
     width
   })
 } else {
-  parentPort.postMessage({ error: 'no-video-track' })
+  parentPort.postMessage({ error: 'no-video-track', reason: reader.getFailureReason() })
 }
