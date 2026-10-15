@@ -906,7 +906,9 @@ export default {
             }
             shotI += 1
           }
-          frames.push(frame)
+          if (frame < this.mainStore.numFrames) {
+            frames.push(frame)
+          }
         }
       }
       this.undoableStore.generateScreenshots(frames)
