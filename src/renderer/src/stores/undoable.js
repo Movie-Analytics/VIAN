@@ -247,8 +247,11 @@ export const useUndoableStore = defineStore('undoable', {
     },
     onScreenshotGeneration(data) {
       data.id = crypto.randomUUID()
-      if (this.timelines.find((t) => t.type === 'screenshots-manual')) {
-        this.timelines.find((t) => t.type === 'screenshots-manual').data.push(data)
+      const manualTimeline = this.timelines.find((t) => t.type === 'screenshots-manual')
+      if (manualTimeline) {
+        // The image file is named after the frame, so a repeat is already covered by the entry
+        if (manualTimeline.data.some((s) => s.frame === data.frame)) return
+        manualTimeline.data.push(data)
       } else {
         this.timelines.push({
           data: [data],
