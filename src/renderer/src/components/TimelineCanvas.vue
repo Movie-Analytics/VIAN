@@ -147,6 +147,7 @@ const CATEGORY_HEADER_HEIGHT = 27
 const MIN_SCROLLBAR_THUMB_WIDTH = 20
 const PLAYHEAD_COLOR = '#ff0000'
 const SELECTION_COLOR = '#fff59d'
+const MANUAL_SCREENSHOT_COLOR = '#fbc02d'
 const ZOOM_STEP_FACTOR = 1.2
 
 const truncateText = (ctx, text, maxWidth) => {
@@ -220,6 +221,11 @@ const drawSegment = (
     }
     ctx.drawImage(image, x, d.y, d.width, d.height)
     ctx.globalAlpha = 1.0
+    if (d.manual) {
+      ctx.strokeStyle = MANUAL_SCREENSHOT_COLOR
+      ctx.lineWidth = 2
+      ctx.strokeRect(x + 1, d.y + 1, d.width - 2, d.height - 2)
+    }
     hCtx.fillRect(x, d.y, d.width, d.height)
   } else if (d.type === 'scalar') {
     ctx.beginPath()
@@ -713,6 +719,7 @@ export default {
             data.push({
               height: segmentHeight,
               id: shot.id,
+              manual: shot.manual,
               selected: this.tempStore.selectedSegments.has(shot.id),
               timeline: timeline.id,
               type: 'screenshot',
