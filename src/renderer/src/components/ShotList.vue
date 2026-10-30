@@ -32,10 +32,14 @@
     </v-row>
 
     <div id="virtualscroll-containerx" class="flex-1-1 height-min-0 overflow-y-auto">
-      <v-virtual-scroll v-if="shotTimeline" :items="shots">
+      <v-virtual-scroll v-if="shotTimeline" ref="virtualScroll" :items="shots">
         <template #default="{ item, index }">
-          <div class="pa-3" :class="getEntryBgColor(item)">
-            <div class="cursor-pointer" @click="shotClicked(item)">
+          <div
+            class="cursor-pointer pa-3"
+            :class="getEntryBgColor(item)"
+            @click="shotClicked(item)"
+          >
+            <div>
               <span class="font-weight-bold">
                 {{ $t('components.shotList.id') }} {{ index + 1 }}
               </span>
@@ -63,7 +67,7 @@
                   :src="img.image"
                   :style="thumbZoomStyle"
                   loading="lazy"
-                  @click="imageClicked($event, img)"
+                  @click.stop="imageClicked($event, img)"
                   @contextmenu.prevent="imageContextMenu($event, img)"
                   @dblclick="imageDoubleClicked(img)"
                 />
@@ -110,6 +114,11 @@ export default {
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
 
+    playheadShotIndex() {
+      const framePos = this.tempStore.playPosition * this.mainStore.fps
+      return this.shots.findLastIndex((s) => s.start <= framePos && framePos <= s.end)
+    },
+
     screenshotTimelineData() {
       const timeline = this.undoableStore.screenshotTimelines.find(
         (s) => s.id === this.screenshotTimeline
@@ -130,6 +139,10 @@ export default {
   },
 
   watch: {
+    playheadShotIndex(index) {
+      if (index >= 0) this.$refs.virtualScroll?.scrollToIndex(index)
+    },
+
     'undoableStore.timelines'(newVal) {
       const timelineIds = newVal.map((t) => t.id)
       if (!timelineIds.includes(this.shotTimeline)) this.shotTimeline = null

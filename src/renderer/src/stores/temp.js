@@ -42,6 +42,15 @@ export const useTempStore = defineStore('temp', {
     async login(email, password) {
       return await api.login(email, password)
     },
+    selectSegmentAtFrame(frame) {
+      // Leave multi-selections alone
+      if (this.selectedSegments.size > 1) return
+      const timeline = useUndoableStore().getTimelineById(this.selectedTimelineId)
+      // Adjacent shots can share a boundary frame, prefer the later one
+      const segment = timeline?.data.findLast((s) => s.start <= frame && frame <= s.end)
+      if (!segment || this.selectedSegments.has(segment.id)) return
+      this.selectedSegments = new Map([[segment.id, timeline.id]])
+    },
     async signup(email, password) {
       const response = await api.signup(email, password)
       if (response) {

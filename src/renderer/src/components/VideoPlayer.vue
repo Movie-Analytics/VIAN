@@ -579,6 +579,7 @@ export default {
     videoTimeUpdate(event) {
       this.tempStore.playPosition = event.target.currentTime
       this.sliderPosition = event.target.currentTime
+      this.tempStore.selectSegmentAtFrame(Math.round(event.target.currentTime * this.mainStore.fps))
 
       // Skip the reset to 0 that happens while a video is (re)loading, and avoid
       // writing the project store on every tick
