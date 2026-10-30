@@ -27,7 +27,7 @@
         class="ma-2 shotlist-header-element"
         hide-details
         :min="30"
-        :max="100"
+        :max="200"
       ></v-slider>
     </v-row>
 
