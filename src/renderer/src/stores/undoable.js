@@ -257,6 +257,7 @@ export const useUndoableStore = defineStore('undoable', {
           return
         }
         timeline.data.push(data)
+        timeline.data.sort((a, b) => a.frame - b.frame)
       } else {
         this.timelines.push({
           data: [data],
@@ -270,12 +271,21 @@ export const useUndoableStore = defineStore('undoable', {
       data.forEach((screenshot) => {
         screenshot.id = crypto.randomUUID()
       })
-      this.timelines.push({
-        data,
-        id: crypto.randomUUID(),
-        name: 'Screenshots',
-        type: 'screenshots'
-      })
+      const timeline = this.timelines.find((t) => t.type === 'screenshots')
+      if (timeline) {
+        // Frames already in the track keep their entry, which may be marked as manual
+        const frames = new Set(timeline.data.map((s) => s.frame))
+        timeline.data = [...timeline.data, ...data.filter((s) => !frames.has(s.frame))].sort(
+          (a, b) => a.frame - b.frame
+        )
+      } else {
+        this.timelines.push({
+          data,
+          id: crypto.randomUUID(),
+          name: 'Screenshots',
+          type: 'screenshots'
+        })
+      }
     },
     onShotBoundaryDetection(data) {
       this.timelines.push({
