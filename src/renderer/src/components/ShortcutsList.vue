@@ -42,7 +42,8 @@ export default {
             {
               action: this.$t('components.shortcutsList.playback.nextSegment'),
               key: '↓ / Tab'
-            }
+            },
+            { action: this.$t('components.shortcutsList.playback.screenshot'), key: 's' }
           ],
 
           title: this.$t('components.shortcutsList.groups.playback')

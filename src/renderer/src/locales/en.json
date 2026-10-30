@@ -379,7 +379,8 @@
         "stop": "Stop playback and reset speed",
         "playForward": "Play forward, press repeatedly to increase speed",
         "previousSegment": "Jump to previous segment",
-        "nextSegment": "Jump to next segment"
+        "nextSegment": "Jump to next segment",
+        "screenshot": "Take screenshot"
       },
       "segmentation": {
         "deleteSegment": "Delete selected segment(s)",

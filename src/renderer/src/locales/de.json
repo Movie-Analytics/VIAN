@@ -381,7 +381,8 @@
         "stop": "Wiedergabe stoppen und Geschwindigkeit zurücksetzen",
         "playForward": "Vorwärts abspielen, mehrfach drücken um die Geschwindigkeit zu erhöhen",
         "previousSegment": "Zum vorherigen Segment springen",
-        "nextSegment": "Zum nächsten Segment springen"
+        "nextSegment": "Zum nächsten Segment springen",
+        "screenshot": "Screenshot aufnehmen"
       },
       "segmentation": {
         "deleteSegment": "Ausgewählte(s) Segment(e) löschen",
