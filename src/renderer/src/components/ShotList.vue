@@ -31,8 +31,8 @@
       ></v-slider>
     </v-row>
 
-    <div id="virtualscroll-containerx" class="flex-1-1 height-min-0 overflow-y-auto">
-      <v-virtual-scroll v-if="shotTimeline" ref="virtualScroll" :items="shots">
+    <div id="virtualscroll-containerx" class="flex-1-1 height-min-0">
+      <v-virtual-scroll v-if="shotTimeline" ref="virtualScroll" :items="shots" height="100%">
         <template #default="{ item, index }">
           <div
             class="cursor-pointer pa-3"
