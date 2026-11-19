@@ -147,7 +147,8 @@ const CATEGORY_HEADER_HEIGHT = 27
 const MIN_SCROLLBAR_THUMB_WIDTH = 20
 const PLAYHEAD_COLOR = '#ff0000'
 const SELECTION_COLOR = '#fff59d'
-const MANUAL_SCREENSHOT_COLOR = '#fbc02d'
+const MANUAL_SCREENSHOT_COLOR = '#e53935'
+const MANUAL_SCREENSHOT_MARKER_SIZE = 10
 const ZOOM_STEP_FACTOR = 1.2
 
 const truncateText = (ctx, text, maxWidth) => {
@@ -222,9 +223,14 @@ const drawSegment = (
     ctx.drawImage(image, x, d.y, d.width, d.height)
     ctx.globalAlpha = 1.0
     if (d.manual) {
-      ctx.strokeStyle = MANUAL_SCREENSHOT_COLOR
-      ctx.lineWidth = 2
-      ctx.strokeRect(x + 1, d.y + 1, d.width - 2, d.height - 2)
+      const size = Math.min(MANUAL_SCREENSHOT_MARKER_SIZE, d.width / 2, d.height / 2)
+      ctx.fillStyle = MANUAL_SCREENSHOT_COLOR
+      ctx.beginPath()
+      ctx.moveTo(x, d.y)
+      ctx.lineTo(x + size, d.y)
+      ctx.lineTo(x, d.y + size)
+      ctx.closePath()
+      ctx.fill()
     }
     hCtx.fillRect(x, d.y, d.width, d.height)
   } else if (d.type === 'scalar') {
