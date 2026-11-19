@@ -382,6 +382,7 @@ export default {
       deep: true,
 
       handler() {
+        this.requestDraw()
         if (this.tempStore.selectedSegments.size !== 1) return
         const [segmentId, timelineId] = this.tempStore.selectedSegments.entries().next().value
         const segment = this.undoableStore.getSegmentForId(timelineId, segmentId)

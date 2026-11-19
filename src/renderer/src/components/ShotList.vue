@@ -106,13 +106,23 @@ export default {
     contextMenuVisible: false,
     contextMenuX: 0,
     contextMenuY: 0,
+    highlightedShotId: null,
     screenshotTimeline: null,
+    selectedFromList: false,
     shotTimeline: null,
     thumbZoom: 50
   }),
 
   computed: {
     ...mapStores(useMainStore, useTempStore, useUndoableStore),
+
+    highlightedShot() {
+      // The latest of playhead movement and screenshot selection wins
+      return (
+        this.shots.find((s) => s.id === this.highlightedShotId) ??
+        this.shots[this.playheadShotIndex]
+      )
+    },
 
     playheadShotIndex() {
       const framePos = this.tempStore.playPosition * this.mainStore.fps
@@ -140,7 +150,25 @@ export default {
 
   watch: {
     playheadShotIndex(index) {
-      if (index >= 0) this.$refs.virtualScroll?.scrollToIndex(index)
+      if (index < 0) return
+      this.highlightedShotId = this.shots[index].id
+      this.$refs.virtualScroll?.scrollToIndex(index)
+    },
+
+    'tempStore.selectedSegments': {
+      deep: true,
+
+      handler() {
+        if (this.tempStore.selectedSegments.size !== 1) return
+        const [id] = this.tempStore.selectedSegments.keys()
+        const img = this.screenshotTimelineData.find((i) => i.id === id)
+        if (!img) return
+        const index = this.shots.findIndex((s) => s.start <= img.frame && img.frame < s.end)
+        if (index < 0) return
+        this.highlightedShotId = this.shots[index].id
+        // Selections made by clicking in this list are already visible
+        if (!this.selectedFromList) this.$refs.virtualScroll?.scrollToIndex(index)
+      }
     },
 
     'undoableStore.timelines'(newVal) {
@@ -152,8 +180,7 @@ export default {
 
   methods: {
     getEntryBgColor(shot) {
-      const framePos = this.tempStore.playPosition * this.mainStore.fps
-      if (shot.start <= framePos && framePos <= shot.end) {
+      if (shot.id === this.highlightedShot?.id) {
         return this.$vuetify.theme.global.name === 'dark' ? 'bg-grey-darken-3' : 'bg-grey-lighten-3'
       }
       return ''
@@ -169,6 +196,10 @@ export default {
     },
 
     imageClicked(event, img) {
+      this.selectedFromList = true
+      this.$nextTick().then(() => {
+        this.selectedFromList = false
+      })
       const selected = this.tempStore.selectedSegments
       // Only allow selection from the same timeline
       const sameTimeline =
