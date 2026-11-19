@@ -285,7 +285,9 @@
       "screenshotTimeline": "Screenshot-Timeline",
       "id": "ID",
       "annotation": "Annotation",
-      "exportScreenshots": "Ausgewählte Screenshots exportieren"
+      "exportScreenshots": "Ausgewählte Screenshots exportieren",
+      "link": "Segmentierungsansicht mit Timeline und Video verknüpfen",
+      "unlink": "Segmentierungsansicht von Timeline und Video trennen"
     },
 
     "imageDialog": {

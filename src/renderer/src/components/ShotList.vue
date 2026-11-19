@@ -29,6 +29,19 @@
         :min="30"
         :max="200"
       ></v-slider>
+
+      <v-btn
+        :color="tempStore.segmentationLinked ? 'primary' : null"
+        :icon="tempStore.segmentationLinked ? 'mdi-link' : 'mdi-link-off'"
+        :title="
+          tempStore.segmentationLinked
+            ? $t('components.shotList.unlink')
+            : $t('components.shotList.link')
+        "
+        class="ma-2"
+        variant="text"
+        @click="tempStore.segmentationLinked = !tempStore.segmentationLinked"
+      />
     </v-row>
 
     <div id="virtualscroll-containerx" class="flex-1-1 height-min-0">
@@ -119,7 +132,7 @@ export default {
       // The latest of playhead movement and screenshot selection wins
       return (
         this.shots.find((s) => s.id === this.highlightedShotId) ??
-        this.shots[this.playheadShotIndex]
+        (this.tempStore.segmentationLinked ? this.shots[this.playheadShotIndex] : null)
       )
     },
 
@@ -174,6 +187,7 @@ export default {
 
   methods: {
     focusShot(index) {
+      if (!this.tempStore.segmentationLinked) return
       this.highlightedShotId = this.shots[index].id
       this.$refs.virtualScroll?.scrollToIndex(index)
     },
@@ -239,8 +253,9 @@ export default {
     },
 
     shotClicked(shot) {
+      this.highlightedShotId = shot.id
       this.tempStore.selectedSegments = new Map([[shot.id, this.shotTimeline]])
-      this.jumpPlayer(shot.start)
+      if (this.tempStore.segmentationLinked) this.jumpPlayer(shot.start)
     }
   }
 }

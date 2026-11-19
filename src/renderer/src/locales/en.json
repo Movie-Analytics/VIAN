@@ -283,7 +283,9 @@
       "screenshotTimeline": "Screenshot Timeline",
       "id": "ID",
       "annotation": "Annotation",
-      "exportScreenshots": "Export selected screenshots"
+      "exportScreenshots": "Export selected screenshots",
+      "link": "Link the segmentation view to the timeline and video",
+      "unlink": "Unlink the segmentation view from the timeline and video"
     },
 
     "imageDialog": {

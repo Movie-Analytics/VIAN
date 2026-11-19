@@ -18,6 +18,8 @@ export const useTempStore = defineStore('temp', {
     muted: false,
     playJumpPosition: null,
     playPosition: 0,
+    // Whether the segmentation view follows and drives the timeline and video
+    segmentationLinked: true,
     // Maps shot id -> timeline id
     selectedSegments: new Map(),
     timelinesFold: {},
@@ -44,7 +46,7 @@ export const useTempStore = defineStore('temp', {
     },
     selectSegmentAtFrame(frame) {
       // Leave multi-selections alone
-      if (this.selectedSegments.size > 1) return
+      if (!this.segmentationLinked || this.selectedSegments.size > 1) return
       const timeline = useUndoableStore().getTimelineById(this.selectedTimelineId)
       // Adjacent shots can share a boundary frame, prefer the later one
       const segment = timeline?.data.findLast((s) => s.start <= frame && frame <= s.end)
