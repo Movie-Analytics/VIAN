@@ -108,7 +108,6 @@ export default {
     contextMenuY: 0,
     highlightedShotId: null,
     screenshotTimeline: null,
-    selectedFromList: false,
     shotTimeline: null,
     thumbZoom: 50
   }),
@@ -150,9 +149,7 @@ export default {
 
   watch: {
     playheadShotIndex(index) {
-      if (index < 0) return
-      this.highlightedShotId = this.shots[index].id
-      this.$refs.virtualScroll?.scrollToIndex(index)
+      if (index >= 0) this.focusShot(index)
     },
 
     'tempStore.selectedSegments': {
@@ -164,10 +161,7 @@ export default {
         const img = this.screenshotTimelineData.find((i) => i.id === id)
         if (!img) return
         const index = this.shots.findIndex((s) => s.start <= img.frame && img.frame < s.end)
-        if (index < 0) return
-        this.highlightedShotId = this.shots[index].id
-        // Selections made by clicking in this list are already visible
-        if (!this.selectedFromList) this.$refs.virtualScroll?.scrollToIndex(index)
+        if (index >= 0) this.focusShot(index)
       }
     },
 
@@ -179,6 +173,11 @@ export default {
   },
 
   methods: {
+    focusShot(index) {
+      this.highlightedShotId = this.shots[index].id
+      this.$refs.virtualScroll?.scrollToIndex(index)
+    },
+
     getEntryBgColor(shot) {
       if (shot.id === this.highlightedShot?.id) {
         return this.$vuetify.theme.global.name === 'dark' ? 'bg-grey-darken-3' : 'bg-grey-lighten-3'
@@ -196,10 +195,6 @@ export default {
     },
 
     imageClicked(event, img) {
-      this.selectedFromList = true
-      this.$nextTick().then(() => {
-        this.selectedFromList = false
-      })
       const selected = this.tempStore.selectedSegments
       // Only allow selection from the same timeline
       const sameTimeline =
