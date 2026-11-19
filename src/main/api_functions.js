@@ -323,8 +323,12 @@ export const exportScreenshot = (channel, projectId, screenshot, associatedAnnot
 }
 
 export const exportScreenshots = (channel, projectId, frames, timelineIds) => {
+  const meta = loadStore('meta')
+  const projectName = meta?.projects?.find((p) => p.id === projectId)?.name
+  const defaultName = projectName ? `${path.parse(projectName).name}_screenshots` : 'screenshots'
+
   const location = dialog.showSaveDialogSync(null, {
-    defaultPath: 'screenshots.zip',
+    defaultPath: `${defaultName}.zip`,
     title: 'Select export location'
   })
   if (location === '') return
