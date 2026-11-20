@@ -69,13 +69,16 @@ const importProject = (videoPath, zipPath, dataPath) => {
                 undoableStore.subtitles = 'app://' + path.join(projectPath, 'subtitles.vtt')
               }
 
+              // Stored paths come from the exporting machine, so they may use backslashes
+              // (Windows) or slashes (macOS/Linux). win32.basename splits on both.
+              const screenshotPath = (stored) =>
+                'app://' + path.join(projectPath, 'screenshots', path.win32.basename(stored))
+
               undoableStore.timelines.forEach((t) => {
                 if (t.type.startsWith('screenshot')) {
                   t.data.forEach((d) => {
-                    d.image =
-                      'app://' + path.join(projectPath, 'screenshots', path.basename(d.image))
-                    d.thumbnail =
-                      'app://' + path.join(projectPath, 'screenshots', path.basename(d.thumbnail))
+                    d.image = screenshotPath(d.image)
+                    d.thumbnail = screenshotPath(d.thumbnail)
                   })
                 }
               })
