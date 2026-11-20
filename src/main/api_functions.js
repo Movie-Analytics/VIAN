@@ -24,6 +24,9 @@ const BUG_REPORT_URL = 'https://github.com/Movie-Analytics/VIAN/issues/new'
 const CANCEL_TIMEOUT_MS = 10000
 const COOPERATIVE_JOB_TYPES = ['shotboundary-detection', 'screenshots-generation']
 const DATA_DIR = 'vian'
+// Re-encodes of the same video can differ slightly in length, so allow some slack
+const FPS_TOLERANCE = 0.01
+const FRAME_COUNT_TOLERANCE = 0.01
 
 const getDataPath = (projectId = '') => path.join(app.getPath('userData'), DATA_DIR, projectId)
 
@@ -435,12 +438,60 @@ const reportImportFailure = (zipFile, error) => {
   }
 }
 
+const probeVideo = (videoPath) =>
+  new Promise((resolve, reject) => {
+    const worker = videoInfoWorker({ workerData: videoPath })
+    worker.on('message', resolve)
+    worker.on('error', reject)
+  })
+
+// Returns a description of how the video differs from the project's, or null if they match
+const describeVideoMismatch = (project, video) => {
+  if (video.error) return 'The selected file could not be read as a video.'
+  const fpsDiffers = Math.abs(video.fps - project.fps) > FPS_TOLERANCE
+  const lengthDiffers =
+    Math.abs(video.numFrames - project.numFrames) > project.numFrames * FRAME_COUNT_TOLERANCE
+  if (!fpsDiffers && !lengthDiffers) return null
+  return [
+    `Project: ${project.fps} fps, ${project.numFrames} frames`,
+    `Video: ${video.fps} fps, ${video.numFrames} frames`
+  ].join('\n')
+}
+
+// The import never reads the video, so a wrong one would silently misalign everything
+const confirmVideoMatches = async (projectId, videoFile) => {
+  const project = loadStore('main', projectId)
+  const mismatch = describeVideoMismatch(project, await probeVideo(videoFile))
+  if (!mismatch) return true
+
+  const choice = dialog.showMessageBoxSync({
+    buttons: ['Import anyway', 'Cancel'],
+    cancelId: 1,
+    defaultId: 1,
+    detail: `${mismatch}\n\nAnnotations and screenshots may not line up with this video.`,
+    message: 'The video does not seem to match this project.',
+    title: 'Video mismatch',
+    type: 'warning'
+  })
+  return choice === 0
+}
+
 export const importProject = (channel, videoFile, zipFile) => {
   const dataPath = path.join(app.getPath('userData'), DATA_DIR)
   const worker = importProjectWorker({ workerData: { dataPath, videoFile, zipFile } })
   const job = jobManager.createWorkerJob(channel, 'import-project', worker)
 
-  worker.on('message', (data) => {
+  worker.on('message', async (data) => {
+    const matches = await confirmVideoMatches(data.id, videoFile).catch((error) => {
+      // Not being able to check shouldn't block the import
+      console.error('Video check failed:', error)
+      return true
+    })
+    if (!matches) {
+      fs.rmSync(getDataPath(data.id), { force: true, recursive: true })
+      jobManager.updateJobStatus(channel, job.id, 'CANCELED')
+      return
+    }
     jobManager.updateJobStatus(channel, job.id, 'DONE')
     channel.sender.send('imported-project', data)
   })
