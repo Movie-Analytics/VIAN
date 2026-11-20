@@ -3,6 +3,21 @@ const fs = require('fs')
 const path = require('path')
 const yauzl = require('yauzl')
 
+// Names the step that failed, so the error log says where an import went wrong
+const withContext = (step, err) => {
+  const wrapped = new Error(`Import failed while ${step}: ${err.message}`)
+  wrapped.stack = `${wrapped.message}\n${err.stack}`
+  return wrapped
+}
+
+const inStep = (step, fn) => {
+  try {
+    return fn()
+  } catch (err) {
+    throw withContext(step, err)
+  }
+}
+
 const importProject = (videoPath, zipPath, dataPath) => {
   return new Promise((resolve, reject) => {
     const name = path.basename(zipPath)
@@ -12,8 +27,11 @@ const importProject = (videoPath, zipPath, dataPath) => {
     fs.mkdirSync(projectPath, { recursive: true })
 
     yauzl.open(zipPath, (err, zipfile) => {
-      if (err) reject(err)
-      zipfile.on('error', reject)
+      if (err) {
+        reject(withContext('opening the zip file', err))
+        return
+      }
+      zipfile.on('error', (zipErr) => reject(withContext('reading the zip file', zipErr)))
 
       const extractionPromises = []
 
@@ -28,7 +46,10 @@ const importProject = (videoPath, zipPath, dataPath) => {
           const extractPromise = new Promise((resolveExtract, rejectExtract) => {
             zipfile.openReadStream(entry, (err3, readStream) => {
               console.log('Entry:', entry)
-              if (err3) rejectExtract(err3)
+              if (err3) {
+                rejectExtract(err3)
+                return
+              }
 
               const entryPath = path.join(projectPath, entry.fileName)
               console.log('Entry path:', entryPath)
@@ -46,21 +67,25 @@ const importProject = (videoPath, zipPath, dataPath) => {
             })
           })
 
-          extractionPromises.push(extractPromise)
+          extractionPromises.push(
+            extractPromise.catch((extractErr) => {
+              throw withContext(`extracting ${entry.fileName}`, extractErr)
+            })
+          )
         }
       })
 
       zipfile.on('end', () => {
         Promise.all(extractionPromises)
           .then(() => {
-            try {
-              const mainStore = JSON.parse(
-                fs.readFileSync(path.join(projectPath, 'main.json'), 'utf8')
+            const readJson = (file) =>
+              inStep(`reading ${file}`, () =>
+                JSON.parse(fs.readFileSync(path.join(projectPath, file), 'utf8'))
               )
-              const undoableStore = JSON.parse(
-                fs.readFileSync(path.join(projectPath, 'undoable.json'), 'utf8')
-              )
+            const mainStore = readJson('main.json')
+            const undoableStore = readJson('undoable.json')
 
+            inStep('updating paths in the project data', () => {
               mainStore.video = 'app://' + videoPath
               mainStore.id = id
               undoableStore.id = id
@@ -82,7 +107,9 @@ const importProject = (videoPath, zipPath, dataPath) => {
                   })
                 }
               })
+            })
 
+            inStep('saving the project data', () => {
               fs.writeFileSync(
                 path.join(projectPath, 'main.json'),
                 JSON.stringify(mainStore),
@@ -93,11 +120,9 @@ const importProject = (videoPath, zipPath, dataPath) => {
                 JSON.stringify(undoableStore),
                 'utf8'
               )
+            })
 
-              resolve({ id, name })
-            } catch (storeErr) {
-              reject(storeErr)
-            }
+            resolve({ id, name })
           })
           .catch(reject)
       })

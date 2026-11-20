@@ -397,6 +397,44 @@ export const exportProject = (channel, projectId) => {
   })
 }
 
+// A failed import has no project page to show its error, so offer the log here
+const reportImportFailure = (zipFile, error) => {
+  const details = (error.stack || error.message).replaceAll(app.getPath('home'), '~')
+  const choice = dialog.showMessageBoxSync({
+    buttons: ['OK', 'Save error log', 'Report a bug'],
+    cancelId: 0,
+    defaultId: 0,
+    detail: error.message,
+    message: 'The project could not be imported.',
+    title: 'Import failed',
+    type: 'error'
+  })
+
+  if (choice === 1) {
+    const location = dialog.showSaveDialogSync(null, {
+      defaultPath: 'vian-import-error.log',
+      title: 'Save error log'
+    })
+    if (!location) return
+    const size = fs.statSync(zipFile, { throwIfNoEntry: false })?.size ?? 'unknown'
+    const log = [
+      'VIAN import error log',
+      `Time: ${new Date().toISOString()}`,
+      `Version: ${app.getVersion()}`,
+      `System: ${process.platform} ${process.getSystemVersion()} (${process.arch})`,
+      `Project file: ${path.basename(zipFile)}`,
+      `Project file size: ${size} bytes`,
+      '',
+      'Error:',
+      details,
+      ''
+    ].join('\n')
+    fs.writeFileSync(location, log, 'utf8')
+  } else if (choice === 2) {
+    openBugReport('import-project', [], details)
+  }
+}
+
 export const importProject = (channel, videoFile, zipFile) => {
   const dataPath = path.join(app.getPath('userData'), DATA_DIR)
   const worker = importProjectWorker({ workerData: { dataPath, videoFile, zipFile } })
@@ -406,6 +444,7 @@ export const importProject = (channel, videoFile, zipFile) => {
     jobManager.updateJobStatus(channel, job.id, 'DONE')
     channel.sender.send('imported-project', data)
   })
+  worker.on('error', (error) => reportImportFailure(zipFile, error))
 }
 
 // The mediapkg import worker reports screenshots timelines with placeholder
