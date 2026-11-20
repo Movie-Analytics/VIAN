@@ -63,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
 
   build-mac:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
