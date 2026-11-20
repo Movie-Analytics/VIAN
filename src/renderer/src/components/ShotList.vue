@@ -1,11 +1,13 @@
 <template>
   <v-sheet class="d-flex flex-1-1 flex-column h-100 height-min-0">
-    <v-row class="flex-0-0 ma-1">
+    <div class="align-center d-flex flex-0-0 flex-nowrap ga-2 ma-2">
       <v-select
         v-model="shotTimeline"
         :items="undoableStore.shotTimelines"
         :label="$t('components.shotList.selectTrack')"
-        class="me-2 shotlist-header-element"
+        class="shotlist-select"
+        density="compact"
+        hide-details
         item-title="name"
         item-value="id"
       />
@@ -14,7 +16,9 @@
         v-model="screenshotTimeline"
         :items="undoableStore.screenshotTimelines"
         :label="$t('components.shotList.screenshotTimeline')"
-        class="shotlist-header-element"
+        class="shotlist-select"
+        density="compact"
+        hide-details
         item-title="name"
         item-value="id"
       />
@@ -24,25 +28,27 @@
         :disabled="!screenshotTimeline"
         append-icon="mdi-magnify-plus-outline"
         prepend-icon="mdi-magnify-minus-outline"
-        class="ma-2 shotlist-header-element"
+        class="shotlist-slider"
         hide-details
         :min="30"
         :max="200"
       ></v-slider>
 
       <v-btn
+        v-tooltip="{
+          text: tempStore.segmentationLinked
+            ? $t('components.shotList.unlink')
+            : $t('components.shotList.link'),
+          location: 'bottom'
+        }"
         :color="tempStore.segmentationLinked ? 'primary' : null"
         :icon="tempStore.segmentationLinked ? 'mdi-link' : 'mdi-link-off'"
-        :title="
-          tempStore.segmentationLinked
-            ? $t('components.shotList.unlink')
-            : $t('components.shotList.link')
-        "
-        class="ma-2"
+        class="flex-0-0"
+        size="small"
         variant="text"
         @click="tempStore.segmentationLinked = !tempStore.segmentationLinked"
       />
-    </v-row>
+    </div>
 
     <div id="virtualscroll-containerx" class="flex-1-1 height-min-0">
       <v-virtual-scroll v-if="shotTimeline" ref="virtualScroll" :items="shots" height="100%">
@@ -271,7 +277,12 @@ export default {
 .screenshot-selected img {
   opacity: 0.5;
 }
-.shotlist-header-element {
+.shotlist-select {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.shotlist-slider {
+  flex: 1 1 0;
   min-width: 120px;
 }
 </style>

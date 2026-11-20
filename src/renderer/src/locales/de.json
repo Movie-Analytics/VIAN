@@ -286,8 +286,8 @@
       "id": "ID",
       "annotation": "Annotation",
       "exportScreenshots": "Ausgewählte Screenshots exportieren",
-      "link": "Segmentierungsansicht mit Timeline und Video verknüpfen",
-      "unlink": "Segmentierungsansicht von Timeline und Video trennen"
+      "link": "Diese Segmentierungsansicht mit Timeline und Video verknüpfen",
+      "unlink": "Diese Segmentierungsansicht von Timeline und Video trennen"
     },
 
     "imageDialog": {
